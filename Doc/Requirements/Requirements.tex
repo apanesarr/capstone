@@ -1,0 +1,138 @@
+\documentclass[11pt]{article} 
+\usepackage{geometry}
+\geometry{letterpaper}
+
+\usepackage{graphicx}   
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{framed}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\usepackage{cleveref}
+%\usepackage[autostyle]{csquotes}
+\usepackage[english]{babel}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{cites.bib}
+
+\defbibheading{bibliography}[\refname]{}
+
+\begin{document}
+
+\newcommand{\PROJECTNAME}{HydroSwarm}
+
+\begin{titlepage}
+	\newcommand{\HRule}{\rule{\linewidth}{0.2mm}}
+	\begin{center}
+	\textsc{\LARGE McMaster University}\\[1.5cm]
+	
+	\textsc{\Large \PROJECTNAME}\\[0.5cm]
+	\textsc{\large Software \& Mechatronics Capstone}\\[0.5cm] 
+
+	\HRule\\[0.4cm]
+		{\huge\bfseries Requirements Document}\\[0.4cm]
+	\HRule\\[0.4cm]
+	
+	\begin{minipage}[t][][t]{0.5\textwidth}
+		\begin{flushleft} \large
+			\emph{Authors:}\\
+			Victor Velechovsky \\
+			Amandeep Panesar \\
+			Taha Mian \\
+			Gabriel Potter \\
+			Nishanth Balamohan \\
+		\end{flushleft}
+	\end{minipage}
+	~
+	\begin{minipage}[t][][t]{0.4\textwidth}
+		\begin{flushright} \large
+			\emph{Professor:} \\
+			Dr. Alan Wassyng \\[0.4cm]
+			\emph{Teaching Assistants:} \\
+			Bennett Mackenzie \\ 
+			Nicholas Annable \\ 
+			Stephen Wynn-Williams \\ 
+			Viktor Smirnov
+		\end{flushright}
+	\end{minipage}\\[2cm]
+	
+	\includegraphics[width=0.3\textwidth]{logo.png} \\
+	{\large Last compiled on \today}
+	\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+
+\vfill
+\begin{figure}[htbp]
+   \centering
+   \noindent\begin{tabularx}{\textwidth}{| >{\centering\arraybackslash}m{0.2\textwidth} | >{\centering\arraybackslash}m{0.2\textwidth} | >{\centering\arraybackslash}m{0.2\textwidth} | >{\centering\arraybackslash}m{0.285\textwidth} |}
+   \hline 
+   \textbf{Date} & \textbf{Revision} & \textbf{Comments} & \textbf{Author(s)} \\
+   \hline
+   Oct 28/2018 & 0 & Basic template & Victor Velechovsky\\ \hline
+   \end{tabularx}
+   \caption{Revision History}
+\end{figure}
+
+\newpage
+%THIS DOCUMENT MUST INCLUDE
+%-Scope
+%-Context Diagram showing boundaries---???
+%-Monitored and controller variables (with units)
+%-Constraints
+%-Behavior overview including notation---???
+%-Diagrams showing functional decomposition---???
+%-Required behavior description (keep away from design as much as possible)
+%-Rationale where necessary - includes simulation analysis if you have any
+%-Performance requirements
+%-Normal operation (optional if handled in requirements with undesired event handling)
+%-Undesired event handling(optional if handled in requirements with normal operation) --- ???
+%-List of requirements that are likely to change
+%-List of requirements that are not likely to change ---???
+%-References
+
+\section{Introduction}
+
+There are many applications for carrying out distributed measurements in large bodies of water. Weather tracking, oil spill tracking, and water toxicity measurements are among countless applications for a distributed water measurement platform. Unfortunately, it is both expensive and time consuming to carry out such measurements over large bodies of water. It requires many measurement stations, all placed in discrete locations, in order to provide accurate readings over large areas. We propose a fundamentally different way of approaching this task.
+
+\subsection{Project Overview}
+
+\PROJECTNAME \space is a swarm of autonomous robotic boats meant to carry out measurements over large bodies of water. For our project, these boats will be measuring water temperature, but the idea can be expanded to any number of other quantifiable measurements. Central to our work will be two major components. First, a small motorized boat, attached with a water temperature sensor, as well as a control unit that allows it to communicate with – and be controlled by – a centralized control unit. Second, a software package that can control a large group (‘swarm’) of these boats, with an algorithm focused on producing reliable, accurate, and fast measurements.
+
+Our swarm will aim to cover large areas more quickly and cost-effectively than traditional products. To test the applicability of our project, we will demo it on a small scale body of water, such as a swimming pool, as well as develop a simulation to hypothetically prove the efficacy of the system on a larger scale.
+
+Our project will be conducted between Fall 2017 – Winter 2018 for our Engineering Capstone project at McMaster University, under the guidance of [PROFESSOR]. We have four Software Engineering students, and one Mechatronics Engineering student.
+
+\subsection{Naming Conventions and Terminology}
+
+\label{sec:definitions}
+\begin{itemize}
+\item \textbf{Swarm}: A large group of objects (in our case, the motorized boats) that can communicate and perform acts as a group
+\end{itemize}
+
+\subsection{Relevant Facts and Assumptions}
+
+For demo purposes, our project will be conducted on a small scale. One major assumption is that this project can be effectively expanded to a much larger scale – that of lakes, rivers, or even oceans. There will likely be design challenges involved in a large scale project, but due to the time and resources available to us, we must assume that such challenges could be overcome without compromising its fundamental goals. This assumption carries with it some  implicit ones. Namely, we must assume that a large scale version of our project will be able to withstand the wind, water currents, and otherwise adverse weather conditions of real lakes and oceans. It will need to be able to communicate reliably over much larger distances.
+
+Another assumption we must make is that there are no sensitive lifeforms or other objects that can be harmed by the system, in the near vicinity of the system. An object collision detection algorithm can certainly be implemented, most likely using cameras and computer vision, but due to time constraints, we may not be able to include one.
+
+To simplify the development and testing process, we will assume that weather conditions are as follows:
+
+\begin{itemize}
+    \item Water temperature between $10^o (C)$ and $30^o (C)$
+    \item Air temperature between $10^o (C)$ and $30^o (C)$
+    \item Water waves are at maximum $+- 15mm$ from the baseline
+\end{itemize}
+
+\section{References}
+\printbibliography
+\end{document}
