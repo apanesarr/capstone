@@ -1,0 +1,40 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype polyline
+skinparam nodesep 70
+skinparam ranksep 30
+
+
+actor :Researcher: as researcher
+actor :System administrator: as admin
+rectangle System {
+  (request specific area to be surveyed) as rs
+  (specify time of operation) as so
+  (inspect returned data) as ad
+  (adjust speed of swarm) as ai
+  (Set Constraints if survey) as cs
+  (check progress of survey) as cp
+  (request to end session) as re
+  (end session) as es
+  (deploy swarm) as ds
+  (so) .down.> (ai) : <extends>
+  (rs) .down.> (cs) : <extends>
+  (re) .down.> (es) : <extends>
+
+  ' (rs) .> (payment) : include
+  ' (help) .> (checkout) : extends
+  }
+(researcher) --> (so)
+(researcher) -up-> (rs)  
+(researcher) --> (ad)
+(admin) -up-> (ai)
+(admin) -up-> (cs)
+(admin) -up-> (ds)
+(researcher) --> re
+(admin) --> es
+(researcher) --> cp
+
+
+
+@enduml

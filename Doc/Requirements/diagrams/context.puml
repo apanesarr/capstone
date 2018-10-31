@@ -1,0 +1,40 @@
+@startuml
+
+left to right direction
+skinparam linetype polyline
+skinparam nodesep 70
+skinparam ranksep 30
+
+
+rectangle admin [
+    System Adminstrator 
+]
+rectangle research [
+     Researcher
+] 
+storage sys [
+    HydroSwarm System
+]
+
+
+storage d [
+    Data Collection
+]
+
+storage l [
+    Location
+]
+
+storage m [
+    motor
+]
+
+admin --> sys : adjust parameters
+research --> sys : View Progress
+sys --> l : request location change
+sys --> m : adjust speed
+l --> sys : transmit location
+d -right-> sys : Send data
+research --> admin : request changes in parameters
+sys -left-> research : Visualize data
+@enduml
