@@ -1,0 +1,28 @@
+@startuml
+package "Server" {
+    [Simulation]
+    [Area Coverage Algorithm]
+    [User Interface]
+    [Server Communication Interface]
+}
+
+[Simulation] --> [Area Coverage Algorithm]
+[Area Coverage Algorithm] <--> [Server Communication Interface]
+[User Interface] <--> [Area Coverage Algorithm]
+[Simulation] --> [Server Communication Interface]
+
+package "Client" {
+    [Insect Communication Interface]
+    [Insect Measurement Sensors]
+    [Insect Motor Control]
+    [Insect Tracking/Positioning]
+}
+
+[Insect Communication Interface] --> [Insect Measurement Sensors]
+[Insect Communication Interface] --> [Insect Motor Control]
+[Insect Communication Interface] --> [Insect Tracking/Positioning]
+
+[Server Communication Interface] --> R.F.
+R.F. --> [Insect Communication Interface]
+
+@enduml
