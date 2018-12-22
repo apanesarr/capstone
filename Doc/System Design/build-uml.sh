@@ -1,0 +1,1 @@
+java -jar "/PATH/TO/plantuml.jar" "./FILE-ONE.uml" "./FILE-TWO.uml" "...etc..."
