@@ -1,0 +1,24 @@
+@startuml
+hide empty description
+state "Main Page" as start
+state "Setup Simulation" as sim
+state "Intialize Survey" as run
+state "Start Survey" as select
+state "Progress of Survey" as ps
+state "Display results" as results
+state "Run Simulation" as setup
+state "Display Results" as dr
+[*] -down-> start
+start -left-> sim : Simulation Mode
+sim --> setup : Enter Parameters 
+setup --> dr : Finish Simulation
+dr --> sim : back to simulation page
+sim -right-> start : back to main page
+start -right-> run : Survey Mode
+run --> select : Enter survey parameters
+select --> ps
+ps --> run : end survey
+ps --> results : survey complete
+run -left-> start : back to main page
+results --> run : back
+@enduml
