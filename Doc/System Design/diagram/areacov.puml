@@ -1,0 +1,13 @@
+@startuml
+hide empty description
+state "Configure intial parameters" as config
+state "Calculate Insect Path" as calc
+state "Publish Results" as pub
+[*] -right-> config
+config -right-> Running
+Running -down-> calc : Area has not yet been covered
+calc --> pub
+pub -right-> Wait
+Wait --> Running
+Running -right-> [*] : Area has been completely covered
+@enduml
