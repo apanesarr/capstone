@@ -1,0 +1,12 @@
+@startuml
+:Researcher: as Researcher
+(System Running) as Running
+(End simulation) as EndSim
+(View visual representation of data) as View
+(Save data representation) as Save
+
+Researcher -> Running
+Running -> EndSim
+EndSim <|-- View
+EndSim <|-- Save
+@enduml

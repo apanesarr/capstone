@@ -1,0 +1,11 @@
+@startuml
+:Researcher: as Researcher
+(Wait for area coverage to finish) as Wait
+(View visual respresentation of data) as View
+(Save data representation) as Save
+
+Researcher --> Wait
+
+Wait <|-- View
+Wait <|-- Save
+@enduml

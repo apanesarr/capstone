@@ -1,0 +1,10 @@
+@startuml
+:Researcher: as Researcher
+(Configure Coverage Area) as (Configure)
+(Configure rectangle bounds) as (Config_Bounds)
+(Configure starting point) as (Config_Start)
+
+Researcher --> Configure
+(Config_Bounds) <|-- (Configure)
+(Config_Start) <|-- (Configure)
+@enduml
