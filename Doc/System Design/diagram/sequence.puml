@@ -1,0 +1,31 @@
+@startuml
+actor "Researcher" as User
+participant "User \n Interface" as ui
+participant Simulation
+participant "Area \n Coverage \n Algorithm" as area
+participant "Insect \n tracking" as tracking
+participant "Insect \n Measurement \n Sensors" as sensors
+participant "Server \n Communication \n interface" as servercomm
+participant "Insect \n User \n Communication \n interface" as insectcomm
+
+User -> ui : StartServer()
+activate ui #FFBBBB
+
+ui -> ui : EnterSimulationMode()
+
+ui -> Simulation : SimulationParameters(NumInsects, StartPoint, Size) 
+activate Simulation #FFBBBB
+
+Simulation -> area : getNextPosition(X,Y)
+activate area #FFBBBB
+
+area --> Simulation : return next_position 
+
+deactivate area
+
+Simulation -> ui : DisplaySimulationResults()
+deactivate Simulation
+
+
+
+@enduml
