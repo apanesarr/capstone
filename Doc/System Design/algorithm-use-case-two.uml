@@ -1,8 +1,0 @@
-@startuml
-:Researcher: as Researcher
-(Configure data retreival interval) as Config_Data_Interval
-
-note right of Config_Data_Interval : This is the interval in which data is displayed to the user, NOT the interval in which measurements are made
-
-Researcher --> Config_Data_Interval
-@enduml

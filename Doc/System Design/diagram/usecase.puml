@@ -1,0 +1,104 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype polyline
+skinparam nodesep 70
+skinparam ranksep 30
+
+
+actor :Researcher: as researcher
+
+rectangle "Data Storage" as data{
+  usecase query as "Query data"
+  usecase insert as "Insert data"
+}
+rectangle Simulation{
+  usecase getPath as "Get insect path"
+  usecase getsim as "Get simulation results"
+}
+rectangle "Area Coverage Alogirthm" as area{
+  usecase ins as "store data"
+  usecase qur as "Get data"
+  usecase path as "Insect predicted path"
+  (ins) -down-> (path)
+}
+rectangle "Server Communication Interface" as sci{
+  usecase send as "Send Data"
+  usecase recieve as "Recieve Data"
+  usecase recieveC as "Recieve Confirmation"
+}
+rectangle "Insect Communication Interface" as ici{
+  usecase sendd as "Send Data"
+  usecase confirm as "Send confirmation"
+  usecase parse as "Parse Data"
+  usecase getID as "Get insect ID"
+  usecase rec as "Recieve Data"
+  (confirm) -down-> (parse)
+  (getID) -down-> (sendd)
+  (parse) -down-> (getID)
+}
+rectangle "Insect Measurement Sensor" as ims {
+  usecase getmeasure as "Get Measurement"
+}
+rectangle "Insect Positioning" as ip {
+  usecase getgps as "Get GPS Data"
+}
+rectangle "Insect Motor Control" as imc {
+  usecase course as "Course Change"
+  usecase calc as "Calculate Rudder angle"
+  usecase getvel as "Get Current Velocity"
+}
+rectangle "User interface" as ui {
+  usecase sim as "Enter Simulation mode"
+  usecase survey as "Enter Survey mode"
+  usecase param as "Enter Parameter for Survey"
+  usecase parm as "Enter Parameter for Simulation "
+  usecase stop as "Stop Survey"
+  usecase check as "Check Progress of survey" 
+  usecase results as "Show results"
+  (sim) -down-> (parm)
+  (survey) -down-> (param)  
+}
+
+researcher -down-> sim
+researcher -down-> survey
+researcher -down-> stop
+researcher -down-> check
+researcher -down-> results
+
+
+parm -down-> getPath
+getPath <-down-> path
+path -down-> getsim
+getsim -down-> results
+
+
+check -down-> qur 
+qur -down-> results
+
+
+param -down->ins
+path -up-> send
+send -down-> rec
+rec -down-> confirm
+confirm -down-> recieveC
+recieveC -down-> path
+parse -down-> getmeasure
+parse -down-> getgps
+parse -down-> getvel
+parse -down-> course
+parse -down-> calc
+getmeasure -down-> sendd
+getgps -down-> sendd
+getvel -down-> sendd
+sendd -down-> recieve
+recieve -up-> ins
+
+
+ins -down-> insert
+qur -down-> query
+
+
+
+
+@enduml

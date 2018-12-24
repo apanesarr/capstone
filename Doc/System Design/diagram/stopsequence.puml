@@ -2,27 +2,27 @@
 actor "Researcher" as User
 participant "User \n Interface" as ui
 participant Simulation
+participant "Data \n Storage" as ds
 participant "Area \n Coverage \n Algorithm" as area
 participant "Insect \n tracking" as tracking
 participant "Insect \n Measurement \n Sensors" as sensors
 participant "Server \n Communication \n interface" as servercomm
 participant "Insect \n User \n Communication \n interface" as insectcomm
 participant "Insect \n Motor \n Control" as imc
-participant "Data \n Storage" as ds
-
 
 activate User #FFBBBB
-User -> ui : EnterSimulationMode()
+User -> ui : stop()
 activate ui #FFBBBB
-' ui -> User : askForParameters()
-User -> ui : SimulationParameters(NumInsects, StartPoint, Size) 
-ui -> Simulation : StartSimulation()
-activate Simulation #FFBBBB
-Simulation -> area : getNextPath(NumInsects, StartPoint, Shape)
+deactivate User
+
+ui -> area : returnToBase()
+deactivate ui
 activate area #FFBBBB
-area --> Simulation : return [Path] 
+area -> ds : insert(details)
+activate ds #FFBBBB
+deactivate ds
 deactivate area
-Simulation --> ui : GetSimulationResults()
-deactivate Simulation
-ui -> User : DisplayResults()
+
+
+
 @enduml

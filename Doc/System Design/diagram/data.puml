@@ -1,9 +1,9 @@
 @startuml
-' direction left to right
 hide empty description
 state "Start Simulation" as start
 state "End Simulation" as end
 state "Run Simulation" as run
+' state "Get insect location" as update
 state "Update insect location" as path
 state "Update insect path" as hist
 [*] -right-> start

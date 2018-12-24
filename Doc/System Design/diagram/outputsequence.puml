@@ -10,19 +10,15 @@ participant "Insect \n User \n Communication \n interface" as insectcomm
 participant "Insect \n Motor \n Control" as imc
 participant "Data \n Storage" as ds
 
-
 activate User #FFBBBB
-User -> ui : EnterSimulationMode()
 activate ui #FFBBBB
-' ui -> User : askForParameters()
-User -> ui : SimulationParameters(NumInsects, StartPoint, Size) 
-ui -> Simulation : StartSimulation()
-activate Simulation #FFBBBB
-Simulation -> area : getNextPath(NumInsects, StartPoint, Shape)
-activate area #FFBBBB
-area --> Simulation : return [Path] 
-deactivate area
-Simulation --> ui : GetSimulationResults()
-deactivate Simulation
+User -> ui : ViewResults()
+activate ds #FFBBBB
+ui -> ds : query(survey)
+ds --> ui : return data
+deactivate ds 
 ui -> User : DisplayResults()
+deactivate ui
+
+
 @enduml

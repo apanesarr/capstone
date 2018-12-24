@@ -2,27 +2,35 @@
 actor "Researcher" as User
 participant "User \n Interface" as ui
 participant Simulation
+participant "Data \n Storage" as ds
 participant "Area \n Coverage \n Algorithm" as area
 participant "Insect \n tracking" as tracking
 participant "Insect \n Measurement \n Sensors" as sensors
 participant "Server \n Communication \n interface" as servercomm
 participant "Insect \n User \n Communication \n interface" as insectcomm
 participant "Insect \n Motor \n Control" as imc
-participant "Data \n Storage" as ds
-
 
 activate User #FFBBBB
-User -> ui : EnterSimulationMode()
+User -> ui : ViewProgress()
 activate ui #FFBBBB
-' ui -> User : askForParameters()
-User -> ui : SimulationParameters(NumInsects, StartPoint, Size) 
-ui -> Simulation : StartSimulation()
-activate Simulation #FFBBBB
-Simulation -> area : getNextPath(NumInsects, StartPoint, Shape)
+
+
+ui -> area : getDetails()
 activate area #FFBBBB
-area --> Simulation : return [Path] 
+area -> ds : query(surveyDetails)
+
+activate ds #FFBBBB
+ds --> area : return data
+deactivate ds
+
+area -> area : calcProgress(data)
+
+area --> ui : return results
+
 deactivate area
-Simulation --> ui : GetSimulationResults()
-deactivate Simulation
-ui -> User : DisplayResults()
+
+ui --> User : DisplayResults()
+
+deactivate ui
+deactivate User
 @enduml

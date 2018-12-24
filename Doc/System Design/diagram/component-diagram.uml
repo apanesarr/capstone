@@ -4,11 +4,13 @@ package "Server" {
     [Area Coverage Algorithm]
     [User Interface]
     [Server Communication Interface]
+    [Data Storage]
 }
 
 [Simulation] --> [Area Coverage Algorithm]
 [Area Coverage Algorithm] <--> [Server Communication Interface]
-[User Interface] <--> [Area Coverage Algorithm]
+[Area Coverage Algorithm] <--> [Data Storage]
+[User Interface] <-right-> [Area Coverage Algorithm]
 [Simulation] --> [Server Communication Interface]
 
 package "Client" {
