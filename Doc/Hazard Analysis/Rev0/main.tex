@@ -1,0 +1,250 @@
+\documentclass[11pt]{article}
+\usepackage{geometry}
+\geometry{letterpaper}
+
+% TODO: roadmap
+
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{multicol}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=blue,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+\begin{document}
+
+\begin{titlepage}
+	\newcommand{\HRule}{\rule{\linewidth}{0.2mm}}
+	\begin{center}
+	\textsc{\LARGE McMaster University}\\[1.5cm]
+
+	\textsc{\Large HydroSwarm}\\[0.5cm]
+	\textsc{\large Software \& Mechatronics Capstone}\\[0.5cm]
+
+	\HRule\\[0.4cm]
+		{\huge\bfseries Hazard Analysis}\\[0.4cm]
+	\HRule\\[0.4cm]
+
+	\begin{minipage}[t][][t]{0.5\textwidth}
+		\begin{flushleft} \large
+			\emph{Authors:}\\
+			Victor Velechovsky - \textit{001305263} \\
+			Amandeep Panesar - \textit{001431191} \\ 
+			Nishanth Balamohan - \textit{001411319}\\
+			Gabriel Potter - \textit{001429884}\\
+		\end{flushleft}
+	\end{minipage}
+	~
+	\begin{minipage}[t][][t]{0.4\textwidth}
+		\begin{flushright} \large
+			\emph{Professor:} \\
+			Dr. Alan Wassyng \\[0.4cm]
+			\emph{Teaching Assistants:} \\
+		\end{flushright}
+	\end{minipage}\\[2cm]
+
+	\includegraphics[width=0.3\textwidth]{logo.png} \\
+	{\large Last compiled on \today}
+	\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+
+\vfill
+\begin{figure}[H]
+   \centering
+   \noindent\begin{tabularx}{\textwidth}{| >{\centering\arraybackslash}m{0.2\textwidth} | >{\centering\arraybackslash}m{0.2\textwidth} | >{\centering\arraybackslash}m{0.2\textwidth} | >{\centering\arraybackslash}m{0.285\textwidth} |}
+   \hline
+   \textbf{Date} & \textbf{Revision} & \textbf{Comments} & \textbf{Author(s)} \\ \hline
+   Jan 18, 2017 & 1.0 & All content added & All Authors \\hline
+   \end{tabularx}
+   \caption{Revision History}
+\end{figure}
+\newpage
+\section{Introduction}
+
+\subsection{Project Overview}
+HydroSwarm is a swarm of autonomous robotic boats meant to carry out measurements over large bodies of water. For our project, these boats will be measuring water temperature, but the idea can be expanded to any number of other quantifiable measurements. Central to our work will be two major components. First, a small motorized boat, attached with a water temperature sensor, as well as a control unit that allows it to communicate with and be controlled by a centralized control unit. Second, a software package that can control a large group (\hyperref[sec:definitions]{swarm}) of these boats, with an algorithm focused on producing reliable, accurate, and fast measurements.\\
+
+Our swarm will aim to cover large areas more quickly and cost-effectively than traditional products. To test the applicability of our project, we will demo it on a small scale body of water, such as a swimming pool, as well as develop a simulation to hypothetically prove the efficacy of the system on a larger scale.\\
+
+Our project will be conducted between Fall 2018 –- Winter 2019 for our Engineering Capstone project at McMaster University, under the guidance of Dr. Alan Wassyng. We have four Software Engineering students, and one Mechatronics Engineering student. \\ \\
+
+\subsection{Document Overview}
+
+This document is intended to be a comprehensive guide to potential hazards that can occur during the
+development or use of HydroSwarm. Although it attempts to be as comprehensive as possible, there
+remains a possibility of other hazards emerging that we did not predict.
+
+Each hazard will contain: a description, a fault tree, and a mitigation plan. This will all discussed
+within the system boundary, which is defined in the section \textit{Scope & Boundary}.
+ 
+\subsection{Naming Conventions and Terminology}
+\label{sec:definitions}
+The following terms and definitions will be used throughout this document:
+\begin{itemize}
+% Alphabetical order is highly preferred as it eases user navigation
+\item \textbf{System}: The entire software and hardware package - including the boats,
+boat hardware, control software, and server running the control software
+\item \textbf{Swarm}: A large group of objects (in our case, motorized boats) that can communicate and perform acts as a group
+\item \textbf{Insect}: A member of the swarm (in our case, a single motorized boat)
+\item \textbf{Simulation}: The simulation will be used for demo purposes, mainly to show that
+the system is valid with a large number of insects.
+\item \textbf{Researcher}: A user that is interested in the data that is returned from the survey.
+\item \textbf{System Administrator}: A user that controls the parameters of the \hyperref[sec:definitions]{\textbf{swarm}}.
+\item \textbf{G.P.S.}: Global Positioning System
+\item \textbf{Coverage area}: The area in which the insects are confined. This defines that space that the user wants to track and measure.
+\item \textbf{API}: Application Programming Interface
+\end{itemize}
+
+\section{System}
+\subsection{High-Level Design}
+
+HydroSwarm contains both hardware components and software components, which can be categorized as
+server components or insect components. Each insect will have an R.C. boat (equipped with a motor,
+location tracking sensors, and measurement sensors), an RF communication device, and a micro-controller
+that functions as the 'brain'.
+
+The server will have a communication protocol, an algorithm to determine where to move each insect,
+a data storage component to store measurement data, and a G.U.I. to interact with the user.
+
+The design of the system is covered in detail in the \textit{System Design} document.
+
+\subsection{Financial Losses}
+\subsubsection*{Description}
+Financial losses could occur either when an insect is damaged or lost, or when an insect causes
+damage to the outside world. \\
+
+A major source for insect damage would be water damage. Although the electrical components will be
+housed inside the boat, adverse conditions could certainly be problematic.
+
+If an insect collides with another insect, or with something in the external world, damage could be
+caused to either the insect(s) or the external world.
+\subsubsection*{Mitigation Plan}
+\textit{Clear Coverage Area}: HydroSwarm should only be used in a body of water that has no
+lifeforms or other fragile objects, to minimize the risk of collisions. This includes, for example,
+small branches floating in the water, which could cause problems for the movement of insects.
+Ensuring a clear coverage area prior to use is recommended to minimize the risk of collision.
+
+\textit{Double Check the Coverage Area}: It is important for the proper functionality of HydroSwarm
+that the coverage area is defined accurately, otherwise insects could travel out of bounds,
+collide with other insects, or provide measurements that aren't spatially accurate. Ensuring
+that the coverage area is properly defined will mitigate such errors.
+
+\textit{Limit Movement Speed}: The maximum speed of the boats can be limited by limiting the voltage
+sent to the motors, which could lessen the severity of collisions if they do happen. For development
+purposes, velocities of the insects will be limited to 1 m/s.
+
+\subsubsection*{Fault Tree}
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Diagrams/Fault Tree - Financial Loss.png} % requires the graphicx package
+   \caption{Fault Analysis Tree for \textit{Financial Loss}}
+   \label{fig:ft-Air}
+\end{figure}
+
+\subsection{Misinformed Policy Decisions}
+\subsubsection*{Description}
+HydroSwarm's measurement data can be used by experts in various fields of study, to inform
+policy decisions in the corporate, academic, or political spheres. This, of course, relies on
+the assumption of accurate data, so an 'invisible' malfunction in HydroSwarm could lead to
+misinformed decision making.
+\subsubsection*{Mitigation Plan}
+\textit{Cross reference results with a physical model.} In some situations it is possible to
+approximate the results of HydroSwarm using a physical model. If there is a large discrepency
+between the model and swarm, then further investigation is required to ensure the accuracy of
+HydroSwarm.
+
+\textit{Cross reference results with a second measurement source.} When available, cross referencing
+HydroSwarm with another water temperature measuring device is extremely helpful in validating
+the accuracy of the system.
+
+\textit{Routinely test the system in known conditions.} If the user has available a body of water
+with a known temperature map, the system should be routinely tested in it to validate the
+accuracy of the measurement device. Note that both the temperature measurements and the locations
+of these measurements should be validated, not simply the temperature measurements themselves.
+\subsubsection*{Fault Tree}
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Diagrams/Faul Tree - Bad Policy Decision.png} % requires the graphicx package
+   \caption{Fault Analysis Tree for \textit{Misinformed Policy Decisions}}
+   \label{fig:ft-Air}
+\end{figure}
+
+\subsection{Bodily Injury}
+\subsubsection*{Description}
+Bodily injury may occur during the process of deploying the insect or during the actual survey. One point where bodily injury may occur is when handling the onboard battery on the insect. The improper handling of the battery may lead to a fire and has the potential to seriously harm someone. Injury may also occur when deploying the insect before placing it in the body of water. The propellers on the insect operate at a high R.P.M. and can lead to injury such as cuts on the hand.
+
+\subsubsection*{Mitigation Plan}
+\textit{Overcharge Protection:} The on board battery should be charged for a maximum of three hours.
+
+\textit{Confirm Boat Is In Water:} Double check that the boat is in the water before proceeding to run the survey. 
+
+\subsubsection*{Fault Tree}
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Diagrams/FTA-injury.png} % requires the graphicx package
+   \caption{Fault Analysis Tree for \textit{Bodily Injury}}
+   \label{fig:ft-Air}
+\end{figure}
+
+\subsection{Environmental Damage and Habitat Disruption}
+\subsubsection*{Description}
+Damage to the environment may occur during operation of this device. The following events have the potential to cause environmental damage:
+\begin{itemize}
+\item Battery leakage
+\item Debris from loose components
+\end{itemize}
+In addition, the following events have the potential to cause habitat disruption:
+\begin{itemize}
+\item Excessive motor noise
+\item Excessive water churn
+\item Destruction of plant material
+\end{itemize}
+
+\subsubsection*{Mitigation Plan}
+\textit{Secure components:} All components must be reasonably secure to the device to prevent pollution caused by loose part debris. \\
+\textit{Shallow motor depth:} Motors will be located close to the surface to prevent damage to aquatic plant life growing on the bottom. \\
+\textit{Small profile:} The boat will have a relatively small profile, minimizing water churn and eliminating the need for large motors that may generate excessive noise. \\
+\textit{Waterproofing:} All electronic components including the battery compartment will be airtight and sealed. This will prevent a ruptured battery from leaking into the water.
+
+\subsubsection*{Fault Tree}
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Diagrams/environmental_hazard_fta.png}
+   \caption{Fault Analysis Tree for \textit{Environmental Damage and Habitat Disruption}}
+   \label{fig:ft-Environment}
+\end{figure}
+
+\subsection{Loss of Time}
+\subsubsection*{Description}
+There are many ways that the user's time can be used up during the operation of the swarm. 
+\begin{itemize}
+\item Insect retrieval from lake
+\item Delayed component delivery time
+\item Damaged insect requiring repair
+\end{itemize}
+
+\subsubsection*{Mitigation Plan}
+\textit{Insect Start Point:} Prepare a system where in the case of a damaged insect, it is able to be manually driven to a start point. \\
+\textit{Order Early:} Order the components as early as possible and anticipate faulty parts when ordering. \\
+\textit{Modular components:} All components must be operational individually, they will be tested to validate its functionality. When integrated with other units there will be a decreased chance of damage to the components. The components will also be integration tested to make sure the components function together. \\
+
+\subsubsection*{Fault Tree}
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Diagrams/Fault Tree - Time Loss.png}
+   \caption{Fault Analysis Tree for \textit{Loss of Time}}
+   \label{fig:ft-Time}
+\end{figure}
+
+\end{document}
