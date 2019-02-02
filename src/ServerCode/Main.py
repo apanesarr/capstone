@@ -1,3 +1,4 @@
+from collections import deque
 import threading
 import time
 import queue
@@ -6,13 +7,14 @@ from imutils.video import VideoStream
 import numpy as np
 import cv2
 import imutils
+import argparse
 
 from Communication import runCommunication
 import Parameters
 import Location
 
-def handleEventQueue(queue):
-    handleComEvent(queue)
+regionSizeX = 1
+regionSizeY = 1
 
 def handleComEvent(queue):
     if queue.empty():
@@ -25,6 +27,7 @@ def handleComEvent(queue):
         return
 
     elif (item.command == 'RECORD_MEASUREMENT'):
+        print()
         # Record a measurement
 
     elif (item.command == 'GET_NEXT_LOCATION'):
@@ -35,22 +38,38 @@ def handleComEvent(queue):
         }
 
 def createRegions():
-    regions = np.full([NUM_REGIONS_X, NUM_REGIONS_Y], {})
+    regions = np.full([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
 
-    for i in range(0, self.regions.shape[0]):
-    for j in range(0, self.regions.shape[1]):
-        region = {'visited': False }
+    for i in range(0, regions.shape[0]):
+        for j in range(0, regions.shape[1]):
+            region = {'visited': False }
 
-        x = (i / NUM_REGIONS_X) * (1.5) * (regionSizeX)
-        y = (j / NUM_REGIONS_Y) * (1/5) * (regionSizeY)
+            x = (i / Parameters.NUM_REGIONS_X) * (1.5) * (regionSizeX)
+            y = (j / Parameters.NUM_REGIONS_Y) * (1/5) * (regionSizeY)
 
-        region['center'] = (x, y)
+            region['center'] = (x, y)
 
-        self.regions[i][j] = region
+            regions[i][j] = region
 
     return regions
 
 if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-v", "--video",
+    help="path to the (optional) video file")
+    ap.add_argument("-b", "--buffer", type=int, default=64,
+    help="max buffer size")
+    args = vars(ap.parse_args())
+
+    # if a video path was not supplied, grab the reference
+    # to the webcam
+    if not args.get("video", False):
+        vs = VideoStream(src=0).start()
+
+    # otherwise, grab a reference to the video file
+    else:
+        vs = cv2.VideoCapture(args["video"])
+
     queue_communication = queue.Queue()
     event_communication = threading.Event()
     event_communication.queue = queue_communication
@@ -66,15 +85,11 @@ if __name__ == '__main__':
     regions = createRegions()
     rawLocation = (-1, -1)
 
-    vs = VideoStream(src=0).start()
-
     # Let the webcam warm up
     time.sleep(2.0)
 
-    pts = deque(maxlen=args["buffer"])
-
     while True:
-        handleEventQueue(queue)
+        handleComEvent(queue_communication)
 
         frame = vs.read()
 
@@ -83,14 +98,14 @@ if __name__ == '__main__':
 
         frame = imutils.resize(
             frame,
-            width=CAMERA_RES_W,
-            height=CAMERA_RES_H
+            width=Parameters.CAMERA_RES_W,
+            height=Parameters.CAMERA_RES_H
         )
 
         blurred = cv2.GaussianBlur(frame, (11, 11), 0)
         hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
-        mask = cv2.inRange(hsv, COLOR_LOWER, COLOR_UPPER)
+        mask = cv2.inRange(hsv, Parameters.COLOR_LOWER, Parameters.COLOR_UPPER)
         mask = cv2.erode(mask, None, iterations=2)
         mask = cv2.dilate(mask, None, iterations=2)
 
@@ -113,7 +128,7 @@ if __name__ == '__main__':
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
 
             # only proceed if the radius meets a minimum size
-            if radius > MIN_RADIUS and radius < MAX_RADIUS:
+            if radius > Parameters.MIN_RADIUS and radius < Parameters.MAX_RADIUS:
                 # draw the circle and centroid on the frame,
                 # then update the list of tracked points
                 cv2.circle(frame, (int(x), int(y)), int(radius),
@@ -121,21 +136,6 @@ if __name__ == '__main__':
                 cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
                 rawLocation = center
-
-        # update the points queue
-        pts.appendleft(center)
-
-        # loop over the set of tracked points
-        for i in range(1, 1):  # for i in range(1, len(pts)):
-            # if either of the tracked points are None, ignore
-            # them
-            if pts[i - 1] is None or pts[i] is None:
-                continue
-
-            # otherwise, compute the thickness of the line and
-            # draw the connecting lines
-            thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
-            cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 
         # show the frame to our screen
         cv2.imshow("Frame", frame)

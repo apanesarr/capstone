@@ -11,9 +11,11 @@ def runCommunication(event):
                 queue.put(item)
 
             elif (item.command == 'SEND_NEW_LOCATION'):
+                print()
                 # Send the insect a new location
 
             elif (item.command == 'MOTION_STOP'):
+                print()
                 # Stop moving the insect
 
             else:
