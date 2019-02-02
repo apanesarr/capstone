@@ -1,4 +1,6 @@
 from collections import deque
+from threading import Thread
+
 from imutils.video import VideoStream
 import numpy as np
 import argparse
@@ -39,137 +41,140 @@ NUM_REGIONS_Y = 10
 regionSizeX = (COVERAGE_AREA_X_MAX - COVERAGE_AREA_X_MIN) / NUM_REGIONS_X
 regionSizeY = (COVERAGE_AREA_Y_MAX - COVERAGE_AREA_Y_MIN) / NUM_REGIONS_Y
 
-regions = np.full([NUM_REGIONS_X, NUM_REGIONS_Y], {})
+class Location(Thread):
+	def __init__(self, val):
+		self.regions = np.full([NUM_REGIONS_X, NUM_REGIONS_Y], {})
 
-for i in range(0, regions.shape[0]):
-	for j in range(0, regions.shape[1]):
-		region = {'visited': False }
+		for i in range(0, self.regions.shape[0]):
+			for j in range(0, self.regions.shape[1]):
+				region = {'visited': False }
 
-		x = (i / NUM_REGIONS_X) * (1.5) * (regionSizeX)
-		y = (j / NUM_REGIONS_Y) * (1/5) * (regionSizeY)
+				x = (i / NUM_REGIONS_X) * (1.5) * (regionSizeX)
+				y = (j / NUM_REGIONS_Y) * (1/5) * (regionSizeY)
 
-		region['center'] = (x, y)
+				region['center'] = (x, y)
 
-		regions[i][j] = region
+				self.regions[i][j] = region
 
-rawLocation = (-1, -1)
+		self.rawLocation = (-1, -1)
 
-pts = deque(maxlen=args["buffer"])
+	def run(self):
+		pts = deque(maxlen=args["buffer"])
 
-if not args.get("video", False):
-	vs = VideoStream(src=0).start()
-else:
-	vs = cv2.VideoCapture(args["video"])
+		if not args.get("video", False):
+			vs = VideoStream(src=0).start()
+		else:
+			vs = cv2.VideoCapture(args["video"])
 
-# allow the camera or video file to warm up
-time.sleep(2.0)
+		# allow the camera or video file to warm up
+		time.sleep(2.0)
 
-def exactLocation():
-	if not rawLocation: return (-1, -1)
+		while True:
+			frame = vs.read()
 
-	x = (rawLocation[0] - COVERAGE_AREA_X_MIN) / (COVERAGE_AREA_X_MAX - COVERAGE_AREA_X_MIN)
-	y = (rawLocation[1] - COVERAGE_AREA_Y_MIN) / (COVERAGE_AREA_Y_MAX - COVERAGE_AREA_Y_MIN)
+			frame = frame[1] if args.get("video", False) else frame
 
-	return (x, y)
+			if frame is None:
+				break
 
-def distance(p1, p2):
-	deltaX = abs(p1[0], p2[1])
-	deltaY = abs(p2[0], p2[1])
+			frame = imutils.resize(frame, width=CAMERA_RES_W, height=CAMERA_RES_H)
+			blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+			hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
-	return math.sqrt(deltaX * deltaX + deltaY * deltaY)
+			mask = cv2.inRange(hsv, COLOR_LOWER, COLOR_UPPER)
+			mask = cv2.erode(mask, None, iterations=2)
+			mask = cv2.dilate(mask, None, iterations=2)
 
-def nextLocation():
-	currentLoc = exactLocation()
+			cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+									cv2.CHAIN_APPROX_SIMPLE)
+			cnts = imutils.grab_contours(cnts)
+			center = None
 
-	if (currentLoc == (-1, -1)): return (-1, -1)
+			if len(cnts) > 0:
+				# find the largest contour in the mask, then use
+				# it to compute the minimum enclosing circle and
+				# centroid
+				c = max(cnts, key=cv2.contourArea)
+				((x, y), radius) = cv2.minEnclosingCircle(c)
+				M = cv2.moments(c)
+				center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
 
-	min = regions[0]
+				# only proceed if the radius meets a minimum size
+				if radius > MIN_RADIUS and radius < MAX_RADIUS:
+					# draw the circle and centroid on the frame,
+					# then update the list of tracked points
+					cv2.circle(frame, (int(x), int(y)), int(radius),
+							   (0, 255, 255), 2)
+					cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
-	for r in regions:
-		cent = r.center
+					rawLocation = center
 
-		if not r.visited and distance(cent, currentLoc) < min:
-			min = r
+			# update the points queue
+			pts.appendleft(center)
 
-	return r.center
+			# loop over the set of tracked points
+			for i in range(1, 1):  # for i in range(1, len(pts)):
+				# if either of the tracked points are None, ignore
+				# them
+				if pts[i - 1] is None or pts[i] is None:
+					continue
 
-def region():
-	loc = exactLocation()
+				# otherwise, compute the thickness of the line and
+				# draw the connecting lines
+				thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
+				cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 
-	if (loc == (-1, -1)): return loc
+			# show the frame to our screen
+			cv2.imshow("Frame", frame)
+			key = cv2.waitKey(1) & 0xFF
 
-	return (loc[0] * NUM_REGIONS_X, loc[1] * NUM_REGIONS_Y)
+			# if the 'q' key is pressed, stop the loop
+			if key == ord("q"):
+				break
 
-while True:
-	frame = vs.read()
+		# if we are not using a video file, stop the camera video stream
+		if not args.get("video", False):
+			vs.stop()
 
-	frame = frame[1] if args.get("video", False) else frame
+		# otherwise, release the camera
+		else:
+			vs.release()
 
-	if frame is None:
-		break
+		# close all windows
+		cv2.destroyAllWindows()
 
-	frame = imutils.resize(frame, width=CAMERA_RES_W, height=CAMERA_RES_H)
-	blurred = cv2.GaussianBlur(frame, (11, 11), 0)
-	hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+	def exactLocation(self):
+		if not self.rawLocation: return (-1, -1)
 
-	mask = cv2.inRange(hsv, COLOR_LOWER, COLOR_UPPER)
-	mask = cv2.erode(mask, None, iterations=2)
-	mask = cv2.dilate(mask, None, iterations=2)
+		x = (self.rawLocation[0] - COVERAGE_AREA_X_MIN) / (COVERAGE_AREA_X_MAX - COVERAGE_AREA_X_MIN)
+		y = (self.rawLocation[1] - COVERAGE_AREA_Y_MIN) / (COVERAGE_AREA_Y_MAX - COVERAGE_AREA_Y_MIN)
 
-	cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
-		cv2.CHAIN_APPROX_SIMPLE)
-	cnts = imutils.grab_contours(cnts)
-	center = None
+		return (x, y)
 
-	if len(cnts) > 0:
-		# find the largest contour in the mask, then use
-		# it to compute the minimum enclosing circle and
-		# centroid
-		c = max(cnts, key=cv2.contourArea)
-		((x, y), radius) = cv2.minEnclosingCircle(c)
-		M = cv2.moments(c)
-		center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+	def distance(self, p1, p2):
+		deltaX = abs(p1[0], p2[1])
+		deltaY = abs(p2[0], p2[1])
 
-		# only proceed if the radius meets a minimum size
-		if radius > MIN_RADIUS and radius < MAX_RADIUS:
-			# draw the circle and centroid on the frame,
-			# then update the list of tracked points
-			cv2.circle(frame, (int(x), int(y)), int(radius),
-				(0, 255, 255), 2)
-			cv2.circle(frame, center, 5, (0, 0, 255), -1)
+		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
-			rawLocation = center
+	def nextLocation(self):
+		currentLoc = self.exactLocation()
 
-	# update the points queue
-	pts.appendleft(center)
+		if (currentLoc == (-1, -1)): return (-1, -1)
 
-	# loop over the set of tracked points
-	for i in range(1, 1): # for i in range(1, len(pts)):
-		# if either of the tracked points are None, ignore
-		# them
-		if pts[i - 1] is None or pts[i] is None:
-			continue
+		min = self.regions[0]
 
-		# otherwise, compute the thickness of the line and
-		# draw the connecting lines
-		thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
-		cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+		for r in self.regions:
+			cent = r.center
 
-	# show the frame to our screen
-	cv2.imshow("Frame", frame)
-	key = cv2.waitKey(1) & 0xFF
+			if not r.visited and self.distance(cent, currentLoc) < min:
+				min = r
 
-	# if the 'q' key is pressed, stop the loop
-	if key == ord("q"):
-		break
+		return r.center
 
-# if we are not using a video file, stop the camera video stream
-if not args.get("video", False):
-	vs.stop()
+	def region(self):
+		loc = self.exactLocation()
 
-# otherwise, release the camera
-else:
-	vs.release()
+		if (loc == (-1, -1)): return loc
 
-# close all windows
-cv2.destroyAllWindows()
+		return (loc[0] * NUM_REGIONS_X, loc[1] * NUM_REGIONS_Y)
