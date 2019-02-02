@@ -34,7 +34,7 @@ def handleComEvent(queue):
         newCommand = {
             'recipient': 'COM',
             'command': 'SEND_NEW_LOCATION',
-            'location': nextLocation()
+            'location': nextLocation(rawLocation)
         }
 
 def createRegions():
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         if key == ord("q"):
             break
 
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     vs.stop()
 

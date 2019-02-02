@@ -23,8 +23,8 @@ def distance(self, p1, p2):
 
 	return math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
-def nextLocation(self):
-	currentLoc = self.exactLocation()
+def nextLocation(rawLocation):
+	currentLoc = rawLocation
 
 	if (currentLoc == (-1, -1)): return (-1, -1)
 

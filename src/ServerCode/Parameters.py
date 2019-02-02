@@ -1,3 +1,5 @@
+# Parameters - Object Tracking #
+
 MIN_RADIUS = 10
 MAX_RADIUS = 50
 COLOR_LOWER = (29, 86, 6)
