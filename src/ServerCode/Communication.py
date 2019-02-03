@@ -47,15 +47,28 @@ def recieved(messageId):
 def runCommunication(event):
     queue = event.queue
 
-    ser = serial.Serial(
-        Parameters.SERIAL_PORT,
+    ser_out = serial.Serial(
+        Parameters.SERIAL_PORT_OUT,
         Parameters.SERIAL_BODE,
         timeout=Parameters.SERIAL_TIMEOUT
     )
 
+    ser_in = serial.Serial(
+        Parameters.SERIAL_PORT_IN,
+        Parameters.SERIAL_BODE,
+        timeout=Parameters.SERIAL_TIMEOUT
+    )
+
+    ser_out.close()
+    ser_out.open()
+
+    ser_in.close()
+    ser_in.open()
+
     while True:
         # Check if there are any response messages waiting for us
-        if True: # ser.in_waiting > 0:
+        print(str(ser_in.in_waiting))
+        if ser_in.in_waiting > 0:
             print('hi')
             data = ser.readline()
             print('hi2')
@@ -82,11 +95,11 @@ def runCommunication(event):
 
             elif (item["command"] == "CHECK_RESPONSE"):
                 if not recieved(item["messageId"]):
-                    resend(ser, queue, item)
+                    resend(ser_out, queue, item)
 
             elif (item["command"] == "SEND_NEW_LOCATION"):
                 message = str(1) + "," + "S" + "," + str(item["location"][0]) + str(item["location"][1])
-                send(ser, queue, message)
+                send(ser_out, queue, message)
 
             elif (item["command"] == "MOTION_STOP"):
                 print()
