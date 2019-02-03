@@ -6,7 +6,9 @@ import Parameters
 recievedMessages = []
 newMessageId = 1
 
-def send(serial, queue, message):
+def send(ser, queue, message,):
+    global newMessageId
+
     messageId = newMessageId
     newMessageId = newMessageId + 1
 
@@ -15,10 +17,25 @@ def send(serial, queue, message):
     queue.put({
         "recipient": "COM",
         "command": "CHECK_RESPONSE",
-        "messageId": messageId
+        "messageId": messageId,
+        "message": message
     })
 
-    serial.write(message.encode())
+    ser.write(message.encode())
+
+    print(('Wrote: ' + message).encode())
+
+def resend(ser, queue, item):
+    message = item["message"]
+
+    queue.put({
+        "recipient": "COM",
+        "command": "CHECK_RESPONSE",
+        "messageId": item["messageId"],
+        "message": message
+    })
+
+    ser.write(message.encode())
 
 def recieved(messageId):
     for r in recievedMessages:
@@ -38,10 +55,11 @@ def runCommunication(event):
 
     while True:
         # Check if there are any response messages waiting for us
-        if ser.inWaiting() > 0:
+        if True: # ser.in_waiting > 0:
+            print('hi')
             data = ser.readline()
-
-            print(data)
+            print('hi2')
+            print('READING: ' + data)
 
             data = data.decode("utf-8").replace("\r\n", "")
 
@@ -64,7 +82,7 @@ def runCommunication(event):
 
             elif (item["command"] == "CHECK_RESPONSE"):
                 if not recieved(item["messageId"]):
-                    send(ser, queue, item["message"])
+                    resend(ser, queue, item)
 
             elif (item["command"] == "SEND_NEW_LOCATION"):
                 message = str(1) + "," + "S" + "," + str(item["location"][0]) + str(item["location"][1])
