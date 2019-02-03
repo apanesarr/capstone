@@ -6,107 +6,102 @@ import Parameters
 recievedMessages = []
 newMessageId = 1
 
-def send(ser, queue, message,):
-    global newMessageId
+class Communication:
+    def send(self, queue, message):
+        global newMessageId
 
-    messageId = newMessageId
-    newMessageId = newMessageId + 1
+        messageId = newMessageId
+        newMessageId = newMessageId + 1
 
-    message = str(messageId) + "," + message
+        message = str(messageId) + "," + message + "\r\n"
 
-    queue.put({
-        "recipient": "COM",
-        "command": "CHECK_RESPONSE",
-        "messageId": messageId,
-        "message": message
-    })
+        queue.put({
+            "recipient": "COM",
+            "command": "CHECK_RESPONSE",
+            "messageId": messageId,
+            "message": message
+        })
 
-    ser.write(message.encode())
+        print(message.encode())
 
-    print(('Wrote: ' + message).encode())
+        self.serial.write(message.encode())
+        print(self.serial.readline())
 
-def resend(ser, queue, item):
-    message = item["message"]
+    def resend(self, queue, item):
+        message = item["message"] + "\r\n"
 
-    queue.put({
-        "recipient": "COM",
-        "command": "CHECK_RESPONSE",
-        "messageId": item["messageId"],
-        "message": message
-    })
+        queue.put({
+            "recipient": "COM",
+            "command": "CHECK_RESPONSE",
+            "messageId": item["messageId"],
+            "message": message
+        })
 
-    ser.write(message.encode())
+        self.serial.write(message.encode())
 
-def recieved(messageId):
-    for r in recievedMessages:
-        if r == messageId:
-            return True
+        print(self.serial.readline())
 
-    return False
+    def recieved(self, messageId):
+        for r in recievedMessages:
+            if r == messageId:
+                return True
 
-def runCommunication(event):
-    queue = event.queue
+        return False
 
-    ser_out = serial.Serial(
-        Parameters.SERIAL_PORT_OUT,
-        Parameters.SERIAL_BODE,
-        timeout=Parameters.SERIAL_TIMEOUT
-    )
+    def runCommunication(self, event):
+        queue = event.queue
 
-    ser_in = serial.Serial(
-        Parameters.SERIAL_PORT_IN,
-        Parameters.SERIAL_BODE,
-        timeout=Parameters.SERIAL_TIMEOUT
-    )
+        self.serial = serial.Serial(
+            Parameters.SERIAL_PORT_IN,
+            Parameters.SERIAL_BODE,
+        )
 
-    ser_out.close()
-    ser_out.open()
+        self.serial.reset_input_buffer()
+        self.serial.reset_output_buffer()
 
-    ser_in.close()
-    ser_in.open()
+        self.serial.write('testeroo'.encode())
 
-    while True:
-        # Check if there are any response messages waiting for us
-        print(str(ser_in.in_waiting))
-        if ser_in.in_waiting > 0:
-            print('hi')
-            data = ser.readline()
-            print('hi2')
-            print('READING: ' + data)
+        while True:
+            # Check if there are any response messages waiting for us
+            print(str(self.serial.inWaiting()))
+            if self.serial.inWaiting() > 0:
+                data = self.serial.readline()
 
-            data = data.decode("utf-8").replace("\r\n", "")
+                print(data)
 
-            # We got an "OK" response, so add it to
-            # the list of responses we"ve recieved
-            message_id  = int(data)
+                # data = data.decode("utf-8").replace("\r\n", "")
 
-            if message_id > 0:
-                recievedMessage.append(message_id)
+                # We got an "OK" response, so add it to
+                # the list of responses we"ve recieved
+                # message_id  = int(data)
+                message_id = -1
+                if message_id > 0:
+                    recievedMessage.append(message_id)
 
-        if not queue.empty():
-            item = queue.get()
+            if not queue.empty():
+                item = queue.get()
 
-            # If it"s not meant for us, put it back and continue
-            if not (item["recipient"] == "COM"):
-                queue.put(item)
+                # If it"s not meant for us, put it back and continue
+                if not (item["recipient"] == "COM"):
+                    queue.put(item)
 
-            elif (item["command"] == "EXIT"):
-                break
+                elif (item["command"] == "EXIT"):
+                    break
 
-            elif (item["command"] == "CHECK_RESPONSE"):
-                if not recieved(item["messageId"]):
-                    resend(ser_out, queue, item)
+                elif (item["command"] == "CHECK_RESPONSE"):
+                    if not self.recieved(item["messageId"]):
+                        self.resend(queue, item)
 
-            elif (item["command"] == "SEND_NEW_LOCATION"):
-                message = str(1) + "," + "S" + "," + str(item["location"][0]) + str(item["location"][1])
-                send(ser_out, queue, message)
+                elif (item["command"] == "SEND_NEW_LOCATION"):
+                    message = str(1) + "," + "S" + "," + str(item["location"][0]) + str(item["location"][1])
+                    self.send(queue, message)
 
-            elif (item["command"] == "MOTION_STOP"):
-                print()
-                # Stop moving the insect
+                elif (item["command"] == "MOTION_STOP"):
+                    print()
+                    # Stop moving the insect
 
-            else:
-                print("ERR: Communication.py - Invalid message")
+                else:
+                    print("ERR: Communication.py - Invalid message")
 
-        # Limit
-        time.sleep(0.1)
+            # Limit
+            time.sleep(0.1)

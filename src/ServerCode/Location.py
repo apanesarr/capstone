@@ -54,7 +54,7 @@ class Location:
 		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
 	def nextLocation(self):
-		# If we"re out of bounds... screw it, it"s game over
+		# If we're out of bounds... screw it, it's game over
 		if (self.rawLocation == (-1, -1)): return (-1, -1)
 
 		min = self.regions[0]
@@ -66,3 +66,8 @@ class Location:
 				min = r
 
 		return r.center
+
+	def angle(self, location_current, location_new):
+		delta = (location_new[0] - location_current[0], location_new[1] - location_current[1])
+
+		return math.degrees(np.arctan2(delta[0], delta[1]))

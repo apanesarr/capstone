@@ -9,7 +9,7 @@ import cv2
 import imutils
 import argparse
 
-from Communication import runCommunication
+import Communication
 import Parameters
 import Location
 
@@ -66,9 +66,11 @@ if __name__ == "__main__":
     event_communication = threading.Event()
     event_communication.queue = queue_communication
 
+    communcation = Communication.Communication()
+
     thread_communication = threading.Thread(
         name="communication",
-        target=runCommunication,
+        target=communcation.runCommunication,
         args=(event_communication,)
     )
 
