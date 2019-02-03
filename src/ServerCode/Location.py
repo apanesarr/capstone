@@ -9,38 +9,60 @@ import imutils
 import time
 import math
 
-def exactLocation(self):
-	if not self.rawLocation: return (-1, -1)
+import Parameters
 
-	x = (self.rawLocation[0] - COVERAGE_AREA_X_MIN) / (COVERAGE_AREA_X_MAX - COVERAGE_AREA_X_MIN)
-	y = (self.rawLocation[1] - COVERAGE_AREA_Y_MIN) / (COVERAGE_AREA_Y_MAX - COVERAGE_AREA_Y_MIN)
+regionSizeX = 1
+regionSizeY = 1
 
-	return (x, y)
+class Location:
+	def createRegions(self):
+		regions = np.full([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
 
-def distance(self, p1, p2):
-	deltaX = abs(p1[0], p2[1])
-	deltaY = abs(p2[0], p2[1])
+		for i in range(0, regions.shape[0]):
+			for j in range(0, regions.shape[1]):
+				region = {"visited": False }
 
-	return math.sqrt(deltaX * deltaX + deltaY * deltaY)
+				x = (i / Parameters.NUM_REGIONS_X) * (1.5) * (regionSizeX)
+				y = (j / Parameters.NUM_REGIONS_Y) * (1/5) * (regionSizeY)
 
-def nextLocation(rawLocation):
-	currentLoc = rawLocation
+				region["center"] = (x, y)
 
-	if (currentLoc == (-1, -1)): return (-1, -1)
+				regions[i][j] = region
 
-	min = self.regions[0]
+		return regions
 
-	for r in self.regions:
-		cent = r.center
+	def __init__(self):
+		self.regions 		= self.createRegions()
+		self.rawLocation 	= (-1, -1)
+		self.hasTarget		= False
 
-		if not r.visited and self.distance(cent, currentLoc) < min:
-			min = r
+	def updateLocation(self, location):
+		self.rawLocation = location
 
-	return r.center
+	def exactLocation(self):
+		if not self.rawLocation: return (-1, -1)
 
-def region(self):
-	loc = self.exactLocation()
+		x = (self.rawLocation[0] - Parameters.COVERAGE_AREA_X_MIN) / (Parameters.COVERAGE_AREA_X_MAX - Parameters.COVERAGE_AREA_X_MIN)
+		y = (self.rawLocation[1] - Parameters.COVERAGE_AREA_Y_MIN) / (Parameters.COVERAGE_AREA_Y_MAX - Parameters.COVERAGE_AREA_Y_MIN)
 
-	if (loc == (-1, -1)): return loc
+		return (x, y)
 
-	return (loc[0] * NUM_REGIONS_X, loc[1] * NUM_REGIONS_Y)
+	def distance(p1, p2):
+		deltaX = abs(p1[0], p2[1])
+		deltaY = abs(p2[0], p2[1])
+
+		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
+
+	def nextLocation(self):
+		# If we"re out of bounds... screw it, it"s game over
+		if (self.rawLocation == (-1, -1)): return (-1, -1)
+
+		min = self.regions[0]
+
+		for r in self.regions:
+			cent = r.center
+
+			if not r.visited and self.distance(cent, currentLoc) < min:
+				min = r
+
+		return r.center
