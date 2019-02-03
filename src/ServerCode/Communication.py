@@ -7,6 +7,11 @@ recievedMessages = []
 newMessageId = 1
 
 class Communication:
+    # Reset the buffer to switch between reading and writing
+    def rb(self):
+        self.serial.close()
+        self.serial.open()
+
     def send(self, queue, message):
         global newMessageId
 
@@ -24,8 +29,8 @@ class Communication:
 
         print(message.encode())
 
+        self.rb()
         self.serial.write(message.encode())
-        print(self.serial.readline())
 
     def resend(self, queue, item):
         message = item["message"] + "\r\n"
@@ -37,9 +42,8 @@ class Communication:
             "message": message
         })
 
+        self.rb()
         self.serial.write(message.encode())
-
-        print(self.serial.readline())
 
     def recieved(self, messageId):
         for r in recievedMessages:
@@ -53,17 +57,12 @@ class Communication:
 
         self.serial = serial.Serial(
             Parameters.SERIAL_PORT_IN,
-            Parameters.SERIAL_BODE,
+            Parameters.SERIAL_BODE
         )
-
-        self.serial.reset_input_buffer()
-        self.serial.reset_output_buffer()
-
-        self.serial.write('testeroo'.encode())
 
         while True:
             # Check if there are any response messages waiting for us
-            print(str(self.serial.inWaiting()))
+            self.rb()
             if self.serial.inWaiting() > 0:
                 data = self.serial.readline()
 

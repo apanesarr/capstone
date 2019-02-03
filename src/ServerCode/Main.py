@@ -150,7 +150,7 @@ if __name__ == "__main__":
                 "location": location.nextLocation()
             })
 
-            location.hasTarget = True
+            location.hasTarget = False
 
         # show the frame to our screen
         cv2.imshow("Frame", frame)
