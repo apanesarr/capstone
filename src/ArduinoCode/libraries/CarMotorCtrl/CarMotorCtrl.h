@@ -1,41 +1,42 @@
-#ifndef CarMotorCtrl_h
-#define CarMotorCtrl_h
+#ifndef MotorControl_h
+#define MotorControl_h
 
-#define FWD_PIN 5
-#define BWD_PIN 6
-#define LEFT_PIN 9
-#define RIGHT_PIN 10
+#include "Arduino.h"
+
+#define LEFT_FWD_PIN 9
+#define LEFT_BWD_PIN 10
+#define RIGHT_FWD_PIN 6
+#define RIGHT_BWD_PIN 5
+
+#define LEFT_MOTOR_PWR 90
+#define RIGHT_MOTOR_PWR LEFT_MOTOR_PWR + 15
 
 #define INVALID_SETTING -1
 
 enum motorState_e {
   FORWARD,
   REVERSE,
-  FWD_LEFT,
-  FWD_RIGHT,
-  BACK_LEFT,
-  BACK_RIGHT,
+  STEER_LEFT,
+  STEER_RIGHT,
   STOP
 };
 
 struct motorSettings_t {
   motorState_e state = STOP;
-  int outputPwr      = 0;
 };
 
 class MotorControl
 {
   public:
     MotorControl();
-    void setMotor(motorState_e newState, float percentOutput);
+    void setMotor(motorState_e newState);
   private:
-    motorSettings_t settings;
+    motorState_e state;
     void updateMotorCtrlPins();
     void forward();
     void reverse();
-    void left();
-    void right();
-    void resetSteering();
+    void steerLeft();
+    void steerRight();
     void stop();
 };
 

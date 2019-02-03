@@ -3,86 +3,75 @@
 
 MotorControl::MotorControl()
 {
-  pinMode(FWD_PIN,  OUTPUT);
-  pinMode(BWD_PIN,  OUTPUT);
-  pinMode(RIGHT_PIN, OUTPUT);
-  pinMode(LEFT_PIN, OUTPUT);
+  pinMode(LEFT_FWD_PIN,  OUTPUT);
+  pinMode(LEFT_BWD_PIN,  OUTPUT);
+  pinMode(RIGHT_FWD_PIN, OUTPUT);
+  pinMode(RIGHT_BWD_PIN, OUTPUT);
 }
 
-void MotorControl::setMotor(motorState_e newState, float percentOutput)
+void MotorControl::setMotor(motorState_e newState)
 {
-  settings.state = newState;
-  settings.outputPwr = percentOutput * 255;
+  state = newState;
   updateMotorCtrlPins();
 }
 
 void MotorControl::updateMotorCtrlPins()
 {
-  switch (settings.state) {
+  switch (state) {
     case FORWARD:
-      resetSteering();
       forward();
       break;
     case REVERSE:
-      resetSteering();
       reverse();
       break;
-    case FWD_LEFT:
-      forward();
-      left();
+    case STEER_LEFT:
+      steerLeft();
       break;
-    case FWD_RIGHT:
-      forward();
-      right();
+    case STEER_RIGHT:
+      steerRight();
       break;
-    case BACK_RIGHT:
-      reverse();
-      left();
-    case BACK_LEFT:
-      reverse();
-      right();
     case STOP:
       stop();
-      break;
-    default:
       break;
   }
 }
 
 void MotorControl::forward()
 {
-  analogWrite(FWD_PIN,  settings.outputPwr);
-  analogWrite(BWD_PIN,  LOW);
+  analogWrite(LEFT_FWD_PIN,  LEFT_MOTOR_PWR);
+  analogWrite(LEFT_BWD_PIN,  LOW);
+  analogWrite(RIGHT_FWD_PIN, RIGHT_MOTOR_PWR);
+  analogWrite(RIGHT_BWD_PIN, LOW);
 }
 
 void MotorControl::reverse()
 {
-  analogWrite(FWD_PIN,  LOW);
-  analogWrite(BWD_PIN,  settings.outputPwr);
+  analogWrite(LEFT_FWD_PIN,  LOW);
+  analogWrite(LEFT_BWD_PIN,  LEFT_MOTOR_PWR);
+  analogWrite(RIGHT_FWD_PIN, LOW);
+  analogWrite(RIGHT_BWD_PIN, RIGHT_MOTOR_PWR);
 }
 
-void MotorControl::left()
+void MotorControl::steerLeft()
 {
-  analogWrite(LEFT_PIN, 255);
-  analogWrite(RIGHT_PIN, LOW);
+  analogWrite(RIGHT_FWD_PIN, RIGHT_MOTOR_PWR);
+  analogWrite(RIGHT_BWD_PIN, LOW);
+  analogWrite(LEFT_FWD_PIN,  LOW);
+  analogWrite(LEFT_BWD_PIN,  LEFT_MOTOR_PWR);
 }
 
-void MotorControl::right()
+void MotorControl::steerRight()
 {
-  analogWrite(RIGHT_PIN, 255);
-  analogWrite(LEFT_PIN, LOW);
+  analogWrite(LEFT_FWD_PIN, LEFT_MOTOR_PWR);
+  analogWrite(LEFT_BWD_PIN, LOW);
+  analogWrite(RIGHT_BWD_PIN, RIGHT_MOTOR_PWR);
+  analogWrite(RIGHT_FWD_PIN, LOW);
 }
 
 void MotorControl::stop()
 {
-  analogWrite(FWD_PIN,  LOW);
-  analogWrite(BWD_PIN,  LOW);
-  analogWrite(RIGHT_PIN, LOW);
-  analogWrite(LEFT_PIN, LOW);
-}
-
-void MotorControl::resetSteering()
-{
-  analogWrite(RIGHT_PIN, LOW);
-  analogWrite(LEFT_PIN, LOW);
+  analogWrite(LEFT_FWD_PIN,  LOW);
+  analogWrite(LEFT_BWD_PIN,  LOW);
+  analogWrite(RIGHT_FWD_PIN, LOW);
+  analogWrite(RIGHT_BWD_PIN, LOW);
 }
