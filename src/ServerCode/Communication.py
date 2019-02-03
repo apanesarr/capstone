@@ -2,6 +2,7 @@ import time
 import serial
 
 import Parameters
+import Location
 
 recievedMessages = []
 newMessageId = 1
@@ -9,8 +10,11 @@ newMessageId = 1
 class Communication:
     # Reset the buffer to switch between reading and writing
     def rb(self):
-        self.serial.close()
-        self.serial.open()
+        self.serial_in.close()
+        self.serial_in.open()
+
+        self.serial_out.close()
+        self.serial_out.open()
 
     def send(self, queue, message):
         global newMessageId
@@ -27,10 +31,7 @@ class Communication:
             "message": message
         })
 
-        print(message.encode())
-
-        self.rb()
-        self.serial.write(message.encode())
+        self.serial_out.write(message.encode())
 
     def resend(self, queue, item):
         message = item["message"] + "\r\n"
@@ -42,8 +43,7 @@ class Communication:
             "message": message
         })
 
-        self.rb()
-        self.serial.write(message.encode())
+        # self.serial.write(message.encode())
 
     def recieved(self, messageId):
         for r in recievedMessages:
@@ -55,27 +55,38 @@ class Communication:
     def runCommunication(self, event):
         queue = event.queue
 
-        self.serial = serial.Serial(
+        self.serial_in = serial.Serial(
             Parameters.SERIAL_PORT_IN,
+            Parameters.SERIAL_BODE
+        )
+
+        self.serial_out = serial.Serial(
+            Parameters.SERIAL_PORT_OUT,
             Parameters.SERIAL_BODE
         )
 
         while True:
             # Check if there are any response messages waiting for us
-            self.rb()
-            if self.serial.inWaiting() > 0:
-                data = self.serial.readline()
+            if self.serial_in.inWaiting() > 0:
+                data = self.serial_in.readline()
 
-                print(data)
+                data = data.decode("utf-8").replace("\r\n", "").split(",")
 
-                # data = data.decode("utf-8").replace("\r\n", "")
+                # Proper responses should have 3 comma seperated values
+                if len(data) == 3:
+                    messageId   = data[0]
+                    messageType = data[1]
+                    message     = data[2]
 
-                # We got an "OK" response, so add it to
-                # the list of responses we"ve recieved
-                # message_id  = int(data)
-                message_id = -1
-                if message_id > 0:
-                    recievedMessage.append(message_id)
+                    if messageType == Parameters.OK:
+                        recievedMessages.append(messageId)
+
+                    elif messageType == Parameters.TEMP:
+                        queue.append({
+                            "recipient": "MAIN",
+                            "command": "RECORD_MEASUREMENT",
+                            "measurement": message
+                        })
 
             if not queue.empty():
                 item = queue.get()
@@ -92,12 +103,32 @@ class Communication:
                         self.resend(queue, item)
 
                 elif (item["command"] == "SEND_NEW_LOCATION"):
-                    message = str(1) + "," + "S" + "," + str(item["location"][0]) + str(item["location"][1])
+                    message = \
+                        "%i,%s,%i,%i" \
+                        % (1, Parameters.CMD_SET_GYRO, item["angle"]
+
                     self.send(queue, message)
 
                 elif (item["command"] == "MOTION_STOP"):
-                    print()
-                    # Stop moving the insect
+                    message = \
+                        "%i,%s" \
+                        % (1, Parameters.CMD_STOP_MOTOR)
+
+                    self.send(queue, message)
+
+                elif (item["command"] == "MOTION_START"):
+                    message = \
+                        "%i,%s" \
+                        % (1, Parameters.CMD_START_MOTOR)
+
+                    self.send(queue, message)
+
+                elif (item["command"] == "GET_TEMP"):
+                    message = \
+                        "%i,%s" \
+                        % (1, Parameters.CMD_GET_TEMP)
+
+                    self.send(queue, message)
 
                 else:
                     print("ERR: Communication.py - Invalid message")

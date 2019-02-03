@@ -20,7 +20,21 @@ NUM_REGIONS_Y = 10
 
 # Parameters - Serial I/O #
 
-SERIAL_PORT_IN  = '/dev/cu.usbmodem14101'
-SERIAL_PORT_OUT = '/dev/tty.usbmodem14101'
+SERIAL_PORT_IN  = '/dev/cu.usbmodem14201'
+SERIAL_PORT_OUT = '/dev/cu.usbmodem14201'
 SERIAL_BODE     = 115200
 SERIAL_TIMEOUT  = 10000
+
+# Parameters - Command Codes #
+
+CMD_SET_GYRO        = "H"
+CMD_START_MOTOR     = "M"
+CMD_GET_GYRO        = "G"
+CMD_STOP_MOTOR      = "S"
+CMD_INIT            = "I"
+CMD_GET_TEMP        = "T"
+
+# Parameters - Response Codes #
+
+RES_OK              = "R"
+RES_TEMP            = "T"

@@ -13,6 +13,8 @@ import Communication
 import Parameters
 import Location
 
+measurements = []
+
 def handleComEvent(queue):
     if queue.empty():
         return
@@ -24,15 +26,12 @@ def handleComEvent(queue):
         return
 
     elif (item["command"] == "RECORD_MEASUREMENT"):
-        print()
-        # Record a measurement
+        measurement = item["measurement"]
 
-    elif (item["command"] == "GET_NEXT_LOCATION"):
-        newCommand = {
-            "recipient": "COM",
-            "command": "SEND_NEW_LOCATION",
-            "location": nextLocation(rawLocation)
-        }
+        measurements.append({
+            "location": rawLocation,
+            "measurement": measurement
+        })
 
 if __name__ == "__main__":
     # Parse command line args
