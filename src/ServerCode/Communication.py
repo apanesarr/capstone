@@ -43,7 +43,7 @@ class Communication:
             "message": message
         })
 
-        # self.serial.write(message.encode())
+        self.serial_out.write(message.encode())
 
     def recieved(self, messageId):
         for r in recievedMessages:
@@ -103,30 +103,22 @@ class Communication:
                         self.resend(queue, item)
 
                 elif (item["command"] == "SEND_NEW_LOCATION"):
-                    message = \
-                        "%i,%s,%i,%i" \
-                        % (1, Parameters.CMD_SET_GYRO, item["angle"]
+                    message = "%i,%s,%i" % (1, Parameters.CMD_SET_GYRO, item["angle"])
 
                     self.send(queue, message)
 
                 elif (item["command"] == "MOTION_STOP"):
-                    message = \
-                        "%i,%s" \
-                        % (1, Parameters.CMD_STOP_MOTOR)
+                    message = "%i,%s" % (1, Parameters.CMD_STOP_MOTOR)
 
                     self.send(queue, message)
 
                 elif (item["command"] == "MOTION_START"):
-                    message = \
-                        "%i,%s" \
-                        % (1, Parameters.CMD_START_MOTOR)
+                    message = "%i,%s" % (1, Parameters.CMD_START_MOTOR)
 
                     self.send(queue, message)
 
                 elif (item["command"] == "GET_TEMP"):
-                    message = \
-                        "%i,%s" \
-                        % (1, Parameters.CMD_GET_TEMP)
+                    message = "%i,%s" % (1, Parameters.CMD_GET_TEMP)
 
                     self.send(queue, message)
 

@@ -13,7 +13,8 @@ import Communication
 import Parameters
 import Location
 
-measurements = []
+import Reader
+import Writer
 
 def handleComEvent(queue):
     if queue.empty():
@@ -61,21 +62,27 @@ if __name__ == "__main__":
         vs = cv2.VideoCapture(args["video"])
 
     # Set up Communication thread
-    queue_communication = queue.Queue()
-    event_communication = threading.Event()
-    event_communication.queue = queue_communication
 
-    communcation = Communication.Communication()
+    queue_writer = queue.Queue()
+    event_writer = threading.Event()
+    event_writer.queue = queue_writer
 
-    thread_communication = threading.Thread(
-        name="communication",
-        target=communcation.runCommunication,
-        args=(event_communication,)
-    )
+    queue_reader = queue.Queue()
+    event_reader = threading.Event()
+    event_reader.queue = queue_reader 
 
-    thread_communication.start()
+    measurements = []
+    recieved = []
+
+    reader = Reader.Reader(Parameters.SERIAL_PORT_IN, Parameters.SERIAL_BODE, queue_reader, recieved)
+    writer = Writer.Writer(Parameters.SERIAL_PORT_OUT, Parameters.SERIAL_BODE, queue_writer, recieved)
+
+    reader.start()
+    writer.start()
 
     rawLocation = (-1, -1)
+
+    nextLocation = (-1, -1)
 
     # Let the webcam warm up
     time.sleep(2.0)
@@ -84,7 +91,7 @@ if __name__ == "__main__":
 
     # Main loop
     while True:
-        handleComEvent(queue_communication)
+        handleComEvent(queue_reader)
 
         frame = vs.read()
 
@@ -141,12 +148,12 @@ if __name__ == "__main__":
                 )
 
                 location.updateLocation(center)
-
+        
         if not location.hasTarget:
-            queue_communication.put({
+            queue_writer.put({
                 "recipient": "COM",
                 "command": "SEND_NEW_LOCATION",
-                "location": location.nextLocation()
+                "angle": location.angle(rawLocation, location.nextLocation())
             })
 
             location.hasTarget = False

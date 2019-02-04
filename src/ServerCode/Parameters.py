@@ -20,8 +20,8 @@ NUM_REGIONS_Y = 10
 
 # Parameters - Serial I/O #
 
-SERIAL_PORT_IN  = '/dev/cu.usbmodem14201'
-SERIAL_PORT_OUT = '/dev/cu.usbmodem14201'
+SERIAL_PORT_IN  = '/dev/cu.usbmodem14101'
+SERIAL_PORT_OUT = '/dev/cu.usbmodem14101'
 SERIAL_BODE     = 115200
 SERIAL_TIMEOUT  = 10000
 
