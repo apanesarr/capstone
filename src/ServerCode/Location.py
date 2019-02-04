@@ -15,6 +15,9 @@ regionSizeX = 1
 regionSizeY = 1
 
 class Location:
+	def reachedTarget(self):
+		return (self.distance(self.rawLocation, self.target) < 0.01)
+
 	def createRegions(self):
 		regions = np.full([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
 
@@ -34,7 +37,7 @@ class Location:
 	def __init__(self):
 		self.regions 		= self.createRegions()
 		self.rawLocation 	= (-1, -1)
-		self.target			= (-1, -1)
+		self.target			= (-999, -999)
 		self.hasTarget		= False
 
 	def updateLocation(self, location):
@@ -48,9 +51,9 @@ class Location:
 
 		return (x, y)
 
-	def distance(p1, p2):
-		deltaX = abs(p1[0], p2[1])
-		deltaY = abs(p2[0], p2[1])
+	def distance(self, p1, p2):
+		deltaX = abs(p1[0] - p2[1])
+		deltaY = abs(p2[0] - p2[1])
 
 		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
@@ -60,10 +63,11 @@ class Location:
 
 		min = self.regions[0]
 
+
 		for r in self.regions:
 			cent = r.center
 
-			if not r.visited and self.distance(cent, currentLoc) < min:
+			if not r.visited and self.distance(cent, self.rawLocation) < min:
 				min = r
 
 		return r.center

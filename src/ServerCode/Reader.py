@@ -18,7 +18,6 @@ class Reader(threading.Thread):
     def run(self):
         while True:
             if (self.ser.inWaiting() > 0):
-                print('hi2')
                 data = self.ser.readline()
 
                 try:

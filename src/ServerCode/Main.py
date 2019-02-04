@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
                 location.updateLocation(center)
         
-        if location.reachedTarget():
+        if False: # location.reachedTarget() == True:
             queue_writer.put({
                 "recipient": "COM",
                 "command": "GET_TEMP"

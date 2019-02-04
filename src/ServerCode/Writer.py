@@ -30,6 +30,9 @@ class Writer(threading.Thread):
             "message": message
         })
 
+        print("SENDING: ")
+        print(message)
+
         self.ser.write(message.encode())
 
     def resend(self, queue, item):
@@ -71,7 +74,19 @@ class Writer(threading.Thread):
                         self.resend(self.queue, item)
 
                 elif (item["command"] == "SEND_NEW_LOCATION"):
+                    message = "%i,%s," % (1, Parameters.CMD_STOP_MOTOR)
+
+                    self.send(self.queue, message)
+
+                    sleep(1000)
+
                     message = "%i,%s,%i" % (1, Parameters.CMD_SET_GYRO, item["angle"])
+
+                    self.send(self.queue, message)
+
+                    sleep(1000)
+
+                    message = "%i,%s," % (1, Parameters.CMD_START_MOTOR)
 
                     self.send(self.queue, message)
 
