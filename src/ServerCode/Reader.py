@@ -23,6 +23,8 @@ class Reader(threading.Thread):
                 try:
                     data = data.decode("utf-8").replace("\r\n", "").split(",")
 
+                    print("<< %s" % data)
+
                     # Proper responses should have 3 comma seperated values
                     if len(data) == 3:
                         messageId   = data[0]

@@ -11,8 +11,8 @@ import math
 
 import Parameters
 
-regionSizeX = 1
-regionSizeY = 1
+regionSizeX = (Parameters.COVERAGE_AREA_X_MAX - Parameters.COVERAGE_AREA_X_MIN) / Parameters.NUM_REGIONS_X
+regionSizeY = (Parameters.COVERAGE_AREA_Y_MAX - Parameters.COVERAGE_AREA_Y_MIN) / Parameters.NUM_REGIONS_Y
 
 class Location:
 	def reachedTarget(self):
@@ -25,8 +25,9 @@ class Location:
 			for j in range(0, regions.shape[1]):
 				region = {"visited": False }
 
-				x = (i / Parameters.NUM_REGIONS_X) * (1.5) * (regionSizeX)
-				y = (j / Parameters.NUM_REGIONS_Y) * (1/5) * (regionSizeY)
+				# Calculate center of region
+				x = (i + 0.5) * regionSizeX
+				y = (i + 0.5) * regionSizeY
 
 				region["center"] = (x, y)
 
@@ -58,19 +59,23 @@ class Location:
 		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
 	def nextLocation(self):
+		currentLoc = self.exactLocation()
+
 		# If we're out of bounds... screw it, it's game over
-		if (self.rawLocation == (-1, -1)): return (-1, -1)
+		if (currentLoc == (-1, -1)): return (-1, -1)
 
-		min = self.regions[0]
-
+		min = self.regions[0][0]
+		minD = 99999
 
 		for r in self.regions:
-			cent = r.center
+			for j in r:
+				cent = j["center"]
 
-			if not r.visited and self.distance(cent, self.rawLocation) < min:
-				min = r
+				if not j["visited"] and self.distance(cent, currentLoc) < minD:
+					min = j
+					minD = self.distance(cent, currentLoc)
 
-		return r.center
+		return min["center"]
 
 	def angle(self, location_current, location_new):
 		delta = (location_new[0] - location_current[0], location_new[1] - location_current[1])

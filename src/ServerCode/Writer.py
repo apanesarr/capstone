@@ -30,8 +30,7 @@ class Writer(threading.Thread):
             "message": message
         })
 
-        print("SENDING: ")
-        print(message)
+        print(">> %s" % message)
 
         self.ser.write(message.encode())
 
@@ -78,13 +77,13 @@ class Writer(threading.Thread):
 
                     self.send(self.queue, message)
 
-                    sleep(1000)
+                    sleep(1)
 
                     message = "%i,%s,%i" % (1, Parameters.CMD_SET_GYRO, item["angle"])
 
                     self.send(self.queue, message)
 
-                    sleep(1000)
+                    sleep(1)
 
                     message = "%i,%s," % (1, Parameters.CMD_START_MOTOR)
 
@@ -101,7 +100,7 @@ class Writer(threading.Thread):
                     self.send(self.queue, message)
 
                 elif (item["command"] == "GET_TEMP"):
-                    message = "%i,%s" % (1, Parameters.CMD_GET_TEMP)
+                    message = "%i,%s," % (1, Parameters.CMD_GET_TEMP)
 
                     self.send(self.queue, message)
 

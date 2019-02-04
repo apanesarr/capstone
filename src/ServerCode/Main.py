@@ -30,7 +30,7 @@ def handleComEvent(queue):
         measurement = item["measurement"]
 
         measurements.append({
-            "location": rawLocation,
+            "location": location.exactLocation(),
             "measurement": measurement
         })
 
@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
                 location.updateLocation(center)
         
-        if False: # location.reachedTarget() == True:
+        if True: #location.reachedTarget() == True:
             queue_writer.put({
                 "recipient": "COM",
                 "command": "GET_TEMP"
@@ -164,7 +164,7 @@ if __name__ == "__main__":
             queue_writer.put({
                 "recipient": "COM",
                 "command": "SEND_NEW_LOCATION",
-                "angle": location.angle(rawLocation, loc)
+                "angle": location.angle(location.exactLocation(), loc)
             })
 
             location.target = loc
@@ -178,7 +178,7 @@ if __name__ == "__main__":
         if key == ord("q"):
             break
 
-        time.sleep(0.1)
+        time.sleep(1)
 
     vs.stop()
 
