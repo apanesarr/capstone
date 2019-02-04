@@ -34,6 +34,8 @@ def handleComEvent(queue):
             "measurement": measurement
         })
 
+        location.hasTarget = False
+
 if __name__ == "__main__":
     # Parse command line args
     ap = argparse.ArgumentParser()
@@ -149,14 +151,24 @@ if __name__ == "__main__":
 
                 location.updateLocation(center)
         
+        if location.reachedTarget():
+            queue_writer.put({
+                "recipient": "COM",
+                "command": "GET_TEMP"
+            })
+            location.hasTarget = True
+
         if not location.hasTarget:
+            loc = location.nextLocation()
+
             queue_writer.put({
                 "recipient": "COM",
                 "command": "SEND_NEW_LOCATION",
-                "angle": location.angle(rawLocation, location.nextLocation())
+                "angle": location.angle(rawLocation, loc)
             })
 
-            location.hasTarget = False
+            location.target = loc
+            location.hasTarget = True
 
         # show the frame to our screen
         cv2.imshow("Frame", frame)

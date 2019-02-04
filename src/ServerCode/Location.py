@@ -34,6 +34,7 @@ class Location:
 	def __init__(self):
 		self.regions 		= self.createRegions()
 		self.rawLocation 	= (-1, -1)
+		self.target			= (-1, -1)
 		self.hasTarget		= False
 
 	def updateLocation(self, location):
