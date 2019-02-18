@@ -1,0 +1,55 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+FWD	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    FWD$/;"	e	enum:msgType_e
+GET_POS	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    GET_POS,$/;"	e	enum:msgType_e
+GET_TEMP	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    GET_TEMP,$/;"	e	enum:msgType_e
+GYRO	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    GYRO,$/;"	e	enum:msgType_e
+InsectID	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  unsigned int InsectID;$/;"	m	struct:payload_t	access:public
+NodeId	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    uint8_t NodeId;$/;"	m	struct:payloadMsg	access:public
+POS_INFO	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    POS_INFO,$/;"	e	enum:msgType_e
+SET_POS	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    SET_POS,$/;"	e	enum:msgType_e
+TEMP	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    TEMP,$/;"	e	enum:msgType_e
+data	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    char data[32];$/;"	m	struct:payloadMsg	access:public
+data	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  char data[32];$/;"	m	struct:payload	access:public
+data	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  char data[32];$/;"	m	struct:payload_r	access:public
+gyroMsg	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^struct gyroMsg {$/;"	s
+gyroMsg::x	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    float x;$/;"	m	struct:gyroMsg	access:public
+latitude	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  unsigned long latitude;$/;"	m	struct:payload_t	access:public
+longitude	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  unsigned long longitude;$/;"	m	struct:payload_t	access:public
+motorMsg	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^struct motorMsg {$/;"	s
+motorMsg::motorState_e	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    motorState_e;$/;"	m	struct:motorMsg	access:public
+motorMsg::state	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    char state;$/;"	m	struct:motorMsg	access:public
+motorMsg::state	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    motorState_e state;$/;"	m	struct:motorMsg	access:public
+motorState_e	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    motorState_e;$/;"	m	struct:motorMsg	access:public
+msgType_e	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^enum msgType_e {$/;"	g
+payload	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^struct payload {$/;"	s
+payload::data	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  char data[32];$/;"	m	struct:payload	access:public
+payload::type	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  char type;$/;"	m	struct:payload	access:public
+payloadMsg	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^struct payloadMsg {$/;"	s
+payloadMsg::NodeId	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    uint8_t NodeId;$/;"	m	struct:payloadMsg	access:public
+payloadMsg::data	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    char data[32];$/;"	m	struct:payloadMsg	access:public
+payloadMsg::type	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    char type;$/;"	m	struct:payloadMsg	access:public
+payloadMsg::type	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    msgType_e type;$/;"	m	struct:payloadMsg	access:public
+payload_r	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^struct payload_r {$/;"	s
+payload_r::data	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  char data[32];$/;"	m	struct:payload_r	access:public
+payload_r::type	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  char type;$/;"	m	struct:payload_r	access:public
+payload_t	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^struct payload_t {$/;"	s
+payload_t::InsectID	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  unsigned int InsectID;$/;"	m	struct:payload_t	access:public
+payload_t::latitude	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  unsigned long latitude;$/;"	m	struct:payload_t	access:public
+payload_t::longitude	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  unsigned long longitude;$/;"	m	struct:payload_t	access:public
+payload_t::temperature	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  unsigned long temperature;$/;"	m	struct:payload_t	access:public
+state	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    char state;$/;"	m	struct:motorMsg	access:public
+state	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    motorState_e state;$/;"	m	struct:motorMsg	access:public
+temp	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    float temp;$/;"	m	struct:tempMsg	access:public
+tempMsg	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^struct tempMsg {$/;"	s
+tempMsg::temp	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    float temp;$/;"	m	struct:tempMsg	access:public
+temperature	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  unsigned long temperature;$/;"	m	struct:payload_t	access:public
+type	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    char type;$/;"	m	struct:payloadMsg	access:public
+type	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    msgType_e type;$/;"	m	struct:payloadMsg	access:public
+type	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  char type;$/;"	m	struct:payload	access:public
+type	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^  char type;$/;"	m	struct:payload_r	access:public
+x	/Users/gpotter/capstone/src/ArduinoCode/libraries/CommsToolbox/CommsToolbox.h	/^    float x;$/;"	m	struct:gyroMsg	access:public
