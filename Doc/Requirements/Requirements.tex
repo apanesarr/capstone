@@ -25,7 +25,7 @@
 
 \begin{document}
 
-\newcommand{\PROJECTNAME}{HydroSwarm}
+\newcommand{\PROJECTNAME}{SwarmBot}
 
 \begin{titlepage}
 	\newcommand{\HRule}{\rule{\linewidth}{0.2mm}}
@@ -133,7 +133,7 @@ There are many applications for carrying out distributed measurements in large b
 
 \subsection{Project Overview}
 
-\PROJECTNAME \space is a \hyperref[sec:definitions]{swarm} of autonomous robotic boats meant to carry out measurements over large bodies of water. For our project, these boats will be measuring water temperature, but the idea can be expanded to any number of other quantifiable measurements. Central to our work will be two major components. First, a small motorized boat, attached with a water temperature sensor, as well as a control unit that allows it to communicate with – and be controlled by – a centralized control unit. Second, a software package that can control a large group (\hyperref[sec:definitions]{swarm}) of these boats, with an algorithm focused on producing reliable, accurate, and fast measurements.\\
+\PROJECTNAME \space is a \hyperref[sec:definitions]{swarm} of autonomous robotic cars meant to carry out measurements over large bodies of water. For our project, these cars will be measuring water temperature, but the idea can be expanded to any number of other quantifiable measurements. Central to our work will be two major components. First, a small motorized car, attached with a water temperature sensor, as well as a control unit that allows it to communicate with – and be controlled by – a centralized control unit. Second, a software package that can control a large group (\hyperref[sec:definitions]{swarm}) of these cars, with an algorithm focused on producing reliable, accurate, and fast measurements.\\
 
 Our swarm will aim to cover large areas more quickly and cost-effectively than traditional products. To test the applicability of our project, we will demo it on a small scale body of water, such as a swimming pool, as well as develop a simulation to hypothetically prove the efficacy of the system on a larger scale.\\
 
@@ -143,10 +143,10 @@ Our project will be conducted between Fall 2018 – Winter 2019 for our Engineer
 
 \label{sec:definitions}
 \begin{itemize}
-\item \textbf{System}: The entire software and hardware package - including the boats,
-boat hardware, control software, and server running the control software
-\item \textbf{Swarm}: A large group of objects (in our case, motorized boats) that can communicate and perform acts as a group
-\item \textbf{Insect}: A member of the swarm (in our case, a single motorized boat)
+\item \textbf{System}: The entire software and hardware package - including the cars,
+car hardware, control software, and server running the control software
+\item \textbf{Swarm}: A large group of objects (in our case, motorized cars) that can communicate and perform acts as a group
+\item \textbf{Insect}: A member of the swarm (in our case, a single motorized car)
 \item \textbf{Simulation}: The simulation will be used for demo purposes, mainly to show that
 the system is valid with a large number of insects.
 \item \textbf{Researcher}: A user that is interested in the data that is returned from the survey.
@@ -156,38 +156,37 @@ the system is valid with a large number of insects.
 
 \subsection{Relevant Facts and Assumptions}
 
-For demo purposes, our project will be conducted on a small scale. One major assumption is that this project can be effectively expanded to a much larger scale – that of lakes, rivers, or even oceans. There will likely be design challenges involved in a large-scale project, but due to the time and resources available to us, we must assume that such challenges could be overcome without compromising its fundamental goals. This assumption carries with it some implicit ones. Namely, we must assume that a large scale version of our project will be able to withstand the wind, water currents, and otherwise adverse weather conditions of real lakes and oceans. It will need to be able to communicate reliably over much larger distances.\\
+For demo purposes, our project will be conducted on a small scale. One major assumption is that this project can be effectively expanded to a much larger scale – that of forests, fields, and larger geographic regions. There will likely be design challenges involved in a large-scale project, but due to the time and resources available to us, we must assume that such challenges could be overcome without compromising its fundamental goals. This assumption carries with it some implicit ones. Namely, we must assume that a large scale version of our project will be able to withstand the wind and otherwise adverse weather conditions of large geographic regions. It will need to be able to communicate reliably over much larger distances.\\
 
 Another assumption we must make is that there are no sensitive lifeforms or other objects that can be harmed by the system, in the near vicinity of the system. An object collision detection algorithm can certainly be implemented, most likely using cameras and computer vision, but due to time constraints, we may not be able to include one.
 
 To simplify the development and testing process, we will assume that weather conditions are as follows:
 
 \begin{itemize}
-    \item Water temperature between $10^o (C)$ and $30^o (C)$
     \item Air temperature between $10^o (C)$ and $30^o (C)$
-    \item Water waves are at maximum \pm $ 15mm$ from the baseline
+    \item Air humidity between $10\%$ and $20\%$
 \end{itemize}
 
 \section{Project Drivers}
 \subsection{Purpose}
-The collection of water temperature data for the purpose of studying large bodies of water poses the following problems: 
+The collection of temperature data for the purpose of studying large bodies poses the following problems: 
 \begin{itemize}
-    \item Water conditions can vary substantially over the area of interest
-    \item Water conditions vary with time
+    \item Tempearture can vary substantially over the area of interest
+    \item Humidity can vary substantially over the area of interest
 \end{itemize}
 
-Therefore, it is optimal to survey multiple test points spanning the area of interest and to collect data regarding the change in water conditions at those test points over a given time interval. The typical solution to this is to place sensors on buoys and fix them to strategic locations in the water. There are two main drawbacks to this approach:
+Therefore, it is optimal to survey multiple test points spanning the area of interest and to collect data regarding the change in environmental conditions at those test points over a given time interval. The typical solution to this is to place sensors on fixed measurement devices and fix them to strategic locations. There are two main drawbacks to this approach:
 \begin{itemize}
-    \item The number of test points is limited to the number of buoys, which cannot be permanently placed in areas which will obstruct water traffic
+    \item The number of test points is limited to the number of fixed test points, which cannot be permanently placed in areas which will obstruct traffic (from humans or other life)
     \item The measurement tools cannot be reused in other areas
-    \item Placing buoys in fixed, arbitrary locations can be costly and time-consuming
+    \item Placing measurement devices in fixed, arbitrary locations can be costly and time-consuming
 \end{itemize}
 
-A possible solution to these issues is a robot swarm of measurement boats. These could be reused in many different regions, and because they are not permanently fixed in the water they could potentially cover a wider range of test points. In addition, the mobility of the swarm allows test points to be measured in different parts of a region at different times, and as such more data can be collected with less equipment. Therefore, the purpose of this project is to build such a system.
+A possible solution to these issues is a robot swarm of measurement cars. These could be reused in many different regions, and because they are not permanently fixed in the water they could potentially cover a wider range of test points. In addition, the mobility of the swarm allows test points to be measured in different parts of a region at different times, and as such more data can be collected with less equipment. Therefore, the purpose of this project is to build such a system.
 
 \subsection{Key Stakeholders}
 \subsubsection{Users}
-The intended users of this system are primarily researchers requiring data for water body analysis. This includes meteorologists, environmental scientists, marine biologists, and oceanographers among many others.
+The intended users of this system are primarily researchers requiring data for environmental analysis. This includes meteorologists, environmental scientists, biologists, among many others.
 \subsubsection{Development Team}
 The development team is responsible for both the project concept and its implementation. This will be done with the guidance of Dr. Alan Wassyng and his teaching assistants.
 \subsubsection{Faculty}
@@ -195,7 +194,7 @@ McMaster University - specifically, the Department of Computing and Software - i
 
 \section{Project Scope}
 \subsection{The Scope of the product}
-Due to time and financial constraints, defining the project's scope is essential to ensure the project is feasible. One way we are scoping the project is the type of data we collect with each insect. We are only collecting temperature and location data. Another way we are scoping the project is restricting the area of the survey. Insects can travel only a maximum distance (approximately covering the size of a swimming pool) from the starting point. The type of water that the swarm will be deployed on is fresh water. We are using existing RC boats, and will not be building our own. We will also rely on other third-party components, such as embedded microcontrollers and transceivers.
+Due to time and financial constraints, defining the project's scope is essential to ensure the project is feasible. One way we are scoping the project is the type of data we collect with each insect. We are only collecting temperature and location data. Another way we are scoping the project is restricting the area of the survey. Insects can travel only a maximum distance (approximately covering the size of a swimming pool) from the starting point. The type of water that the swarm will be deployed on is fresh water. We are using existing RC cars, and will not be building our own. We will also rely on other third-party components, such as embedded microcontrollers and transceivers.
 \subsubsection{Individual use case}
 The actors that interact with the system are the \textbf{\hyperref[sec:definitions]{researcher}}, and the \textbf{\hyperref[sec:definitions]{system administrator}}. The researcher is a primary actor, and the system administrator is a secondary actor. The researcher does not have to be present during the operation of the system. \\
 The following are the primary use cases:
@@ -203,7 +202,7 @@ The following are the primary use cases:
     \item Researcher requests a specific area to be surveyed
     \item Researcher requests time frame to retrieve data
     \item Researcher analyzes the returned data
-    \item  Researcher requests to end surveying session
+    \item Researcher requests to end surveying session
     \item Researcher checks the progress of the survey
 \end{itemize}
 The following are secondary use cases:
@@ -222,7 +221,7 @@ The following are secondary use cases:
 \subsection{Mandated Constraints}
 There are 2 constraints put on the project. The first being time, since the project is due at the end of April 2019. The second constraint is money. There is a \$750 budget for this project.
 \subsection{Undesired Behavior}
-An insect should not lose connection to the server during the survey. An insect should not be hit or come in the path on any object including other insects. The power supply of an insect should not explode. The water should not interfere with the operations of an insect. Other network signals should not interfere with the server and the swarm. 
+An insect should not lose connection to the server during the survey. An insect should not be hit or come in the path on any object including other insects. The power supply of an insect should not explode. The environment should not interfere with the operations of an insect. Other network signals should not interfere with the server and the swarm. 
 \subsection{Variables}
 \begin{figure}[H]
    \centering
@@ -230,11 +229,11 @@ An insect should not lose connection to the server during the survey. An insect 
    \hline 
    \textbf{Variable Name} & \textbf{Type} & \textbf{Value} & \textbf{Description} \\
    \hline
-   Area of survey & Fixed & $X$ in $m^2$ & The total surface area of water in a survey \\ \hline
-   Perimeter of survey & Fixed & $X$ in $m$ & The region that bounds the survey on a body of water \\ \hline
+   Area of survey & Fixed & $X$ in $m^2$ & The total surface area of coverage area in a survey \\ \hline
+   Perimeter of survey & Fixed & $X$ in $m$ & The region that bounds the survey area \\ \hline
    \hyperref[sec:definitions]{Insect} location & Monitored & (X, Y) representing lat/lon values, respectively & The perceived location of an insect at any given time\\ \hline
    Temperature & Monitored & $X$ in $^\circ$C & The measurement an insect takes at a specific point\\ \hline
-   Speed of  \hyperref[sec:definitions]{Insect} & Controlled & $X$ in $m/s$  & The speed relative to the water of an insect \\ \hline
+   Speed of  \hyperref[sec:definitions]{Insect} & Controlled & $X$ in $m/s$  & The speed relative to the ground of an insect \\ \hline
    Number of \hyperref[sec:definitions]{Insect} & Controlled & $X$ amount of insects & The number insects currently deployed in a swarm\\ \hline
    Battery life & Monitored & $X$ in $minutes$ & The amount of battery left in a specific insect \\ \hline
    Range of communication & Fixed & $X$ in $m$ & The range in which server can communicate with each insect \\ \hline
@@ -268,10 +267,24 @@ An insect should not lose connection to the server during the survey. An insect 
 {Each \hyperref[sec:definitions]{insect} in the
 \hyperref[sec:definitions]{swarm}
 must be able to measure
-the water temperature at its current location}
-{Accurate water temperature measurements have many applications
+the air temperature at its current location}
+{Accurate air temperature measurements have many applications
 in academic or professional work}
-{Each insect must be able to measure the water accuracy at its location
+{Each insect must be able to measure the air temperature accurately at its location
+to within \pm $ 1^o C$ at all times}
+{Victor Velechovsky}
+{High}
+{Created Oct. 28, 2018}
+
+\functionalRequirement
+{1}
+{Each \hyperref[sec:definitions]{insect} in the
+\hyperref[sec:definitions]{swarm}
+must be able to measure
+the air humidity at its current location}
+{Accurate air humidity measurements have many applications
+in academic or professional work}
+{Each insect must be able to measure the air humidity accurately at its location
 to within \pm $ 1^o C$ at all times}
 {Victor Velechovsky}
 {High}
@@ -282,7 +295,7 @@ to within \pm $ 1^o C$ at all times}
 {Each \hyperref[sec:definitions]{insect} in the
 \hyperref[sec:definitions]{swarm}
 must be able to provide its current location}
-{Water temperature measurements must be combined with the location
+{Temperature measurements must be combined with the location
 at which they are measured}
 {Each \hyperref[sec:definitions]{insect}'s location must be known to within
 $1m$ accuracy at all times}
@@ -294,9 +307,9 @@ $1m$ accuracy at all times}
 {3}
 {The \hyperref[sec:definitions]{system} must be able to produce temperature
 measurements, specified in Requirement F1, at many different locations
-in a body of water}
+in the coverage area}
 {Producing many data points provides a more accurate representation of the
-underlying property (in our case, the temperature of the water)}
+underlying property (in our case, the temperature and humidity of the air)}
 {The \hyperref[sec:definitions]{system} must produce at least 5 different
 measurements for each \hyperref[sec:definitions]{insect} that is
 available}
@@ -306,8 +319,8 @@ available}
 
 \functionalRequirement
 {4}
-{The \hyperref[sec:definitions]{system} must be able to produce a \hyperref[sec:definitions]{Water Temperature Map} of a swimming pool-sized body of water}
-{Producing a visual temperature map of a body of water is a useful
+{The \hyperref[sec:definitions]{system} must be able to produce an Air Temperature Map of a swimming pool-sized body of water}
+{Producing a visual temperature map of the coverage area is a useful
 tool for analyzing measurement data}
 {The swarm must be able to produce a visualization that displays a representation
 of the temperature measurement data}
@@ -412,7 +425,7 @@ amount of time without failing}
 {Users want the system to collect data for long enough to produce enough
 data points}
 {The system must collect temperature measurements reliably for a minimum of
-20m}
+20 minutes}
 {Victor Velechovsky}
 {High}
 {Created Oct. 28, 2018}
@@ -423,7 +436,7 @@ data points}
 {5}
 {The \hyperref[sec:definitions]{swarm} must be able to work with an arbitrary
 number of \hyperref[sec:definitions]{insects}}
-{The number of boats in the swarm should be easily configurable}
+{The number of cars in the swarm should be easily configurable}
 {The swarm must work correctly with 3-30 insects}
 {Victor Velechovsky}
 {High}
@@ -431,9 +444,9 @@ number of \hyperref[sec:definitions]{insects}}
 
 \nonFunctionalRequirement
 {6}
-{The \hyperref[sec:definitions]{server software} will run on Linux}
+{The \hyperref[sec:definitions]{server software} will run on MacOS Mojave}
 {Linux is a popular, efficient and well-supported operating system}
-{The \hyperref[sec:definitions]{server software} will run on Linux}
+{The \hyperref[sec:definitions]{server software} will run on MacOS Mojave}
 {Victor Velechovsky}
 {High}
 {Created Oct. 30, 2018}
@@ -498,8 +511,8 @@ offend the users that purchase it}
 \nonFunctionalRequirement
 {12}
 {The \hyperref[sec:definitions]{insects} will not travel too quickly}
-{Fast moving boats may present a danger to the nearby environment}
-{The boats will not travel faster than $10 km/h$}
+{Fast moving cars may present a danger to the nearby environment}
+{The cars will not travel faster than $10 km/h$}
 {Victor Velechovsky}
 {Medium}
 {Created Oct. 29, 2018}
@@ -508,14 +521,14 @@ offend the users that purchase it}
 {13}
 {The \hyperref[sec:definitions]{insects} will not have exposed wiring}
 {Expired wiring could be a safety concern to the nearby environment}
-{The boats will not have any visible wiring under normal operation}
+{The cars will not have any visible wiring under normal operation}
 {Victor Velechovsky}
 {Medium}
 {Created Oct. 30, 2018}
 
 \section{Project Issues}
 \subsection{Open Issues}
-Due to the complexity of the project, there are some open issues that our group might have to overcome to be successful. One of the open issues that we have is an error in data and how to check the validity of the temperature data received from the boats. For example, one of the insects in the swarm could potentially have a faulty reading and skew the data resulting in an invalid survey. Since our group has not chosen the temperature sensor yet, we do not have concrete information about the severity of this issue. Another open issue we have is the battery life for the insect. If it dies midway through the survey, it will result in missing data. In addition, if the insect battery dies, an issue that might arise is how to retrieve the insect and supplement the missing data. Path correction is also an open issue that might be difficult to solve since we do not have any information on direction or about the water current speed and location. 
+Due to the complexity of the project, there are some open issues that our group might have to overcome to be successful. One of the open issues that we have is an error in data and how to check the validity of the temperature data received from the cars. For example, one of the insects in the swarm could potentially have a faulty reading and skew the data resulting in an invalid survey. Since our group has not chosen the temperature sensor yet, we do not have concrete information about the severity of this issue. Another open issue we have is the battery life for the insect. If it dies midway through the survey, it will result in missing data. In addition, if the insect battery dies, an issue that might arise is how to retrieve the insect and supplement the missing data. Path correction is also an open issue that might be difficult to solve since we do not have any information on direction or about the water current speed and location. 
 \subsection{Off The Shelf Solutions}
 In order to solve the open issues, some off-the-shelf solutions must be incorporated into the project. The error in temperature data, for example, can be solved by buying a more accurate temperature. However, the more accurate the temperature sensor, the higher the price, which is one of the constraints in this project. Another open issue that can be solved with Off The Shelf Solutions is the battery life. Again buying a larger battery will increase the life of the insect but will increase weight and costs which might affect other requirements. In addition, path correction might be solved by an accurate G.P.S. system but the price might force the solution to be too expensive to pursue. 
 \subsection{New Problems}
