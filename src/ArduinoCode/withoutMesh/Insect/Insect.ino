@@ -17,10 +17,13 @@ void setup() {
   Serial.begin(115200);
   radio.begin();
   network.begin(100, nodeID);
+  Serial.println("Starting insect...");
 }
 
 void loop() {
   network.update();
+  payloadMsg payload;
+  //safeSend('I', &payload, 10);
   while(network.available()){
     RF24NetworkHeader header;
     payloadMsg payload;
@@ -90,10 +93,9 @@ void handle_move_motor(RF24NetworkHeader *header, payloadMsg *payload){
 }
 
 void safeSend(char type, payloadMsg *payload, int tryAgain ){
-  while ( !sendToMaster(type,payload) && tryAgain > 0 ){
-    tryAgain --;
+  while ( !sendToMaster(type,payload)){
     Serial.println("Failed to send");
-    delay(10);
+    delay(100);
   }
 }
 
