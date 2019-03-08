@@ -1,12 +1,12 @@
 #include <CommsToolbox.h>
 #include "RF24.h"
 #include "RF24Network.h"
-#include "RF24Mesh.h"
+#include "CarMotorCtrl.h"
 
 #define nodeID 0
 
-RF24 radio(7, 8);
-RF24Network network(radio);
+RF24 radio1(7, 8);
+RF24Network network(radio1);
 const char s[2] = ",";
 
 uint16_t msg = 45;
@@ -36,12 +36,33 @@ sendMsg convertToMsg (String str) {
   msg.to_id = (uint16_t)split[1][0] - 48;
   msg.type = split[2][0];
   strncpy (msg.value, split[3], sizeof(msg.value));
+  motorSettings_t settings;
+  switch(msg.type){
+    case MOTOR_TYPE:
+     Serial.println(msg.value);
+      if(strcmp(msg.value, "FORWARD")){
+        settings.state = FORWARD;
+        settings.targetAngle = 0;
+        Serial.println("GOING FORWARD");
+      }
+
+      else if( strcmp(msg.value,"BACKWARD")){
+        settings.state = REVERSE;
+        settings.targetAngle = 0;
+        Serial.println("GOING BACK");
+      }
+      break;
+    default:
+      Serial.println("Error");
+      break;
+  }
+  memcpy(&msg.value, &settings, sizeof(settings));
   return msg;
 }
 
 void setup() {
   Serial.begin(115200);
-  radio.begin();
+  radio1.begin();
   network.begin(100,nodeID);
   Serial.print("Starting Master");
 }
@@ -56,7 +77,7 @@ void loop() {
     payloadMsg payload;
     payload.msg_id = data.msg_id;
     strcpy(payload.data, data.value);
-    network.write(header,&payload,sizeof(payload));   
+    network.write(header,&payload,sizeof(payload));
   }
   
   while(network.available()){

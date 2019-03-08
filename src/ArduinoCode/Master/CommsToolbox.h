@@ -5,6 +5,13 @@
 #define INIT 'I'
 #define TEMP_TYPE 'T'
 
+// typedef enum motorState_e {
+//     FORWARD,
+//     REVERSE,
+//     STEER_LEFT,
+//     STEER_RIGHT,
+//     STOP
+// };
 
 struct payloadMsg {
     unsigned msg_id;
@@ -12,17 +19,3 @@ struct payloadMsg {
 };
 
 
-struct MotorPayload {
-  unsigned int msg_id;
-  motorSettings_t setting;
-};
-
-
-struct SensorPayload {
-  unsigned int msg_id;
-  float temp;
-};
-
-struct InitPayload {
-  unsigned int msg_id;
-};

@@ -24,12 +24,10 @@ void MotorControl::setMotor(motorSettings_t newSettings)
     case FORWARD:
       settings.targetTimeMs = millis() + newSettings.targetTimeMs;
       forward();
-      ready = TRUE;
       break;
     case REVERSE:
       settings.targetTimeMs = millis() + newSettings.targetTimeMs;
       reverse();
-      ready = TRUE;
       break;
     case LEFT:
       settings.targetAngle = imu.getYaw() - newSettings.targetAngle;

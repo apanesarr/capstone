@@ -1,6 +1,6 @@
 #include "RadioComms.h"
 
-#define nodeID 1
+//#define nodeID 1
 #define retry 10
 
 RF24 radio(7,8);
@@ -8,17 +8,17 @@ RF24Network network(radio);
 
 bool init_conn = false;
 
-void RadioComms::init() {
+void RadioComms::init(unsigned int nodeID) {
   Serial.begin(115200);
   radio.begin();
   network.begin(100, nodeID);
   Serial.println("Starting insect...");
 }
 
+
 void RadioComms::update() {
   network.update();
   payloadMsg payload;
-  //safeSend('I', &payload, 10);
   while(network.available()){
     RF24NetworkHeader header;
     payloadMsg payload;
@@ -40,7 +40,9 @@ void RadioComms::update() {
         handle_stop_motor(&header, &payload);
         break;
       case MOTOR_TYPE:
-        handle_move_motor(&header, &payload);
+        memcpy(&newSettings, &payload.data, sizeof(newSettings));
+        Serial.println(newSettings.state);
+//        handle_move_motor(&header, &payload);
         break;
       default:
         Serial.println("UNKNOWN MESSAGE TYPE");

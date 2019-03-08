@@ -17,15 +17,24 @@ struct payloadMsg {
     char data [32];
 };
 
+struct SensorPayload {
+  unsigned int msg_id;
+  float temp;
+};
+
+struct InitPayload {
+  unsigned int msg_id;
+};
+
 class RadioComms {
     public:
         RadioComms() : radio(7,8), network(radio) {};
-        void init();
+        void init(unsigned int nodeID);
         void update();
+        motorSettings_t newSettings;
     private:
         RF24 radio;
         RF24Network network;
-        motorSettings_t newSettings;
         void handle_temp(RF24NetworkHeader *header, payloadMsg *payload);
         void handle_set_gyro (RF24NetworkHeader *header, payloadMsg *payload);
         void handle_get_gyro (RF24NetworkHeader *header, payloadMsg *payload);
