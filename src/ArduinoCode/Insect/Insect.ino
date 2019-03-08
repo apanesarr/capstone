@@ -1,24 +1,22 @@
 #include "CarMotorCtrl.h"
 #include "MotorPatterns.h"
 #include "RadioComms.h"
-
-
-
+#include "dht.h"
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0])) 
 MotorControl motor;
 int i = 0;
 motorSettings_t getNewMotorSettings();
-Antenna antenna;
+RadioComms comms;
 
 motorSettings_t settings[LEN_PATTERN_2] = {TEST_PATTERN_2};
 
 void setup() {
   //motor.init();
-  antenna.init();
+  comms.init();
 }
 
 void loop() {
-  antenna.update();
+  comms.update();
   //motor.update();
 //  if (motor.ready) {
 //    motor.setMotor(getNewMotorSettings());

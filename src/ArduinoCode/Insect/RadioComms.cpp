@@ -8,14 +8,14 @@ RF24Network network(radio);
 
 bool init_conn = false;
 
-void Antenna::init() {
+void RadioComms::init() {
   Serial.begin(115200);
   radio.begin();
   network.begin(100, nodeID);
   Serial.println("Starting insect...");
 }
 
-void Antenna::update() {
+void RadioComms::update() {
   network.update();
   payloadMsg payload;
   //safeSend('I', &payload, 10);
@@ -49,52 +49,52 @@ void Antenna::update() {
   }
 }
 
-void Antenna::handle_temp(RF24NetworkHeader *header, payloadMsg *payload){
+void RadioComms::handle_temp(RF24NetworkHeader *header, payloadMsg *payload){
   Serial.println("Handling temp_type");
   float temp = 20.00;
   dtostrf(temp,12,20,(payload->data));
   safeSend(GET_GYRO_TYPE, payload, retry);
 }
 
-void Antenna::handle_set_gyro (RF24NetworkHeader *header, payloadMsg *payload) {
+void RadioComms::handle_set_gyro (RF24NetworkHeader *header, payloadMsg *payload) {
   float degree = atof(payload->data);
   Serial.println(degree);
 
 }
 
-void Antenna::handle_get_gyro (RF24NetworkHeader *header, payloadMsg *payload) {
+void RadioComms::handle_get_gyro (RF24NetworkHeader *header, payloadMsg *payload) {
   Serial.println("Handling get gyro");
   float degree = 90.0012312312313;
   dtostrf(degree,12,20,(payload->data));
   safeSend(SET_GYRO_TYPE,payload, retry);
 }
 
-void Antenna::handle_init(RF24NetworkHeader *header, payloadMsg *payload){
+void RadioComms::handle_init(RF24NetworkHeader *header, payloadMsg *payload){
   Serial.println("Handling init_type");
 //  payload->data = "INIT";
   safeSend(INIT, payload, retry);
 }
 
-void Antenna::handle_stop_motor(RF24NetworkHeader *header, payloadMsg *payload){
+void RadioComms::handle_stop_motor(RF24NetworkHeader *header, payloadMsg *payload){
   Serial.println("Handling stop_type");
   //motor.setMotor(STOP);
   safeSend(STOP_TYPE, payload, retry);
 }
 
-void Antenna::handle_move_motor(RF24NetworkHeader *header, payloadMsg *payload){
+void RadioComms::handle_move_motor(RF24NetworkHeader *header, payloadMsg *payload){
   Serial.println("Handling move_type");
   //motor.setMotor(FORWARD);
   safeSend(MOTOR_TYPE, payload, retry);
 }
 
-void Antenna::safeSend(char type, payloadMsg *payload, int tryAgain ){
-  while ( !sendToMaster(type,payload)){
+void RadioComms::safeSend(char type, payloadMsg *payload, int tryAgain ){
+  while (!sendToMaster(type,payload)){
     Serial.println("Failed to send");
     delay(100);
   }
 }
 
-bool Antenna::sendToMaster (char type, payloadMsg *payload) {
+bool RadioComms::sendToMaster (char type, payloadMsg *payload) {
   RF24NetworkHeader header(0,type);
   return network.write(header, payload, sizeof(*payload));
 }

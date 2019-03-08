@@ -1,13 +1,24 @@
 #ifndef RadioComms_h
 #define RadioComms_h
 
-#include "CommsToolbox.h"
 #include "RF24.h"
 #include "RF24Network.h"
 
-class Antenna {
+#define SET_GYRO_TYPE 'H'
+#define MOTOR_TYPE 'M'
+#define GET_GYRO_TYPE 'G'
+#define STOP_TYPE 'S'
+#define INIT 'I'
+#define TEMP_TYPE 'T'
+
+struct payloadMsg {
+    unsigned msg_id;
+    char data [32];
+};
+
+class RadioComms {
     public:
-        Antenna() : radio(7,8), network(radio) {};
+        RadioComms() : radio(7,8), network(radio) {};
         void init();
         void update();
     private:
