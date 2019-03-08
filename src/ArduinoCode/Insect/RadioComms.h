@@ -3,6 +3,7 @@
 
 #include "RF24.h"
 #include "RF24Network.h"
+#include "CarMotorCtrl.h"
 
 #define SET_GYRO_TYPE 'H'
 #define MOTOR_TYPE 'M'
@@ -24,6 +25,7 @@ class RadioComms {
     private:
         RF24 radio;
         RF24Network network;
+        motorSettings_t newSettings;
         void handle_temp(RF24NetworkHeader *header, payloadMsg *payload);
         void handle_set_gyro (RF24NetworkHeader *header, payloadMsg *payload);
         void handle_get_gyro (RF24NetworkHeader *header, payloadMsg *payload);
