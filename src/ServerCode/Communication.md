@@ -89,3 +89,14 @@ Response:
     "Angle"   : Float
 }
 ```
+
+## Send Failed
+```json
+{
+    "MessageId"     : Int,
+    "RecipientId"   : Int,
+    "MessageType"   : String,
+    "Error"         : String
+}
+```
+
