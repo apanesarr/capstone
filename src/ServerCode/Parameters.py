@@ -1,3 +1,5 @@
+SURVEY_TIME = 10 * 60 # Max time, in seconds, for the surveying process
+
 # Parameters - Object Tracking #
 
 MIN_RADIUS = 10
@@ -25,6 +27,7 @@ SERIAL_PORT_OUT = '/dev/ttyACM0'
 SERIAL_BODE     = 115200
 SERIAL_TIMEOUT  = 10000
 
+PAIR_TIME       = 10 # Amount of time to wait for pairing
 RESEND_DELAY    = 1  # Amount of time in seconds to wait before resending a message
 DEAD_DELAY      = 10 # Amount of inactivity in seconds before an insect is considered dead
 
@@ -38,3 +41,7 @@ MSG_TYPE_GET_LOCATION           : "GetLocation"
 
 RES_OK              = "R"
 RES_TEMP            = "T"
+
+# Parameters - Insects #
+
+NUM_INSECTS         = 1

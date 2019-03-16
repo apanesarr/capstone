@@ -40,21 +40,28 @@ class Reader(threading.Thread):
                 messageType = data["MessageType"]
                 messageId   = data["MessageId"]
 
-                # Check if this is an acknowledgement
+                # Acknowledge that the message has been recieved to prevent retries
                 if messageId not in self.recieved:
                     self.recieved.append(messageId)
 
                 # We only handle certain responses (RequestMeasurement, GetLocation)
 
+                if messageType == "Pair":
+                    self.queue.append({
+                        "recipient"     : "PAIR",
+                        "command"       : "Pair",
+                        "insectId"      : data["data"]["insectId"] # TODO
+                    })
+
                 if messageType == "RequestMeasurement":
                     self.queue.append({
                         "recipient"     : "MAIN",
                         "command"       : "RequestMeasurement",
-                        "measurement"   : message["data"]
+                        "measurement"   : data["data"]
 
                 if messageType == "GetLocation":
                     self.queue.append({
                         "recipient"     : "MAIN",
                         "command"       : "GetLocation",
-                        "location"      : message["data"]
+                        "location"      : data["data"]
                     )}

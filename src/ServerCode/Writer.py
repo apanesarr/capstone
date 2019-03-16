@@ -78,10 +78,13 @@ class Writer(threading.Thread):
                         self.resend(self.queue, item)
 
                 elif (item["command"] == "RequestMeasurement"):
+                    self.send(self.queue, "RequestMeasurement", item["insectId"], "")
 
                 elif (item["command"] == "SetState"):
+                    self.send(self.queue, "SetState", item["insectId"], item["message"])
 
                 elif (item["command"] == "GetLocation"):
-
+                    self.send(self.queue, "GetLocation", item["insectId"], "")
+                    
                 else:
                     print("ERR: Communication.py - Invalid message")

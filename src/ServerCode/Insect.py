@@ -2,7 +2,9 @@ import time
 
 # Waits for insects to pair and initializes them
 def pairInsects():
-    endTime = time.time() + 60 * Parameters.PAIR_TIME
+    print("Beginning pairing")
+
+    endTime = time.time() + Parameters.PAIR_TIME
 
     # Initialize serial communication
     queue_writer = queue.Queue()
@@ -21,17 +23,25 @@ def pairInsects():
 
     insects = []
 
-    while (time.time() < endTime):
+    while (time.time() < endTime and len(insects) < Parameters.NUM_INSECTS):
         if not queue_reader.empty():
             item = queue_reader.get()
 
-            if (item["recipient"] == "PAIR"):
-                insectId   = item["id"]
-                colorRange = item["colorRange"]
+            if (item["recipient"] == "PAIR" and item["command"] == "PAIR"):
+                insectId   = item["insectId"]
 
-                ins = Insect(insectId, colorRange)
+                ins = Insect(insectId)
 
                 insects.append(ins)
+
+            # If it's not for us, put it back
+            else:
+                queue_reader.put(item)
+
+        time.sleep(2)
+        print("...")
+
+    print("%i out of %i insects paired" % (len(insects), Parameters.NUM_INSECTS)
 
 class Insect:
     def __init__(self, insectId, colorRange):
