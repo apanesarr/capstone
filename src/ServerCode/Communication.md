@@ -27,6 +27,10 @@ The following represents the 'Data' section of each message.
 
 ## Request measurement reading
 
+```json
+MessageType: "RequestMeasurement"
+```
+
 Challenge:
 
 ```json
@@ -43,6 +47,10 @@ Response:
 ```
 
 ## Set motion state
+
+```json
+MessageType: "SetState"
+```
 
 Challenge:
 
@@ -61,6 +69,10 @@ Response:
 ```
 
 ## Get location
+
+```json
+MessageType: "GetLocation"
+```
 
 Challenge:
 
