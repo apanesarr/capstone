@@ -21,24 +21,40 @@ class Reader(threading.Thread):
                 data = self.ser.readline()
 
                 try:
-                    data = data.decode("utf-8").replace("\r\n", "").split(",")
+                    data = data.decode()
+                    data = json.dumps(data)
 
-                    print("<< %s" % data)
+                except JSONDecodeError as e:
+                    print("Reader.run() - error decoding JSON - %s" % e)
+                    break
 
-                    # Proper responses should have 3 comma seperated values
-                    if len(data) == 3:
-                        messageId   = data[0]
-                        messageType = data[1]
-                        message     = data[2]
+                except UnicodeError as e:
+                    print("Reader.run() - error decoding binary - %s" % e)
+                    break
 
-                        if messageType == Parameters.OK:
-                            self.recieved.append(messageId)
-
-                        elif messageType == Parameters.TEMP:
-                            self.queue.append({
-                                "recipient": "MAIN",
-                                "command": "RECORD_MEASUREMENT",
-                                "measurement": message
-                            })
                 except:
-                    pass
+                    print("Reader.run() - unknown error")
+                    break
+
+                
+                messageType = data["MessageType"]
+                messageId   = data["MessageId"]
+
+                # Check if this is an acknowledgement
+                if messageId not in self.recieved:
+                    self.recieved.append(messageId)
+
+                # We only handle certain responses (RequestMeasurement, GetLocation)
+
+                if messageType == "RequestMeasurement":
+                    self.queue.append({
+                        "recipient"     : "MAIN",
+                        "command"       : "RequestMeasurement",
+                        "measurement"   : message["data"]
+
+                if messageType == "GetLocation":
+                    self.queue.append({
+                        "recipient"     : "MAIN",
+                        "command"       : "GetLocation",
+                        "location"      : message["data"]
+                    )}

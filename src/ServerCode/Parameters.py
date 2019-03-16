@@ -25,14 +25,14 @@ SERIAL_PORT_OUT = '/dev/ttyACM0'
 SERIAL_BODE     = 115200
 SERIAL_TIMEOUT  = 10000
 
+RESEND_DELAY    = 1  # Amount of time in seconds to wait before resending a message
+DEAD_DELAY      = 10 # Amount of inactivity in seconds before an insect is considered dead
+
 # Parameters - Command Codes #
 
-CMD_SET_GYRO        = "H"
-CMD_START_MOTOR     = "M"
-CMD_GET_GYRO        = "G"
-CMD_STOP_MOTOR      = "S"
-CMD_INIT            = "I"
-CMD_GET_TEMP        = "T"
+MSG_TYPE_REQUEST_MEASUREMENT    : "RequestMeasurement"
+MSG_TYPE_SET_STATE              : "SetState"
+MSG_TYPE_GET_LOCATION           : "GetLocation" 
 
 # Parameters - Response Codes #
 

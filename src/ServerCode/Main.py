@@ -22,11 +22,12 @@ def handleComEvent(queue):
 
     item = queue.get()
 
+    # if it's not meant for us, put it back and return
     if not (item["recipient"] == "MAIN"):
         queue.put(item)
         return
 
-    elif (item["command"] == "RECORD_MEASUREMENT"):
+    elif (item["command"] == "RequestMeasurement"):
         measurement = item["measurement"]
 
         measurements.append({
@@ -39,7 +40,7 @@ def handleComEvent(queue):
 if __name__ == "__main__":
     # Parse command line args
     ap = argparse.ArgumentParser()
-    
+
     ap.add_argument(
         "-v", "--video",
         help="path to the (optional) video file"
@@ -150,11 +151,12 @@ if __name__ == "__main__":
                 )
 
                 location.updateLocation(center)
-        
+
         if True: #location.reachedTarget() == True:
             queue_writer.put({
-                "recipient": "COM",
-                "command": "GET_TEMP"
+                "recipient"     : "COM",
+                "command"       : "RequestMeasurement",
+                "insectId"      : 1
             })
             location.hasTarget = True
 
@@ -162,10 +164,9 @@ if __name__ == "__main__":
             loc = location.nextLocation()
 
             queue_writer.put({
-                "recipient": "COM",
-                "command": "SEND_NEW_LOCATION",
-                "angle": location.angle(location.exactLocation(), loc)
-            })
+                "recipient"     : "COM",
+                "command"       : "SetState"
+            }) # TODO - we still need this funcitonality that determines the correct state to set
 
             location.target = loc
             location.hasTarget = True

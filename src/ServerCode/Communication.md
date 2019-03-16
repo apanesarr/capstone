@@ -91,12 +91,10 @@ Response:
 ```
 
 ## Send Failed
+
 ```json
 {
-    "MessageId"     : Int,
-    "RecipientId"   : Int,
-    "MessageType"   : String,
-    "Error"         : String
+    "Error":        : String
 }
 ```
 

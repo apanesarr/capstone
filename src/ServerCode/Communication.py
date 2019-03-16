@@ -1,11 +1,13 @@
 import time
 import serial
+import json
 
 import Parameters
 import Location
 
-recievedMessages = []
-newMessageId = 1
+awaitingResponse    = []
+recievedMessages    = []
+newMessageId        = 1
 
 class Communication:
     # Reset the buffer to switch between reading and writing
@@ -16,19 +18,28 @@ class Communication:
         self.serial_out.close()
         self.serial_out.open()
 
-    def send(self, queue, message):
+    def send(self, queue, messageType, message):
         global newMessageId
 
         messageId = newMessageId
         newMessageId = newMessageId + 1
 
-        message = str(messageId) + "," + message + "\r\n"
+        message = {
+            "MessageId"     : messageId,
+            "RecipientId"   : 1,
+            "MessageType"   : messageType,
+            "Data"          : message  
+        }
 
+        # Periodically check for a response and re-send if necessary
+        # The outer layer is meant for the Server - the inner layer (the `message` object
+        # is the layer that is meant for the insect)
         queue.put({
-            "recipient": "COM",
-            "command": "CHECK_RESPONSE",
-            "messageId": messageId,
-            "message": message
+            "recipient"     : "COM",
+            "command"       : "CHECK_RESPONSE",
+            "time"          : time.time() + Parameters.RESEND_DELAY
+            "messageId"     : messageId,
+            "message"       : message
         })
 
         self.serial_out.write(message.encode())
@@ -37,10 +48,10 @@ class Communication:
         message = item["message"] + "\r\n"
 
         queue.put({
-            "recipient": "COM",
-            "command": "CHECK_RESPONSE",
-            "messageId": item["messageId"],
-            "message": message
+            "recipient"     : "COM",
+            "command"       : "CHECK_RESPONSE",
+            "messageId"     : item["messageId"],
+            "message"       : message
         })
 
         self.serial_out.write(message.encode())
@@ -70,10 +81,24 @@ class Communication:
             if self.serial_in.inWaiting() > 0:
                 data = self.serial_in.readline()
 
-                data = data.decode("utf-8").replace("\r\n", "").split(",")
+                try:
+                    data = data.decode()
+                    data = json.dumps(data)
+
+                except JSONDecodeError as e:
+                    print("runCommunication() - error decoding JSON - %s" % e)
+                    break
+
+                except UnicodeError as e:
+                    print("runCommunication() - error decoding binary - %s" % e)
+                    break
+
+                except:
+                    print("runCommunication() - unknown error")
+                    break
 
                 # Proper responses should have 3 comma seperated values
-                if len(data) == 3:
+"""                 if len(data) == 3:
                     messageId   = data[0]
                     messageType = data[1]
                     message     = data[2]
@@ -86,7 +111,7 @@ class Communication:
                             "recipient": "MAIN",
                             "command": "RECORD_MEASUREMENT",
                             "measurement": message
-                        })
+                        }) """
 
             if not queue.empty():
                 item = queue.get()
