@@ -1,5 +1,12 @@
 import time
 
+def getInsect(insects, insectId):
+    for (insect in insects):
+        if insect["insectId"] == insectId:
+            return insectId
+
+    return null
+
 # Waits for insects to pair and initializes them
 def pairInsects():
     print("Beginning pairing")

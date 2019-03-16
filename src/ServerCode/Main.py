@@ -21,10 +21,9 @@ def handleComEvent(queue):
         queue.put(item)
         return
 
-    elif (item["command" == "Pair"):
-        insectId = item["insectId"]
-
-        ## TODO - add insect
+    if (item["command" == "Arrived"):
+        # TODO
+        pass
 
     elif (item["command"] == "RequestMeasurement"):
         measurement = item["measurement"]
@@ -36,7 +35,7 @@ def handleComEvent(queue):
             "measurement"   : measurement
         })
 
-        getInsect(insectId).hasTarget = False
+        getInsect(insects, insectId).hasTarget = False
 
     elif (item["command"] == "GetLocation"):
         data = item["location"]
@@ -75,23 +74,13 @@ if __name__ == "__main__":
     while time.time() < Parameters.SURVEY_TIME: # TODO - check for when the process is complete
         handleComEvent(queue_reader)
 
-"""             queue_writer.put({
-                "recipient"     : "COM",
-                "command"       : "RequestMeasurement",
-                "insectId"      : 1
-            }) """
-            location.hasTarget = True
-
-        if not location.hasTarget:
-            loc = location.nextLocation()
-
-            queue_writer.put({
-                "recipient"     : "COM",
-                "command"       : "SetState"
-            }) # TODO - we still need this funcitonality that determines the correct state to set
-
-            location.target = loc
-            location.hasTarget = True
+        for insect in insects:
+            if not insect.hasTarget:
+                queue_writer.put({
+                    "recipient"     : "COM",
+                    "command"       : "SetState",
+                    "state"         : location.nextLocation(insect)
+                })
 
         # if the "q" key is pressed, stop the loop
         if key == ord("q"):

@@ -90,6 +90,22 @@ Response:
 }
 ```
 
+## Arrived at Location
+
+MessageId is not necessary for this one
+
+```json
+MessageType: "Arrived"
+```
+
+```json
+{
+    "X"     : Float,
+    "Y"     : Float,
+    "Angle" : Float
+}
+```
+
 ## Send Failed
 
 ```json

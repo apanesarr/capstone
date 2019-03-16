@@ -53,6 +53,13 @@ class Reader(threading.Thread):
                         "insectId"      : data["data"]["insectId"] # TODO
                     })
 
+                if messageType == "Arrived":
+                    self.queue.append({
+                        "recipient"     : "MAIN",
+                        "command"       : "Arrived",
+                        "location"      : data["data"]
+                    })
+
                 if messageType == "RequestMeasurement":
                     self.queue.append({
                         "recipient"     : "MAIN",
