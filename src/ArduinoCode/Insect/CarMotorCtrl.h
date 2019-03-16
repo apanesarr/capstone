@@ -4,20 +4,24 @@
 #include "MotorPatterns.h"
 #include "Arduino.h"
 #include "IMU.h"
-#include <limits.h>
 
 #define LEFT_FWD_PIN 6
 #define LEFT_BWD_PIN 5
 #define RIGHT_FWD_PIN 9
 #define RIGHT_BWD_PIN 10
 
+/* Encoder pins - on Uno, interrupt pins are 2, 3.
+ * These should be set to encoder output A for each side. */
+#define RS_ENC_A 2
+#define RS_ENC_B 1
+#define LS_ENC_A 3
+#define LS_ENC_B 4
+
 #define LEFT_MOTOR_PWR 255
 #define RIGHT_MOTOR_PWR LEFT_MOTOR_PWR
 
 #define TRUE 1
 #define FALSE 0
-
-#define INDEFINITE LONG_MAX
 
 enum motorState_e {
   FORWARD,

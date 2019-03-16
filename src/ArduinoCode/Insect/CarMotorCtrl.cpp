@@ -12,7 +12,25 @@ MotorControl::MotorControl()
 void MotorControl::init()
 {
     imu.init();
+    initEncoderPins();
     ready = TRUE;
+}
+
+void MotorControl::initEncoderPins()
+{
+    /* Right side encoder */
+    pinMode(RS_ENC_A, INPUT);
+    digitalWrite(RS_ENC_A, HIGH);
+    pinMode(RS_ENC_B, INPUT);
+    digitalWrite(RS_ENC_B, HIGH);
+    attachInterrupt(digitalPinToInterrupt(RS_ENC_A), doEncoder, CHANGE);
+
+    /* Left side encoder */
+    pinMode(LS_ENC_A, INPUT);
+    digitalWrite(LS_ENC_A, HIGH);
+    pinMode(LS_ENC_B, INPUT);
+    digitalWrite(LS_ENC_B, HIGH);
+    attachInterrupt(digitalPinToInterrupt(LS_ENC_A), doEncoder, CHANGE);
 }
 
 void MotorControl::setMotor(motorSettings_t newSettings)
