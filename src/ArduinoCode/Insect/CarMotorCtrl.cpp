@@ -23,14 +23,14 @@ void MotorControl::initEncoderPins()
     digitalWrite(RS_ENC_A, HIGH);
     pinMode(RS_ENC_B, INPUT);
     digitalWrite(RS_ENC_B, HIGH);
-    attachInterrupt(digitalPinToInterrupt(RS_ENC_A), doEncoder, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(RS_ENC_A), updateEncRS, CHANGE);
 
     /* Left side encoder */
     pinMode(LS_ENC_A, INPUT);
     digitalWrite(LS_ENC_A, HIGH);
     pinMode(LS_ENC_B, INPUT);
     digitalWrite(LS_ENC_B, HIGH);
-    attachInterrupt(digitalPinToInterrupt(LS_ENC_A), doEncoder, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(LS_ENC_A), updateEncLS, CHANGE);
 }
 
 void MotorControl::setMotor(motorSettings_t newSettings)
@@ -92,6 +92,26 @@ int MotorControl::update()
       break;
   }
   return 1;
+}
+
+void MotorControl::updateEncLS()
+{
+    if (digitalRead(LS_ENC_A) == digitalRead(LS_ENC_B)) {
+        encoder.tickLS++;
+    }
+    else {
+        encoder.tickLS--;
+    }
+}
+
+void MotorControl::updateEncRS()
+{
+    if (digitalRead(RS_ENC_A) == digitalRead(RS_ENC_B)) {
+        encoder.tickRS++;
+    }
+    else {
+        encoder.tickRS--;
+    }
 }
 
 void MotorControl::forward()

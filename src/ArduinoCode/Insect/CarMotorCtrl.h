@@ -37,6 +37,12 @@ struct motorSettings_t {
   long int targetTimeMs;
 };
 
+struct encoder_t {
+    long int tickRS;
+    long int tickLS;
+    float distance;
+};
+
 class MotorControl
 {
   public:
@@ -48,13 +54,16 @@ class MotorControl
   private:
     IMU imu;
     motorSettings_t settings;
+    encoder_t encoder;
     void forward();
     void reverse();
     void left();
     void right();
     void stop();
-    void resetPinState();
-    bool commsError;
+    void initEncoderPins();
+    void updateEncLS();
+    void updateEncRS();
+    void updateDistance();
 };
 
 #endif
