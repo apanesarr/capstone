@@ -2,8 +2,8 @@ SURVEY_TIME = 10 * 60 # Max time, in seconds, for the surveying process
 
 # Parameters - Object Tracking #
 
-MIN_RADIUS = 10
-MAX_RADIUS = 50
+MIN_RADIUS  = 10
+MAX_RADIUS  = 50
 COLOR_LOWER = (29, 86, 6)
 COLOR_UPPER = (64, 255, 255)
 

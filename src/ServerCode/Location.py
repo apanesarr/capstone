@@ -1,11 +1,7 @@
 from collections import deque
 from threading import Thread
 
-from imutils.video import VideoStream
 import numpy as np
-import argparse
-import cv2
-import imutils
 import time
 import math
 
@@ -15,9 +11,6 @@ regionSizeX = (Parameters.COVERAGE_AREA_X_MAX - Parameters.COVERAGE_AREA_X_MIN) 
 regionSizeY = (Parameters.COVERAGE_AREA_Y_MAX - Parameters.COVERAGE_AREA_Y_MIN) / Parameters.NUM_REGIONS_Y
 
 class Location:
-	def reachedTarget(self):
-		return (self.distance(self.rawLocation, self.target) < 0.01)
-
 	def createRegions(self):
 		regions = np.full([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
 
@@ -37,12 +30,6 @@ class Location:
 
 	def __init__(self):
 		self.regions 		= self.createRegions()
-		self.rawLocation 	= (-1, -1)
-		self.target			= (-999, -999)
-		self.hasTarget		= False
-
-	def updateLocation(self, location):
-		self.rawLocation = location
 
 	def exactLocation(self):
 		if not self.rawLocation: return (-1, -1)
@@ -52,17 +39,12 @@ class Location:
 
 		return (x, y)
 
-	def distance(self, p1, p2):
-		deltaX = abs(p1[0] - p2[1])
-		deltaY = abs(p2[0] - p2[1])
+	def nextLocation(self, insect):
+		currentLoc = insect.currentLocation()
 
-		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
-
-	def nextLocation(self):
-		currentLoc = self.exactLocation()
-
-		# If we're out of bounds... screw it, it's game over
-		if (currentLoc == (-1, -1)): return (-1, -1)
+		# If we're out of bounds... screw it, it's game over for this insect
+		if (currentLoc == (-1, -1)):
+			return (-1, -1)
 
 		min = self.regions[0][0]
 		minD = 99999
@@ -76,6 +58,22 @@ class Location:
 					minD = self.distance(cent, currentLoc)
 
 		return min["center"]
+
+	def roundToRegion(self, x, y):
+		# TODO
+		pass
+
+	# A measurement has been made so mark it as visited
+	def measurementMade(self, x, y):
+		(x, y) = roundToRegion(x, y)
+
+		self.regions[x][y]["visited"] = True
+
+	def distance(self, p1, p2):
+		deltaX = abs(p1[0] - p2[1])
+		deltaY = abs(p2[0] - p2[1])
+
+		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
 	def angle(self, location_current, location_new):
 		delta = (location_new[0] - location_current[0], location_new[1] - location_current[1])

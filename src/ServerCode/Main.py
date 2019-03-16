@@ -3,12 +3,6 @@ import threading
 import time
 import queue
 
-from imutils.video import VideoStream
-import numpy as np
-import cv2
-import imutils
-import argparse
-
 import Communication
 import Parameters
 import Location
@@ -71,11 +65,7 @@ if __name__ == "__main__":
     reader.start()
     writer.start()
 
-    # TODO replace
-    rawLocation = (-1, -1) 
-    nextLocation = (-1, -1)
-
-    location = Location.Location() # TODO
+    location = Location.Location(measurements) # TODO
 
     print("Initialization complete. Surveying area...")
 
