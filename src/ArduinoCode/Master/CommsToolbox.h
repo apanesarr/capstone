@@ -1,21 +1,30 @@
-#define SET_GYRO_TYPE 'H'
 #define MOTOR_TYPE 'M'
-#define GET_GYRO_TYPE 'G'
-#define STOP_TYPE 'S'
+#define MOTOR_READY 'R'
+// #define MOTOR_SET_STATE 'S'
 #define INIT 'I'
 #define TEMP_TYPE 'T'
-
-// typedef enum motorState_e {
-//     FORWARD,
-//     REVERSE,
-//     STEER_LEFT,
-//     STEER_RIGHT,
-//     STOP
-// };
+#define FAILURE 'F'
 
 struct payloadMsg {
-    unsigned msg_id;
+    unsigned int msg_id;
     char data [32];
 };
 
 
+struct SendMessage{
+  unsigned int msgID;
+  unsigned int recID;
+  char msgType;
+  char value [32];
+};
+
+
+struct TempData{
+	float Temp;
+	float Humidity;
+};
+
+
+struct initData {
+	int msgID;
+};

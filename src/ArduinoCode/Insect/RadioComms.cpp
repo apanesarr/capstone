@@ -73,7 +73,9 @@ void RadioComms::handle_get_gyro (RF24NetworkHeader *header, payloadMsg *payload
 
 void RadioComms::handle_init(RF24NetworkHeader *header, payloadMsg *payload){
   Serial.println("Handling init_type");
-//  payload->data = "INIT";
+  initData init;
+  init.msgID = -1;
+  memcpy(payload->data,&init,sizeof(payload->data));
   safeSend(INIT, payload, retry);
 }
 
