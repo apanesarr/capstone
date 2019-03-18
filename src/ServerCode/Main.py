@@ -41,7 +41,6 @@ def handleComEvent(queue):
         data = item["location"]
 
         # TODO - are we doing this?
-        
 
 if __name__ == "__main__":
     # Set up Communication threads

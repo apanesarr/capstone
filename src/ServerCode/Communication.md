@@ -14,7 +14,7 @@ Each message will follow the following overall format
 }
 ```
 
-| | |
+| | |t
 |--|--|
 | MessageId     | Unique identifier for each message - used to ensure communication reliability |
 | RecipientId   | ID of who the message is meant for. Usually the Insect ID |
