@@ -14,7 +14,6 @@ VISITED_STATUS_NEVER 		= 0
 VISITED_STATUS_DONE  		= 1
 VISITED_STATUS_IN_PROGRESS 	= 2
 
-# TODO - replace loops with filter/map
 class Location:
 	def createRegions(self):
 		regions = np.full([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
@@ -40,13 +39,9 @@ class Location:
 	def regionComplete(self, region):
 		center = region["center"]
 
-		for m in self.measurements:
-			(x, y) = round(m["location"])
+		filtered = [item for item in self.measurements if lambda x : center == round(x["location"])
 
-			if (x, y) == center:
-				return True
-
-		return False
+		return len(filtered) > 0
 
 	def surveyComplete(self):
 		for i in range(0, self.regions.shape[0]):
@@ -65,6 +60,18 @@ class Location:
 		y = (self.rawLocation[1] - Parameters.COVERAGE_AREA_Y_MIN) / (Parameters.COVERAGE_AREA_Y_MAX - Parameters.COVERAGE_AREA_Y_MIN)
 
 		return (x, y)
+
+	def nextState(self, insect):
+		currentLoc	= insect.currentLocation()
+		nextLoc		= self.nextLocation(insect)
+
+		if nextLoc == (-1, -1):
+			return { "State": "STOP" }
+
+		# TODO just testing
+		self.hasTarget = True
+
+		return { "State": "FORWARD", "Distance": "20" }
 
 	def nextLocation(self, insect):
 		currentLoc = insect.currentLocation()

@@ -84,7 +84,7 @@ class Main(Threading.thread):
                     self.queue_writer.put({
                         "recipient"     : "COM",
                         "command"       : "SetState",
-                        "state"         : self.location.nextLocation(insect)
+                        "state"         : self.location.nextState(insect)
                     })
 
             # if the "q" key is pressed, stop the loop
