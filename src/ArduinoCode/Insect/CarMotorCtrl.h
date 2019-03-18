@@ -13,9 +13,15 @@
 /* Encoder pins - on Uno, interrupt pins are 2, 3.
  * These should be set to encoder output A for each side. */
 #define RS_ENC_A 2
-#define RS_ENC_B 1
+/* Pin 1 doesn't work while printing serial */
+//#define RS_ENC_B 1
 #define LS_ENC_A 3
-#define LS_ENC_B 4
+//#define LS_ENC_B 4
+
+/* Rover wheel radius in mm */
+#define RADIUS_SCALE_FACTOR 1.15
+#define WHEEL_RADIUS 31 * RADIUS_SCALE_FACTOR
+#define TICKS_PER_REV 166.5
 
 #define LEFT_MOTOR_PWR 255
 #define RIGHT_MOTOR_PWR LEFT_MOTOR_PWR
@@ -35,12 +41,12 @@ struct motorSettings_t {
   motorState_e state;
   float targetAngle;
   long int targetTimeMs;
+  float target;
 };
 
 struct encoder_t {
     long int tickRS;
     long int tickLS;
-    float distance;
 };
 
 class MotorControl
@@ -54,16 +60,14 @@ class MotorControl
   private:
     IMU imu;
     motorSettings_t settings;
-    encoder_t encoder;
     void forward();
     void reverse();
     void left();
     void right();
     void stop();
     void initEncoderPins();
-    void updateEncLS();
-    void updateEncRS();
-    void updateDistance();
+    float getDistance();
+    void resetEncoders();
 };
 
 #endif

@@ -1,6 +1,18 @@
 #include "Arduino.h"
 #include "CarMotorCtrl.h"
 
+static encoder_t encoder;
+
+void updateEncLS()
+{
+    encoder.tickLS++;
+}
+
+void updateEncRS()
+{
+    encoder.tickRS++;
+}
+
 MotorControl::MotorControl()
 {
   pinMode(LEFT_FWD_PIN,  OUTPUT);
@@ -12,6 +24,7 @@ MotorControl::MotorControl()
 void MotorControl::init()
 {
     imu.init();
+    Serial.begin(115200);
     initEncoderPins();
     ready = TRUE;
 }
@@ -21,15 +34,11 @@ void MotorControl::initEncoderPins()
     /* Right side encoder */
     pinMode(RS_ENC_A, INPUT);
     digitalWrite(RS_ENC_A, HIGH);
-    pinMode(RS_ENC_B, INPUT);
-    digitalWrite(RS_ENC_B, HIGH);
     attachInterrupt(digitalPinToInterrupt(RS_ENC_A), updateEncRS, CHANGE);
 
     /* Left side encoder */
     pinMode(LS_ENC_A, INPUT);
     digitalWrite(LS_ENC_A, HIGH);
-    pinMode(LS_ENC_B, INPUT);
-    digitalWrite(LS_ENC_B, HIGH);
     attachInterrupt(digitalPinToInterrupt(LS_ENC_A), updateEncLS, CHANGE);
 }
 
@@ -40,23 +49,24 @@ void MotorControl::setMotor(motorSettings_t newSettings)
 
   switch (settings.state) {
     case FORWARD:
-      settings.targetTimeMs = millis() + newSettings.targetTimeMs;
+      settings.target = newSettings.target;
+      resetEncoders();
       forward();
       break;
     case REVERSE:
-      settings.targetTimeMs = millis() + newSettings.targetTimeMs;
+      settings.target = newSettings.target;
+      resetEncoders();
       reverse();
       break;
     case LEFT:
-      settings.targetAngle = imu.getYaw() - newSettings.targetAngle;
+      settings.target = imu.getYaw() - newSettings.target;
       left();
       break;
     case RIGHT:
-      settings.targetAngle = imu.getYaw() + newSettings.targetAngle;
+      settings.target = imu.getYaw() + newSettings.target;
       right();
       break;
     case STOP:
-      settings.targetTimeMs = millis() + newSettings.targetTimeMs;
       stop();
       break;
   }
@@ -70,22 +80,25 @@ int MotorControl::update()
   switch (settings.state) {
     case FORWARD:
     case REVERSE:
+        if (getDistance() >= settings.target) {
+            stop();
+            ready = TRUE;
+        }
+        break;
+
     case STOP:
-      if (millis() >= settings.targetTimeMs) {
-          stop();
-          ready = TRUE;
-      }
+      ready = TRUE;
       break;
 
     case LEFT:
-      if (imu.getYaw() <= settings.targetAngle) {
+      if (imu.getYaw() <= settings.target) {
         stop();
         ready = TRUE;
       }
       break;
 
     case RIGHT:
-      if (imu.getYaw() >= settings.targetAngle) {
+      if (imu.getYaw() >= settings.target) {
         stop();
         ready = TRUE;
       }
@@ -94,24 +107,21 @@ int MotorControl::update()
   return 1;
 }
 
-void MotorControl::updateEncLS()
+float MotorControl::getDistance()
 {
-    if (digitalRead(LS_ENC_A) == digitalRead(LS_ENC_B)) {
-        encoder.tickLS++;
-    }
-    else {
-        encoder.tickLS--;
-    }
+    float avgTicks;
+    float distance;
+
+    avgTicks = (encoder.tickLS + encoder.tickRS) / 2;
+    distance = 2 * M_PI * (encoder.tickLS / TICKS_PER_REV) * WHEEL_RADIUS;
+    //Serial.println(encoder.tickLS);
+    return distance;
 }
 
-void MotorControl::updateEncRS()
+void MotorControl::resetEncoders()
 {
-    if (digitalRead(RS_ENC_A) == digitalRead(RS_ENC_B)) {
-        encoder.tickRS++;
-    }
-    else {
-        encoder.tickRS--;
-    }
+    encoder.tickRS = 0;
+    encoder.tickLS = 0;
 }
 
 void MotorControl::forward()
