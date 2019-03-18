@@ -10,6 +10,11 @@ import Parameters
 regionSizeX = (Parameters.COVERAGE_AREA_X_MAX - Parameters.COVERAGE_AREA_X_MIN) / Parameters.NUM_REGIONS_X
 regionSizeY = (Parameters.COVERAGE_AREA_Y_MAX - Parameters.COVERAGE_AREA_Y_MIN) / Parameters.NUM_REGIONS_Y
 
+VISITED_STATUS_NEVER 		= 0
+VISITED_STATUS_DONE  		= 1
+VISITED_STATUS_IN_PROGRESS 	= 2
+
+# TODO - replace loops with filter/map
 class Location:
 	def createRegions(self):
 		regions = np.full([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
@@ -28,8 +33,30 @@ class Location:
 
 		return regions
 
-	def __init__(self):
+	def __init__(self, measurements):
 		self.regions 		= self.createRegions()
+		self.measurements	= measurements
+
+	def regionComplete(self, region):
+		center = region["center"]
+
+		for m in self.measurements:
+			(x, y) = round(m["location"])
+
+			if (x, y) == center:
+				return True
+
+		return False
+
+	def surveyComplete(self):
+		for i in range(0, self.regions.shape[0]):
+			for j in range(0, self.regions.shape[1]):
+				r = self.regions[i][j]
+
+				if not regionComplete(r):
+					return False
+
+		return True
 
 	def exactLocation(self):
 		if not self.rawLocation: return (-1, -1)
@@ -53,21 +80,23 @@ class Location:
 			for j in r:
 				cent = j["center"]
 
-				if not j["visited"] and self.distance(cent, currentLoc) < minD:
+				if j["visited"] == VISITED_STATUS_NEVER and self.distance(cent, currentLoc) < minD:
 					min = j
 					minD = self.distance(cent, currentLoc)
 
+		min["visited"] = VISITED_STATUS_IN_PROGRESS
+		
 		return min["center"]
 
 	def roundToRegion(self, x, y):
-		# TODO
+		# TODO this function
 		pass
 
 	# A measurement has been made so mark it as visited
-	def measurementMade(self, x, y):
+	def measurementMade(self, x, y): # TODO this function
 		(x, y) = roundToRegion(x, y)
 
-		self.regions[x][y]["visited"] = True
+		self.regions[x][y]["visited"] = VISITED_STATUS_DONE
 
 	def distance(self, p1, p2):
 		deltaX = abs(p1[0] - p2[1])

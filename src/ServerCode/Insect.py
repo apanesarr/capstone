@@ -56,4 +56,3 @@ class Insect:
         self.currentLocation = (-1, -1)
         self.hasTarget       = False
         self.target          = (-1, -1)
-        self.colorRange      = colorRange
