@@ -1,9 +1,15 @@
 import time
+import queue
+import threading
+
+import Reader
+import Writer
+import Parameters
 
 def getInsect(insects, insectId):
-    for (insect in insects):
+    for insect in insects:
         if insect["insectId"] == insectId:
-            return insectId
+            return insect
 
     return null
 
@@ -22,13 +28,18 @@ def pairInsects():
     event_reader = threading.Event()
     event_reader.queue = queue_reader
 
-    reader = Reader.Reader(Parameters.SERIAL_PORT_IN, Parameters.SERIAL_BODE, queue_reader, recieved)
-    writer = Writer.Writer(Parameters.SERIAL_PORT_IN, Parameters.SERIAL_BODE, queue_writer, recieved)
+    insects  = []
+    recieved = []
+
+    try:
+        reader = Reader.Reader(Parameters.SERIAL_PORT_IN, Parameters.SERIAL_BODE, queue_reader, recieved)
+        writer = Writer.Writer(Parameters.SERIAL_PORT_IN, Parameters.SERIAL_BODE, queue_writer, recieved)
+    except Exception as e:
+        print('pairInsects() - SerialException - %s' % e)
+        return []
 
     reader.start()
     writer.start()
-
-    insects = []
 
     while (time.time() < endTime and len(insects) < Parameters.NUM_INSECTS):
         if not queue_reader.empty():
@@ -48,7 +59,8 @@ def pairInsects():
         time.sleep(2)
         print("...")
 
-    print("%i out of %i insects paired" % (len(insects), Parameters.NUM_INSECTS)
+    print("%i out of %i insects paired" % (len(insects), Parameters.NUM_INSECTS))
+    return insects
 
 class Insect:
     def __init__(self, insectId, colorRange):

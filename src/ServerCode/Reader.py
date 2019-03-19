@@ -1,7 +1,7 @@
 import serial
 import threading
 from time import sleep
-
+import json
 import Parameters
 
 class Reader(threading.Thread):
@@ -20,6 +20,9 @@ class Reader(threading.Thread):
             if (self.ser.inWaiting() > 0):
                 data = self.ser.readline()
 
+                print('Data')
+                print(data)
+
                 try:
                     data = data.decode()
                     data = json.dumps(data)
@@ -36,7 +39,6 @@ class Reader(threading.Thread):
                     print("Reader.run() - unknown error")
                     break
 
-                
                 messageType = data["MessageType"]
                 messageId   = data["MessageId"]
 
@@ -65,10 +67,11 @@ class Reader(threading.Thread):
                         "recipient"     : "MAIN",
                         "command"       : "RequestMeasurement",
                         "measurement"   : data["data"]
+                    })
 
                 if messageType == "GetLocation":
                     self.queue.append({
                         "recipient"     : "MAIN",
                         "command"       : "GetLocation",
                         "location"      : data["data"]
-                    )}
+                    })

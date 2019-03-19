@@ -122,11 +122,4 @@ MessageType: "Arrived"
 | 2  |  Invalid Motor Type | 
 | 3  |  Message Failed to send |
 
-
-
 #Master to Insect
-
-
-
-
-

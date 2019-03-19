@@ -3,14 +3,15 @@ import threading
 import time
 import queue
 
-import Communication
 import Parameters
 import Location
 
 import Reader
 import Writer
 
-class Main(Threading.thread):
+import Insect
+
+class Main(threading.Thread):
     def handleComEvent(self):
         if self.queue.empty():
             return
@@ -22,7 +23,7 @@ class Main(Threading.thread):
             self.queue.put(item)
             return
 
-        if (item["command" == "Arrived"):
+        if (item["command"] == "Arrived"):
             insectId    = item["insectId"]
 
             getInsect(insects, insectId).hasTarget = False
@@ -34,7 +35,7 @@ class Main(Threading.thread):
             loc         = insect.exactloc()
 
             measurements.append({
-                "insectId"      : insectId
+                "insectId"      : insectId,
                 "location"      : loc,
                 "measurement"   : measurement
             })
@@ -49,18 +50,22 @@ class Main(Threading.thread):
         # Set up Communication threads
         self.queue_writer = queue.Queue()
         self.event_writer = threading.Event()
-        self.event_writer.queue = queue_writer
+        self.event_writer.queue = self.queue_writer
 
         self.queue_reader = queue.Queue()
         self.event_reader = threading.Event()
-        self.event_reader.queue = queue_reader 
+        self.event_reader.queue = self.queue_reader 
 
         self.measurements    = [] # List of recieved measurement data
         self.recieved        = [] # List of recieved messages
-        self.insects         = pairInsects() # List of insects
+        self.insects         = Insect.pairInsects() # List of insects
 
-        self.reader = Reader.Reader(Parameters.SERIAL_PORT_IN, Parameters.SERIAL_BODE, queue_reader, recieved)
-        self.writer = Writer.Writer(Parameters.SERIAL_PORT_OUT, Parameters.SERIAL_BODE, queue_writer, recieved)
+        if len(self.insects) < 1:
+            print('No insects pairing. Exiting...')
+            exit()
+
+        self.reader = Reader.Reader(Parameters.SERIAL_PORT_IN, Parameters.SERIAL_BODE, self.queue_reader, self.recieved)
+        self.writer = Writer.Writer(Parameters.SERIAL_PORT_OUT, Parameters.SERIAL_BODE, self.queue_writer, self.recieved)
 
         self.reader.start()
         self.writer.start()

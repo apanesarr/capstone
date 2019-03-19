@@ -34,8 +34,8 @@ class Writer(threading.Thread):
         queue.put({
             "recipient"     : "COM",
             "command"       : "CHECK_RESPONSE",
-            "time"          : time.time() + Parameters.RESEND_DELAY
-            "messageId"     : messageId,
+            "time"          : time.time() + Parameters.RESEND_DELAY,
+            "MessageId"     : messageId,
             "message"       : str(message).encode()
         })
 
@@ -47,7 +47,7 @@ class Writer(threading.Thread):
         queue.put({
             "recipient"     : "COM",
             "command"       : "CHECK_RESPONSE",
-            "time"          : time.time() + Parameters.RESEND_DELAY
+            "time"          : time.time() + Parameters.RESEND_DELAY,
             "messageId"     : item["messageId"],
             "message"       : message
         })

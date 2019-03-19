@@ -39,7 +39,7 @@ class Location:
 	def regionComplete(self, region):
 		center = region["center"]
 
-		filtered = [item for item in self.measurements if lambda x : center == round(x["location"])
+		filtered = [item for item in self.measurements if lambda x : center == round(x["location"])]
 
 		return len(filtered) > 0
 
