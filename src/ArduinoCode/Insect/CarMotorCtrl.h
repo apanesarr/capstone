@@ -23,8 +23,11 @@
 #define WHEEL_RADIUS 31 * RADIUS_SCALE_FACTOR
 #define TICKS_PER_REV 166.5
 
-#define LEFT_MOTOR_PWR 255
-#define RIGHT_MOTOR_PWR LEFT_MOTOR_PWR
+#define MOTOR_PWR 225
+
+/* Rate in ms for compensating between motors */
+#define UPDATE_RATE 200
+#define MOTOR_OFFSET 5
 
 #define TRUE 1
 #define FALSE 0
@@ -49,6 +52,14 @@ struct encoder_t {
     long int tickLS;
 };
 
+struct pwrCtrl_t {
+    long int lastUpdateTime;
+    int powerLS = MOTOR_PWR;
+    int powerRS = MOTOR_PWR;
+    int prevCntLS = 0;
+    int prevCntRS = 0;
+};
+
 class MotorControl
 {
   public:
@@ -60,6 +71,7 @@ class MotorControl
   private:
     IMU imu;
     motorSettings_t settings;
+    pwrCtrl_t pwrCtrl;
     void forward();
     void reverse();
     void left();
@@ -68,6 +80,7 @@ class MotorControl
     void initEncoderPins();
     float getDistance();
     void resetEncoders();
+    void updatePwrCtrl();
 };
 
 #endif

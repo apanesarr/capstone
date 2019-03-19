@@ -23,7 +23,7 @@ MotorControl::MotorControl()
 
 void MotorControl::init()
 {
-    imu.init();
+    //imu.init();
     Serial.begin(115200);
     initEncoderPins();
     ready = TRUE;
@@ -74,15 +74,18 @@ void MotorControl::setMotor(motorSettings_t newSettings)
 
 int MotorControl::update()
 {
-  if (imu.update() < 0) {
-      return -1;
-  }
+  //if (imu.update() < 0) {
+      //return -1;
+  //}
   switch (settings.state) {
     case FORWARD:
     case REVERSE:
         if (getDistance() >= settings.target) {
             stop();
             ready = TRUE;
+        }
+        else if ((millis() - pwrCtrl.lastUpdateTime) > UPDATE_RATE) {
+            updatePwrCtrl();
         }
         break;
 
@@ -107,15 +110,54 @@ int MotorControl::update()
   return 1;
 }
 
+void MotorControl::updatePwrCtrl()
+{
+    int diffLS, diffRS;
+
+    diffRS = encoder.tickRS - pwrCtrl.prevCntRS;
+    diffLS = encoder.tickLS - pwrCtrl.prevCntLS;
+    pwrCtrl.prevCntRS = encoder.tickRS;
+    pwrCtrl.prevCntLS = encoder.tickLS;
+
+    if (diffLS > diffRS) {
+        pwrCtrl.powerLS -= MOTOR_OFFSET;
+        pwrCtrl.powerRS += MOTOR_OFFSET;
+    }
+    else if (diffLS < diffRS) {
+        pwrCtrl.powerLS += MOTOR_OFFSET;
+        pwrCtrl.powerRS -= MOTOR_OFFSET;
+    }
+    pwrCtrl.powerLS = constrain(pwrCtrl.powerLS, 0, 255);
+    pwrCtrl.powerRS = constrain(pwrCtrl.powerRS, 0, 255);
+
+    Serial.print("LS:\t");
+    Serial.print(encoder.tickLS);
+    Serial.print("\t");
+    Serial.println(pwrCtrl.powerLS);
+
+    Serial.print("RS:\t");
+    Serial.print(encoder.tickRS);
+    Serial.print("\t");
+    Serial.println(pwrCtrl.powerRS);
+
+    switch (settings.state) {
+    case FORWARD:
+        forward();
+        break;
+    case REVERSE:
+        reverse();
+        break;
+    }
+    pwrCtrl.lastUpdateTime = millis();
+}
+
 float MotorControl::getDistance()
 {
     float avgTicks;
     float distance;
-    avgTicks = (encoder.tickLS + encoder.tickRS) / 2;
 
-    //TODO: change to avg ticks when both sides are attached
-    distance = 2 * M_PI * (encoder.tickLS / TICKS_PER_REV) * WHEEL_RADIUS;
-    //Serial.println(encoder.tickLS);
+    avgTicks = (encoder.tickLS + encoder.tickRS) / 2;
+    distance = 2 * M_PI * (avgTicks / TICKS_PER_REV) * WHEEL_RADIUS;
     return distance;
 }
 
@@ -123,37 +165,39 @@ void MotorControl::resetEncoders()
 {
     encoder.tickRS = 0;
     encoder.tickLS = 0;
+    pwrCtrl.prevCntRS = 0;
+    pwrCtrl.prevCntLS = 0;
 }
 
 void MotorControl::forward()
 {
-  analogWrite(LEFT_FWD_PIN,  LEFT_MOTOR_PWR);
+  analogWrite(LEFT_FWD_PIN,  pwrCtrl.powerLS);
   analogWrite(LEFT_BWD_PIN,  LOW);
-  analogWrite(RIGHT_FWD_PIN, RIGHT_MOTOR_PWR);
+  analogWrite(RIGHT_FWD_PIN, pwrCtrl.powerRS);
   analogWrite(RIGHT_BWD_PIN, LOW);
 }
 
 void MotorControl::reverse()
 {
   analogWrite(LEFT_FWD_PIN,  LOW);
-  analogWrite(LEFT_BWD_PIN,  LEFT_MOTOR_PWR);
+  analogWrite(LEFT_BWD_PIN,  pwrCtrl.powerLS);
   analogWrite(RIGHT_FWD_PIN, LOW);
-  analogWrite(RIGHT_BWD_PIN, RIGHT_MOTOR_PWR);
+  analogWrite(RIGHT_BWD_PIN, pwrCtrl.powerRS);
 }
 
 void MotorControl::left()
 {
-  analogWrite(RIGHT_FWD_PIN, RIGHT_MOTOR_PWR);
+  analogWrite(RIGHT_FWD_PIN, pwrCtrl.powerRS);
   analogWrite(RIGHT_BWD_PIN, LOW);
   analogWrite(LEFT_FWD_PIN,  LOW);
-  analogWrite(LEFT_BWD_PIN,  LEFT_MOTOR_PWR);
+  analogWrite(LEFT_BWD_PIN,  pwrCtrl.powerLS);
 }
 
 void MotorControl::right()
 {
-  analogWrite(LEFT_FWD_PIN, LEFT_MOTOR_PWR);
+  analogWrite(LEFT_FWD_PIN, pwrCtrl.powerLS);
   analogWrite(LEFT_BWD_PIN, LOW);
-  analogWrite(RIGHT_BWD_PIN, RIGHT_MOTOR_PWR);
+  analogWrite(RIGHT_BWD_PIN, pwrCtrl.powerRS);
   analogWrite(RIGHT_FWD_PIN, LOW);
 }
 
