@@ -111,8 +111,9 @@ float MotorControl::getDistance()
 {
     float avgTicks;
     float distance;
-
     avgTicks = (encoder.tickLS + encoder.tickRS) / 2;
+
+    //TODO: change to avg ticks when both sides are attached
     distance = 2 * M_PI * (encoder.tickLS / TICKS_PER_REV) * WHEEL_RADIUS;
     //Serial.println(encoder.tickLS);
     return distance;
