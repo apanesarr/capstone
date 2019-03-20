@@ -23,7 +23,7 @@ MotorControl::MotorControl()
 
 void MotorControl::init()
 {
-    //imu.init();
+    imu.init();
     Serial.begin(115200);
     initEncoderPins();
     ready = TRUE;
@@ -35,6 +35,7 @@ void MotorControl::initEncoderPins()
     pinMode(RS_ENC_A, INPUT);
     digitalWrite(RS_ENC_A, HIGH);
     attachInterrupt(digitalPinToInterrupt(RS_ENC_A), updateEncRS, CHANGE);
+    DEBUG_PRINT("ISR num:", digitalPinToInterrupt(RS_ENC_A));
 
     /* Left side encoder */
     pinMode(LS_ENC_A, INPUT);
@@ -74,9 +75,9 @@ void MotorControl::setMotor(motorSettings_t newSettings)
 
 int MotorControl::update()
 {
-  //if (imu.update() < 0) {
-      //return -1;
-  //}
+
+  imu.update();
+
   switch (settings.state) {
     case FORWARD:
     case REVERSE:

@@ -5,6 +5,16 @@
 #include "Arduino.h"
 #include "IMU.h"
 
+#define DEBUG
+
+#ifdef DEBUG
+#define DEBUG_PRINT(label, var) Serial.print(label); \
+                                Serial.print("\t");  \
+                                Serial.println(var);
+#else
+#define DEBUG_PRINT
+#endif
+
 #define LEFT_FWD_PIN 6
 #define LEFT_BWD_PIN 5
 #define RIGHT_FWD_PIN 9
@@ -12,10 +22,10 @@
 
 /* Encoder pins - on Uno, interrupt pins are 2, 3.
  * These should be set to encoder output A for each side. */
-#define RS_ENC_A 2
+#define RS_ENC_A 3
 /* Pin 1 doesn't work while printing serial */
 //#define RS_ENC_B 1
-#define LS_ENC_A 3
+#define LS_ENC_A 2
 //#define LS_ENC_B 4
 
 /* Rover wheel radius in mm */
