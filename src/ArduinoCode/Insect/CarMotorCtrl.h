@@ -33,11 +33,12 @@
 #define WHEEL_RADIUS 31 * RADIUS_SCALE_FACTOR
 #define TICKS_PER_REV 166.5
 
-#define MOTOR_PWR 225
+#define MOTOR_PWR 150
 
 /* Rate in ms for compensating between motors */
-#define UPDATE_RATE 200
-#define MOTOR_OFFSET 5
+#define UPDATE_RATE 50
+#define GAIN 0.2
+#define MAX_OFFSET 10
 
 #define TRUE 1
 #define FALSE 0

@@ -7,7 +7,7 @@ motorSettings_t settings;
 void setup() {
   motor.init();
   settings.state = FORWARD;
-  settings.target = 2000;
+  settings.target = 65000;
   motor.setMotor(settings);
 }
 

@@ -113,21 +113,11 @@ int MotorControl::update()
 
 void MotorControl::updatePwrCtrl()
 {
-    int diffLS, diffRS;
+    int right = constrain(round((encoder.tickLS - encoder.tickRS) * GAIN), -MAX_OFFSET, MAX_OFFSET);
+    int left  = - right;
 
-    diffRS = encoder.tickRS - pwrCtrl.prevCntRS;
-    diffLS = encoder.tickLS - pwrCtrl.prevCntLS;
-    pwrCtrl.prevCntRS = encoder.tickRS;
-    pwrCtrl.prevCntLS = encoder.tickLS;
-
-    if (diffLS > diffRS) {
-        pwrCtrl.powerLS -= MOTOR_OFFSET;
-        pwrCtrl.powerRS += MOTOR_OFFSET;
-    }
-    else if (diffLS < diffRS) {
-        pwrCtrl.powerLS += MOTOR_OFFSET;
-        pwrCtrl.powerRS -= MOTOR_OFFSET;
-    }
+    pwrCtrl.powerRS = MOTOR_PWR + right;
+    pwrCtrl.powerLS = MOTOR_PWR + left;
     pwrCtrl.powerLS = constrain(pwrCtrl.powerLS, 0, 255);
     pwrCtrl.powerRS = constrain(pwrCtrl.powerRS, 0, 255);
 
