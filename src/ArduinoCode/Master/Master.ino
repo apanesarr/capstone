@@ -9,30 +9,26 @@
 RF24 radio1(7, 8);
 RF24Network network(radio1);
 
-DynamicJsonDocument doc(512);
-DynamicJsonDocument data(200);
-
-DynamicJsonDocument err(512);
-
-DynamicJsonDocument Tempbody(512);
-DynamicJsonDocument Motorbody(512);
-DynamicJsonDocument Initbody(512);
-
-// 
-
 void setup() {
   Serial.begin(115200);
+  
   radio1.begin();
   network.begin(100,nodeID);
+
   Serial.println("Starting Master");
-  // String j = "{"MessageId":1,"RecipientId":13518, "MessageType" : "M" ,"Data":{"State":"FORWARD","Distance":12.3}}";
-  // handlejson(j);
+  
+  while(Serial.available() > 0) Serial.readStringUntil('\n');
 }
 
 void loop() {
   network.update();
+  
   if (Serial.available() > 0) {
     String input = Serial.readStringUntil('\n');
+
+    Serial.println("Input:");
+    Serial.println(input);
+
     SendMessage msg = handlejson(input);
     if ( msg.msgType != FAILURE ){
       payloadMsg payload;
@@ -52,9 +48,11 @@ void loop() {
     network.read(header,&payload, sizeof(payloadMsg));
     switch (header.type){
       case INIT:
-        initData init;
-        memcpy(&init,&payload.data,sizeof(payload.data));
-        printinit(&init,&payload,&header);
+        //initData init;
+        //memcpy(&init,&payload.data,sizeof(payload.data));
+        Serial.println(header.from_node);
+        Serial.println("Got init type message");
+        printinit(&header);
         break;
       case TEMP_TYPE:
         TempData temp;
@@ -124,7 +122,10 @@ bool sendToInsect (char type, unsigned int to, payloadMsg *payload) {
 
 
 SendMessage handlejson(String json){
-  
+  StaticJsonDocument<200> doc;
+  StaticJsonDocument<200> data;
+  Serial.print("Json");
+  Serial.print(json); 
   SendMessage msg;
   DeserializationError error = deserializeJson(doc, json);
    if (error) {
@@ -182,6 +183,8 @@ SendMessage handlejson(String json){
 }
 
 void sendErr (SendMessage msg, String errM, int errType){
+  StaticJsonDocument<512> err;
+
   err["MessageId"] = msg.msgID;
   err["RecipientId"] = msg.recID;
   err["MessageType"] = msg.msgType;
@@ -193,10 +196,11 @@ void sendErr (SendMessage msg, String errM, int errType){
 }
 
 void printTemp(TempData *temp, payloadMsg *payload,RF24NetworkHeader *header){
+  StaticJsonDocument<200> Tempbody;
+
   Tempbody["MessageId"] = payload->msg_id;
   Tempbody["RecipientId"] = header->from_node;
   Tempbody["MessageType"] = header->type;
-  Tempbody.createNestedObject("Data");
   Tempbody["Data"]["Temperature"] = temp->Temp;
   Tempbody["Data"]["Humidity"] = temp->Humidity;
   serializeJson(Tempbody, Serial);
@@ -204,10 +208,12 @@ void printTemp(TempData *temp, payloadMsg *payload,RF24NetworkHeader *header){
 }
 
 void printMotor( motorSettings_t *motor, payloadMsg *payload, RF24NetworkHeader *header){
+  StaticJsonDocument<200> Motorbody;
+
   Motorbody["MessageId"] = payload->msg_id;
   Motorbody["RecipientId"] = header->from_node;
   Motorbody["MessageType"] = header->type;
-  Motorbody.createNestedObject("Data");
+  //Motorbody.createNestedObject("Data");
   Motorbody["Data"]["X"] = 0;
   Motorbody["Data"]["Y"] = 0;
   Motorbody["Data"]["Angle"] = motor->targetAngle;
@@ -215,12 +221,13 @@ void printMotor( motorSettings_t *motor, payloadMsg *payload, RF24NetworkHeader 
   Serial.println("");
 }
 
-void printinit(initData *init, payloadMsg *payload, RF24NetworkHeader *header){
-  Initbody["MessageId"] = payload->msg_id;
-  Initbody["RecipientId"] = header->from_node;
-  Initbody["MessageType"] = header->type;
-  Initbody.createNestedObject("Data");
-  Initbody["Data"]["Initialize"] = init->msgID;
-  serializeJson(Initbody, Serial);
+void printinit(RF24NetworkHeader * header) {
+  StaticJsonDocument<200> jsonDoc;
+
+  jsonDoc["MessageId"]          = 0;
+  jsonDoc["RecipientId"]        = header->from_node;
+  jsonDoc["MessageType"]        = header->type;
+  jsonDoc["Data"]["Initialize"] = 0;
+  serializeJson(jsonDoc, Serial);
   Serial.println("");
 }
