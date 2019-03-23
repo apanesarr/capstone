@@ -3,7 +3,6 @@
 #include "RadioComms.h"
 #include "dht.h"
 
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0])) 
 MotorControl motor;
 
 RadioComms comms;

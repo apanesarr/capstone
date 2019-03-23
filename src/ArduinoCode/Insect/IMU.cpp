@@ -14,7 +14,7 @@ void IMU::init() {
         Serial.println("Check IMU wiring or try cycling power");
         Serial.print("Status: ");
         Serial.println(status);
-        while(1) {}
+        //while(1) {}
     }
     /* Setting the accelerometer full scale range to +/-8G */
     sensor.setAccelRange(MPU9250::ACCEL_RANGE_8G);
