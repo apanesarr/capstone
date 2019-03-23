@@ -1,11 +1,7 @@
 from collections import deque
 from threading import Thread
 
-from imutils.video import VideoStream
 import numpy as np
-import argparse
-import cv2
-import imutils
 import time
 import math
 
@@ -14,10 +10,11 @@ import Parameters
 regionSizeX = (Parameters.COVERAGE_AREA_X_MAX - Parameters.COVERAGE_AREA_X_MIN) / Parameters.NUM_REGIONS_X
 regionSizeY = (Parameters.COVERAGE_AREA_Y_MAX - Parameters.COVERAGE_AREA_Y_MIN) / Parameters.NUM_REGIONS_Y
 
-class Location:
-	def reachedTarget(self):
-		return (self.distance(self.rawLocation, self.target) < 0.01)
+VISITED_STATUS_NEVER 		= 0
+VISITED_STATUS_DONE  		= 1
+VISITED_STATUS_IN_PROGRESS 	= 2
 
+class Location:
 	def createRegions(self):
 		regions = np.full([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
 
@@ -35,14 +32,26 @@ class Location:
 
 		return regions
 
-	def __init__(self):
+	def __init__(self, measurements):
 		self.regions 		= self.createRegions()
-		self.rawLocation 	= (-1, -1)
-		self.target			= (-999, -999)
-		self.hasTarget		= False
+		self.measurements	= measurements
 
-	def updateLocation(self, location):
-		self.rawLocation = location
+	def regionComplete(self, region):
+		center = region["center"]
+
+		filtered = [item for item in self.measurements if lambda x : center == round(x["location"])]
+
+		return len(filtered) > 0
+
+	def surveyComplete(self):
+		for i in range(0, self.regions.shape[0]):
+			for j in range(0, self.regions.shape[1]):
+				r = self.regions[i][j]
+
+				if not regionComplete(r):
+					return False
+
+		return True
 
 	def exactLocation(self):
 		if not self.rawLocation: return (-1, -1)
@@ -52,17 +61,24 @@ class Location:
 
 		return (x, y)
 
-	def distance(self, p1, p2):
-		deltaX = abs(p1[0] - p2[1])
-		deltaY = abs(p2[0] - p2[1])
+	def nextState(self, insect):
+		currentLoc	= insect.currentLocation()
+		nextLoc		= self.nextLocation(insect)
 
-		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
+		if nextLoc == (-1, -1):
+			return { "State": "STOP" }
 
-	def nextLocation(self):
-		currentLoc = self.exactLocation()
+		# TODO just testing
+		self.hasTarget = True
 
-		# If we're out of bounds... screw it, it's game over
-		if (currentLoc == (-1, -1)): return (-1, -1)
+		return { "State": "FORWARD", "Distance": "20" }
+
+	def nextLocation(self, insect):
+		currentLoc = insect.currentLocation()
+
+		# If we're out of bounds... screw it, it's game over for this insect
+		if (currentLoc == (-1, -1)):
+			return (-1, -1)
 
 		min = self.regions[0][0]
 		minD = 99999
@@ -71,11 +87,29 @@ class Location:
 			for j in r:
 				cent = j["center"]
 
-				if not j["visited"] and self.distance(cent, currentLoc) < minD:
+				if j["visited"] == VISITED_STATUS_NEVER and self.distance(cent, currentLoc) < minD:
 					min = j
 					minD = self.distance(cent, currentLoc)
 
+		min["visited"] = VISITED_STATUS_IN_PROGRESS
+		
 		return min["center"]
+
+	def roundToRegion(self, x, y):
+		# TODO this function
+		pass
+
+	# A measurement has been made so mark it as visited
+	def measurementMade(self, x, y): # TODO this function
+		(x, y) = roundToRegion(x, y)
+
+		self.regions[x][y]["visited"] = VISITED_STATUS_DONE
+
+	def distance(self, p1, p2):
+		deltaX = abs(p1[0] - p2[1])
+		deltaY = abs(p2[0] - p2[1])
+
+		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
 	def angle(self, location_current, location_new):
 		delta = (location_new[0] - location_current[0], location_new[1] - location_current[1])

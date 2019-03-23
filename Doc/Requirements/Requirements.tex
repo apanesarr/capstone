@@ -89,7 +89,7 @@
 
 \newcommand{\functionalRequirement}[7]{
 \begin{framed}
-	\noindent\textbf{Requirement ID}: F{#1} \hfill \textbf{Requirement Type}: F \hfill\\\\
+	\noindent\textbf{Requirement ID}: F{#1} \hfill \textbf{Requirement Type}: Functional \hfill\\\\
 	\noindent\textbf{Description}: {#2} \\
 	\textbf{Rationale}: {#3} \\
 	\textbf{Fit Criterion}: {#4} \\
@@ -101,7 +101,7 @@
 
 \newcommand{\nonFunctionalRequirement}[7]{
 \begin{framed}
-	\noindent\textbf{Requirement ID}: NF{#1} \hfill \textbf{Requirement Type}: NF \hfill\\\\
+	\noindent\textbf{Requirement ID}: NF{#1} \hfill \textbf{Requirement Type}: Non-Functional \hfill\\\\
 	\noindent\textbf{Description}: {#2} \\
 	\textbf{Rationale}: {#3} \\
 	\textbf{Fit Criterion}: {#4} \\
@@ -130,13 +130,13 @@
 
 \section{Introduction}
 
-There are many applications for carrying out distributed measurements in large bodies of water. Weather tracking, oil spill tracking, and water toxicity measurements are among many. Unfortunately, it is both expensive and time-consuming to carry out such measurements over large regions. It typically requires many measurement stations, all placed in discrete locations, in order to provide accurate readings over large areas. We propose a fundamentally different approach.
+There are many applications for carrying out distributed measurements over large areas. Analysis of irradiated areas, elevation mapping, and air toxicity measurements are among many. Unfortunately, it is both expensive and time-consuming to carry out such measurements over large regions. It typically requires many measurement stations, all placed in discrete locations, in order to provide accurate readings over large areas. We propose a fundamentally different approach.
 
 \subsection{Project Overview}
 
-\PROJECTNAME \space is a \hyperref[sec:definitions]{swarm} of autonomous robotic cars meant to carry out measurements over large bodies of water. For our project, these cars will be measuring water temperature, but the idea can be expanded to any number of other quantifiable measurements. Central to our work will be two major components. First, a small motorized car, attached with a water temperature sensor, as well as a control unit that allows it to communicate with – and be controlled by – a centralized control unit. Second, a software package that can control a large group (\hyperref[sec:definitions]{swarm}) of these cars, with an algorithm focused on producing reliable, accurate, and fast measurements.\\
+\PROJECTNAME \space is a \hyperref[sec:definitions]{swarm} of autonomous robotic cars meant to carry out measurements over large areas. For our project, these cars will be measuring temperature, but the idea can be expanded to any number of other quantifiable measurements. Central to our work will be two major components. First, a small motorized car, attached with a temperature sensor, as well as a control unit that allows it to communicate with – and be controlled by – a centralized control unit. Second, a software package that can control a large group (\hyperref[sec:definitions]{swarm}) of these cars, with an algorithm focused on producing reliable, accurate, and fast measurements.\\
 
-Our swarm will aim to cover large areas more quickly and cost-effectively than traditional products. To test the applicability of our project, we will demo it on a small scale body of water, such as a swimming pool, as well as develop a simulation to hypothetically prove the efficacy of the system on a larger scale.\\
+Our swarm will aim to cover large areas more quickly and cost-effectively than traditional products. To test the applicability of our project, we will demo it in a small scale area as well as develop a simulation to hypothetically prove the efficacy of the system on a larger scale.\\
 
 Our project will be conducted between Fall 2018 – Winter 2019 for our Engineering Capstone project at McMaster University, under the guidance of Dr. Alan Wassyng. We have four Software Engineering students, and one Mechatronics Engineering student.
 
@@ -153,13 +153,15 @@ the system is valid with a large number of insects.
 \item \textbf{Researcher}: A user that is interested in the data that is returned from the survey.
 \item \textbf{System Administrator}: A user that controls the parameters of the \hyperref[sec:definitions]{\textbf{swarm}}.
 \item \textbf{G.P.S.}: Global Positioning System
+\item \textbf{Map}: A 3D visualisation of the data collected by the system.
 \end{itemize}
 
 \subsection{Relevant Facts and Assumptions}
 
 For demo purposes, our project will be conducted on a small scale. One major assumption is that this project can be effectively expanded to a much larger scale – that of forests, fields, and larger geographic regions. There will likely be design challenges involved in a large-scale project, but due to the time and resources available to us, we must assume that such challenges could be overcome without compromising its fundamental goals. This assumption carries with it some implicit ones. Namely, we must assume that a large scale version of our project will be able to withstand the wind and otherwise adverse weather conditions of large geographic regions. It will need to be able to communicate reliably over much larger distances.\\
 
-Another assumption we must make is that there are no sensitive lifeforms or other objects that can be harmed by the system, in the near vicinity of the system. An object collision detection algorithm can certainly be implemented, most likely using cameras and computer vision, but due to time constraints, we may not be able to include one.
+Another assumption we must make is that there are no sensitive lifeforms or other objects that can be harmed by the system, in the near vicinity of the system. An object collision detection algorithm can certainly be implemented, most likely using cameras and computer vision, but due to time constraints, we may not be able to include one. We will ensure the lack of sensitive lifeforms by inspecting the
+(very small) coverage area prior to running the system.
 
 To simplify the development and testing process, we will assume that weather conditions are as follows:
 
@@ -170,10 +172,10 @@ To simplify the development and testing process, we will assume that weather con
 
 \section{Project Drivers}
 \subsection{Purpose}
-The collection of temperature data for the purpose of studying large bodies poses the following problems: 
+The collection of data for the purpose of studying large areas poses the following problems: 
 \begin{itemize}
-    \item Tempearture can vary substantially over the area of interest
-    \item Humidity can vary substantially over the area of interest
+    \item Measurements can vary substantially over the area of interest
+    \item Measurements can vary substantially over time
 \end{itemize}
 
 Therefore, it is optimal to survey multiple test points spanning the area of interest and to collect data regarding the change in environmental conditions at those test points over a given time interval. The typical solution to this is to place sensors on fixed measurement devices and fix them to strategic locations. There are two main drawbacks to this approach:
@@ -183,7 +185,7 @@ Therefore, it is optimal to survey multiple test points spanning the area of int
     \item Placing measurement devices in fixed, arbitrary locations can be costly and time-consuming
 \end{itemize}
 
-A possible solution to these issues is a robot swarm of measurement cars. These could be reused in many different regions, and because they are not permanently fixed in the water they could potentially cover a wider range of test points. In addition, the mobility of the swarm allows test points to be measured in different parts of a region at different times, and as such more data can be collected with less equipment. Therefore, the purpose of this project is to build such a system.
+A possible solution to these issues is a robot swarm of measurement cars. These could be reused in many different regions, and because they are not permanently fixed they could potentially cover a wider range of test points. In addition, the mobility of the swarm allows test points to be measured in different parts of a region at different times, and as such more data can be collected with less equipment. Therefore, the purpose of this project is to build such a system.
 
 \subsection{Key Stakeholders}
 \subsubsection{Users}
@@ -193,25 +195,67 @@ The development team is responsible for both the project concept and its impleme
 \subsubsection{Faculty}
 McMaster University - specifically, the Department of Computing and Software - is invested in the success of this project. Upon successful completion, it can be used to highlight the quality of the program, department, and institution.
 
-\section{Project Scope}
-\subsection{The Scope of the product}
-Due to time and financial constraints, defining the project's scope is essential to ensure the project is feasible. One way we are scoping the project is the type of data we collect with each insect. We are only collecting temperature and location data. Another way we are scoping the project is restricting the area of the survey. Insects can travel only a maximum distance (approximately covering the size of a swimming pool) from the starting point. The type of water that the swarm will be deployed on is fresh water. We are using existing RC cars, and will not be building our own. We will also rely on other third-party components, such as embedded microcontrollers and transceivers.
-\subsubsection{Individual use case}
-The actors that interact with the system are the \textbf{\hyperref[sec:definitions]{researcher}}, and the \textbf{\hyperref[sec:definitions]{system administrator}}. The researcher is a primary actor, and the system administrator is a secondary actor. The researcher does not have to be present during the operation of the system. \\
-The following are the primary use cases:
+\section{Project Scope and Goals}
+\subsection{Feasibility}
+Due to time and financial constraints, defining the project's scope is essential to ensure the project is feasible. One way to ensure the project remains in scope is to restrict the area of the survey. Insects can travel only a maximum distance (approximately covering the size of a swimming pool) from the starting point. The test environment will also be level and free from obstructions. We will take advantage of third-party chassis systems, and will not be building our own. We will also rely on other third-party components, such as embedded micro-controllers and transceivers.
+
+\subsection{Sensor Choice}
+Another way we will reduce the scope of the project is by limiting the type of data we collect with each insect. While this system could be used with a multitude of measurement types, for this prototype we will limit our integration efforts to just two types. We have chosen to focus on temperature and humidity measurements for the following reasons:
+
 \begin{itemize}
-    \item Researcher requests a specific area to be surveyed
-    \item Researcher requests time frame to retrieve data
-    \item Researcher analyzes the returned data
-    \item Researcher requests to end surveying session
-    \item Researcher checks the progress of the survey
+    \item Transmitting temperature/humidity information is akin to transmitting any other type of measurement -- the main control unit can be designed without regard for the type of data being collected
+    \item Temperature/humidity sensors are relatively cheap in comparison to other measuring devices such as Geiger counters
+    \item Heat is infrared radiation [\hyperref[sec:references]{1}] and therefore mapping it will be analogous to mapping other types of radiation (a possible usage scenario)
+    \item Humidity is the water content of the air and therefore is analogous to other measures of air composition such as the amount of pollutants present (another possible usage scenario)
 \end{itemize}
-The following are secondary use cases:
+
+\subsection{Project Goals}
+With the above scope considerations in mind, the following sections cover the necessary and optional goals for the project.
+\subsubsection{Necessary Goals}
 \begin{itemize}
-    \item System Administrator adjusts the speed of an insect
-    \item System Administrator sets the constraints of the survey
-    \item System Administrator deploys the swarm
-    \item System Administrator ends the session
+    \item Measure the temperature and humidity of a small area (for demo purposes, approximately the size of a small swimming pool) as it varies by location and time
+    \item Produce a visual representation of the measurements
+    \item Produce a simulation to show the system working efficiently with a large number of insects in a larger area (for demo purposes) 
+    \item Make the system flexible with respect to how many insects are in a swarm, so that end users can use as many/few insects as they want
+\end{itemize}
+
+\subsubsection{Optional Goals}
+\begin{itemize}
+    \item Explore other types of measurements and incorporate them along with the temperature and humidity measurements (or replace them, if need be). One possible idea for this is measuring air pollutant levels.
+    \item Make the system as easy to use for a beginner as possible 
+    \item Include object collision detection in order to improve safety 
+    \item Design the boats to be as cost efficient as possible for end users 
+    \item Create a phone app for end users to run the swarm from
+\end{itemize}
+
+\subsection{Individual Use Cases}
+
+The actors that interact with the system are the \textbf{\hyperref[sec:definitions]{researcher}}, and the \textbf{\hyperref[sec:definitions]{system administrator}}. The researcher is a primary actor, and the system administrator is a secondary actor. The researcher does not have to be present during the operation of the system. \\\\
+The following are the primary use cases:
+
+\begin{itemize}
+    \item \textbf{Researcher requests a specific area to be surveyed}:\\
+        The initial state going forward with this action would be the insects are already placed in the area of survey, and have been paired to the server. The researcher has a particular area he wants to investigate. He will input this area into the GUI so that the software knows about the coverage area that he wants to inspect.Once the area coverage has been set the outcome is the insects begin to survey the area. 
+    \item \textbf{Researcher analyzes the returned data}:\\
+        The initial state for this use case is that the insects have all returned to the initial starting point and have reported back their findings.The outcome is data returned by the system is presented to the researcher in the form of a visual graph. For example, humidity information about the environment could influence decisions in land surveying.
+    \item \textbf{Researcher requests to end surveying session}:\\
+        Initial state for this scenario would be that the insects are in the process of conducting a survey. The researcher then stops the current survey which might be due to the fact enough data has been collected. The outcome is all the insects return to the initial starting point, and whatever data was collected is returned to the graphical interface. 
+    \item \textbf{Researcher checks the progress of the survey}:\\
+        The initial state of this use case would be that a survey is currently being conducted. The researcher then wants to know how much progress has been made in covering the coverage area, so through the GUI he checks what percentage of regions have been explored and measured by the swarm.
+\end{itemize}
+
+The following are secondary use cases:
+
+\begin{itemize}
+    \item \textbf{System Administrator sets the constraints of the survey}:
+        The constraints of the survey would include the coverage area and the number of
+        insects in the swarm. The administrator would make these changes through the GUI.
+    \item \textbf{System Administrator deploys the swarm. This is done through the GUI.}:
+        The swarm constraints have been set, so the administrator begins the surveying process.
+    \item \textbf{System Administrator ends the session}:
+        The administrator has detected an issue with the surveying process, such as a safety risk,
+        so he ends the process prematurely, through the GUI.
+
 \end{itemize}
 \begin{figure}[H]
    \centering
@@ -219,6 +263,7 @@ The following are secondary use cases:
    \caption{Use Case Diagram}
    \label{fig:ucd}
 \end{figure}
+
 \subsection{Mandated Constraints}
 There are 2 constraints put on the project. The first being time, since the project is due at the end of April 2019. The second constraint is money. There is a \$750 budget for this project.
 \subsection{Undesired Behavior}
@@ -278,7 +323,7 @@ to within \pm $ 1^o C$ at all times}
 {Created Oct. 28, 2018}
 
 \functionalRequirement
-{1}
+{2}
 {Each \hyperref[sec:definitions]{insect} in the
 \hyperref[sec:definitions]{swarm}
 must be able to measure
@@ -292,7 +337,7 @@ to within \pm $ 1^o C$ at all times}
 {Created Oct. 28, 2018}
 
 \functionalRequirement
-{2}
+{3}
 {Each \hyperref[sec:definitions]{insect} in the
 \hyperref[sec:definitions]{swarm}
 must be able to provide its current location}
@@ -305,7 +350,7 @@ $1m$ accuracy at all times}
 {Created Oct. 28, 2018}
 
 \functionalRequirement
-{3}
+{4}
 {The \hyperref[sec:definitions]{system} must be able to produce temperature
 measurements, specified in Requirement F1, at many different locations
 in the coverage area}
@@ -319,8 +364,8 @@ available}
 {Created Oct. 28, 2018}
 
 \functionalRequirement
-{4}
-{The \hyperref[sec:definitions]{system} must be able to produce an Air Temperature Map of a swimming pool-sized body of water}
+{5}
+{The \hyperref[sec:definitions]{system} must be able to produce an air temperature \hyperref[sec:definitions]{map} of the coverage area}
 {Producing a visual temperature map of the coverage area is a useful
 tool for analyzing measurement data}
 {The swarm must be able to produce a visualization that displays a representation
@@ -330,8 +375,19 @@ of the temperature measurement data}
 {Created Oct. 28, 2018}
 
 \functionalRequirement
-{5}
-{Each \hyperref[sec:definitions]{insect} in the \hyperref[sec:definitions]{system} shall be maneuverable such that it can move to any position (x, y) on the surface of the water}
+{6}
+{The \hyperref[sec:definitions]{system} must be able to produce an air humidity \hyperref[sec:definitions]{map} of the coverage area}
+{Producing a visual humidity map of the coverage area is a useful
+tool for analyzing measurement data}
+{The swarm must be able to produce a visualization that displays a representation
+of the temperature measurement data}
+{Victor Velechovsky}
+{High}
+{Created Oct. 28, 2018}
+
+\functionalRequirement
+{7}
+{Each \hyperref[sec:definitions]{insect} in the \hyperref[sec:definitions]{system} shall be maneuverable such that it can move to any position (x, y) in the survey area}
 {Allows proper coverage of the area of interest}
 {The \hyperref[sec:definitions]{insect} is able to move to a specified position}
 {Gabriel Potter}
@@ -339,7 +395,7 @@ of the temperature measurement data}
 {Created Oct. 31, 2018}
 
 \functionalRequirement
-{6}
+{8}
 {The \hyperref[sec:definitions]{system} shall be able to plan and control the paths of \hyperref[sec:definitions]{insect}s such that redundant measurements are not made and there are no collisions}
 {Efficiency}
 {There are no collisions (between insects) or redundant measurements}
@@ -348,7 +404,7 @@ of the temperature measurement data}
 {Created Oct. 31, 2018}
 
 \functionalRequirement
-{7}
+{9}
 {The \hyperref[sec:definitions]{insect}s shall return to the start point when data collection is complete}
 {Ease of use, cost effectiveness}
 {All \hyperref[sec:definitions]{insect}s return when collection is complete}
@@ -357,7 +413,7 @@ of the temperature measurement data}
 {Created Oct. 31, 2018}
 
 \functionalRequirement
-{8}
+{10}
 {The \hyperref[sec:definitions]{insect}s shall move in an autonomous manner}
 {\hyperref[sec:definitions]{Swarm}s should move based on collective intelligence}
 {All \hyperref[sec:definitions]{insect}s should move without control input from users}
@@ -366,16 +422,7 @@ of the temperature measurement data}
 {Created Oct. 31, 2018}
 
 \functionalRequirement
-{9}
-{If an \hyperref[sec:definitions]{insect} loses a critical function for autonomous operation (i.e. location) it shall have the ability to be manually overridden and controlled by the user}
-{Allow the \hyperref[sec:definitions]{insect} to be easily returned to the start point}
-{Each \hyperref[sec:definitions]{insect} has the ability to be manually controlled if the circumstances require it}
-{Gabriel Potter}
-{Medium}
-{Created Oct. 31, 2018}
-
-\functionalRequirement
-{10}
+{11}
 {If an \hyperref[sec:definitions]{insect} loses critical functionality such as communication, sensing, or movement, the remaining operational \hyperref[sec:definitions]{insect}s should operate as if that \hyperref[sec:definitions]{insect} is no longer part of the swarm}
 {A non-functional \hyperref[sec:definitions]{insect} provides no use to the \hyperref[sec:definitions]{swarm}}
 {If an \hyperref[sec:definitions]{insect} fails to communicate or notifies the swarm of an error, the algorithm must recompute the paths based on the new number of \hyperref[sec:definitions]{insect}s}
@@ -466,11 +513,11 @@ to the server}
 
 \nonFunctionalRequirement
 {8}
-{The \hyperref[sec:definitions]{insects} will be waterproof in the areas that hold critical electronics}
-{The electronics will fail and require replacement if they get wet}
-{All critical areas are sufficiently waterproof}
+{The \hyperref[sec:definitions]{insects} will be solidly built and well protected in the areas that hold critical electronics}
+{The electronics will fail and require replacement if they are subject to damage}
+{All critical areas are sufficiently protected}
 {Gabriel Potter}
-{High}
+{Medium}
 {Created Oct. 31, 2018}
 
 \subsection{Security Requirements}
@@ -513,15 +560,16 @@ offend the users that purchase it}
 {12}
 {The \hyperref[sec:definitions]{insects} will not travel too quickly}
 {Fast moving cars may present a danger to the nearby environment}
-{The cars will not travel faster than $10 km/h$}
+{The cars will not travel faster than $1 m/s$}
 {Victor Velechovsky}
 {Medium}
 {Created Oct. 29, 2018}
 
 \nonFunctionalRequirement
 {13}
-{The \hyperref[sec:definitions]{insects} will not have exposed wiring}
-{Expired wiring could be a safety concern to the nearby environment}
+{The \hyperref[sec:definitions]{insects} will not have unnecessary exposed wiring}
+{Expired wiring could be a safety concern to the nearby environment. It should
+be limited as much as possible (within design, time, and financial constraints).}
 {The cars will not have any visible wiring under normal operation}
 {Victor Velechovsky}
 {Medium}
@@ -529,11 +577,20 @@ offend the users that purchase it}
 
 \section{Project Issues}
 \subsection{Open Issues}
-Due to the complexity of the project, there are some open issues that our group might have to overcome to be successful. One of the open issues that we have is an error in data and how to check the validity of the temperature data received from the cars. For example, one of the insects in the swarm could potentially have a faulty reading and skew the data resulting in an invalid survey. Since our group has not chosen the temperature sensor yet, we do not have concrete information about the severity of this issue. Another open issue we have is the battery life for the insect. If it dies midway through the survey, it will result in missing data. In addition, if the insect battery dies, an issue that might arise is how to retrieve the insect and supplement the missing data. Path correction is also an open issue that might be difficult to solve since we do not have any information on direction or about the water current speed and location. 
+Due to the complexity of the project, there are several open issues that our group will have to overcome to be successful. 
+One issue is the error that is sometimes introduced by the use of a gyro to track the orientation of the insect. This will result in errors in the desired path of the insect, meaning a path correction system may need to be implemented to keep the insects from veering too far off track.
+Another possible issue is the bandwidth of the communications network, and whether it will be able to handle multiple insects communicating at once.
+The final open issue we have is the battery life for the insect. If it dies midway through the survey, it will result in missing data. In addition, if the insect battery dies, an issue that might arise is how to retrieve the insect and supplement the missing data.
 \subsection{Off The Shelf Solutions}
-In order to solve the open issues, some off-the-shelf solutions must be incorporated into the project. The error in temperature data, for example, can be solved by buying a more accurate temperature. However, the more accurate the temperature sensor, the higher the price, which is one of the constraints in this project. Another open issue that can be solved with Off The Shelf Solutions is the battery life. Again buying a larger battery will increase the life of the insect but will increase weight and costs which might affect other requirements. In addition, path correction might be solved by an accurate G.P.S. system but the price might force the solution to be too expensive to pursue. 
+In order to solve the open issues, some off-the-shelf solutions can be incorporated into the project. For example, buying a larger battery will increase the life of the insect but will increase weight and costs which might affect other requirements. In addition, a higher quality, more accurate gyro could be purchased however this option will likely be avoided due to high costs and integration time.
+
 \subsection{New Problems}
-As of October $30^{th}$ 2018, no new problems exist.
+Problems were encountered with doing a demo in a body of water, which caused us
+to pivot our project to a land-based one. There were also issues with
+tracking the location of our insects, and communicating between them.
+As of Revision 1 (published March 7 2019) the issues have been overcome, at
+least on a small scale - though reliability of the system remains a concern.
+
 \subsection{Risk}
 The largest risk that the group has is potentially going over budget. The cost will mainly be based on the number of insects we decide to build for the swarm. In addition, the precision of the sensors and motors used will also be correlated with price, which might increase as development progresses. 
 
@@ -547,4 +604,26 @@ The users will be informed of the following items in order to use the system eff
     \item Deploying insects 
     \item How to read/interpret the resultant data
 \end{itemize}
+
+\section{Likely Changes}
+
+As this document is now in revision 1 the requirements are less likely to
+change than before. The major changes that have been made since revision 0
+(a water-based project with boats was turned into a land-based project with
+cars) have been reflected in this document.
+
+The most likely change will be what measurements our insects make. Since
+our project is more of a platform for exploring areas with a swarm of insects,
+rather than a specific use case, we may decide to change the temperature and
+humidity measurements to something else, for the purposes of our
+demonstration.
+
+\section{References}
+
+\label{sec:references}
+\begin{itemize}
+\item \textbf{1}: How Does Heat Travel?\\
+\texttt{http://coolcosmos.ipac.caltech.edu/cosmic\_classroom/light\_lessons/thermal/\\transfer.html}
+\end{itemize}
+
 \end{document}

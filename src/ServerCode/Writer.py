@@ -15,33 +15,41 @@ class Writer(threading.Thread):
 
         return False
 
-    def send(self, queue, message):
+    def send(self, queue, messageType, recipientId, message):
         global newMessageId
 
         messageId = newMessageId
         newMessageId = newMessageId + 1
 
-        message = str(messageId) + "," + message + "\0"
+        message = {
+            "MessageId"     : messageId,
+            "RecipientId"   : recipientId,
+            "MessageType"   : messageType,
+            "Data"          : message  
+        }
 
+        # Periodically check for a response and re-send if necessary
+        # The outer layer is meant for the Server - the inner layer (the `message` object
+        # is the layer that is meant for the insect)
         queue.put({
-            "recipient": "COM",
-            "command": "CHECK_RESPONSE",
-            "messageId": messageId,
-            "message": message
+            "recipient"     : "COM",
+            "command"       : "CHECK_RESPONSE",
+            "time"          : time.time() + Parameters.RESEND_DELAY,
+            "MessageId"     : messageId,
+            "message"       : str(message).encode()
         })
-
-        print(">> %s" % message)
 
         self.ser.write(message.encode())
 
     def resend(self, queue, item):
-        message = item["message"] + "\0"
+        message = item["message"]
 
         queue.put({
-            "recipient": "COM",
-            "command": "CHECK_RESPONSE",
-            "messageId": item["messageId"],
-            "message": message
+            "recipient"     : "COM",
+            "command"       : "CHECK_RESPONSE",
+            "time"          : time.time() + Parameters.RESEND_DELAY,
+            "messageId"     : item["messageId"],
+            "message"       : message
         })
 
         self.ser.write(message.encode())
@@ -65,44 +73,18 @@ class Writer(threading.Thread):
                 if not (item["recipient"] == "COM"):
                     self.queue.put(item)
 
-                elif (item["command"] == "EXIT"):
-                    break
-
-                elif (item["command"] == "CHECK_RESPONSE"):
+                elif (item["command"] == "CheckResponse"):
                     if not self.rec(item["messageId"]):
                         self.resend(self.queue, item)
 
-                elif (item["command"] == "SEND_NEW_LOCATION"):
-                    message = "%i,%s," % (1, Parameters.CMD_STOP_MOTOR)
+                elif (item["command"] == "RequestMeasurement"):
+                    self.send(self.queue, "RequestMeasurement", item["insectId"], "")
 
-                    self.send(self.queue, message)
+                elif (item["command"] == "SetState"):
+                    self.send(self.queue, "SetState", item["insectId"], item["message"])
 
-                    sleep(1)
-
-                    message = "%i,%s,%i" % (1, Parameters.CMD_SET_GYRO, item["angle"])
-
-                    self.send(self.queue, message)
-
-                    sleep(1)
-
-                    message = "%i,%s," % (1, Parameters.CMD_START_MOTOR)
-
-                    self.send(self.queue, message)
-
-                elif (item["command"] == "MOTION_STOP"):
-                    message = "%i,%s" % (1, Parameters.CMD_STOP_MOTOR)
-
-                    self.send(self.queue, message)
-
-                elif (item["command"] == "MOTION_START"):
-                    message = "%i,%s" % (1, Parameters.CMD_START_MOTOR)
-
-                    self.send(self.queue, message)
-
-                elif (item["command"] == "GET_TEMP"):
-                    message = "%i,%s," % (1, Parameters.CMD_GET_TEMP)
-
-                    self.send(self.queue, message)
-
+                elif (item["command"] == "GetLocation"):
+                    self.send(self.queue, "GetLocation", item["insectId"], "")
+                    
                 else:
                     print("ERR: Communication.py - Invalid message")

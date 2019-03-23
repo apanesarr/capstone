@@ -1,7 +1,7 @@
 import serial
 import threading
 from time import sleep
-
+import json
 import Parameters
 
 class Reader(threading.Thread):
@@ -20,25 +20,58 @@ class Reader(threading.Thread):
             if (self.ser.inWaiting() > 0):
                 data = self.ser.readline()
 
+                print('Data')
+                print(data)
+
                 try:
-                    data = data.decode("utf-8").replace("\r\n", "").split(",")
+                    data = data.decode()
+                    data = json.dumps(data)
 
-                    print("<< %s" % data)
+                except JSONDecodeError as e:
+                    print("Reader.run() - error decoding JSON - %s" % e)
+                    break
 
-                    # Proper responses should have 3 comma seperated values
-                    if len(data) == 3:
-                        messageId   = data[0]
-                        messageType = data[1]
-                        message     = data[2]
+                except UnicodeError as e:
+                    print("Reader.run() - error decoding binary - %s" % e)
+                    break
 
-                        if messageType == Parameters.OK:
-                            self.recieved.append(messageId)
-
-                        elif messageType == Parameters.TEMP:
-                            self.queue.append({
-                                "recipient": "MAIN",
-                                "command": "RECORD_MEASUREMENT",
-                                "measurement": message
-                            })
                 except:
-                    pass
+                    print("Reader.run() - unknown error")
+                    break
+
+                messageType = data["MessageType"]
+                messageId   = data["MessageId"]
+
+                # Acknowledge that the message has been recieved to prevent retries
+                if messageId not in self.recieved:
+                    self.recieved.append(messageId)
+
+                # We only handle certain responses (RequestMeasurement, GetLocation)
+
+                if messageType == "Pair":
+                    self.queue.append({
+                        "recipient"     : "PAIR",
+                        "command"       : "Pair",
+                        "insectId"      : data["data"]["insectId"] # TODO
+                    })
+
+                if messageType == "Arrived":
+                    self.queue.append({
+                        "recipient"     : "MAIN",
+                        "command"       : "Arrived",
+                        "location"      : data["data"]
+                    })
+
+                if messageType == "RequestMeasurement":
+                    self.queue.append({
+                        "recipient"     : "MAIN",
+                        "command"       : "RequestMeasurement",
+                        "measurement"   : data["data"]
+                    })
+
+                if messageType == "GetLocation":
+                    self.queue.append({
+                        "recipient"     : "MAIN",
+                        "command"       : "GetLocation",
+                        "location"      : data["data"]
+                    })

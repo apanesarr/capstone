@@ -1,16 +1,22 @@
-
 #include "CarMotorCtrl.h"
+#include "MotorPatterns.h"
+#include "RadioComms.h"
+#include "dht.h"
 
 MotorControl motor;
-motorSettings_t settings;
+
+RadioComms comms;
 
 void setup() {
   motor.init();
-  settings.state = FORWARD;
-  settings.target = 65000;
-  motor.setMotor(settings);
+  comms.init(1);
 }
 
 void loop() {
+  comms.update();
   motor.update();
+  if (motor.ready) {
+    motor.setMotor(comms.newSettings);
+  }
+  delay(10);
 }
