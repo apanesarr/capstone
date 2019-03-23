@@ -23,84 +23,81 @@ void setup() {
 void loop() {
   network.update();
   
-  if (Serial.available() > 0) {
-    String input = Serial.readStringUntil('\n');
+  // if (Serial.available() > 0) {
+  //   String input = Serial.readStringUntil('\n');
 
-    Serial.println("Input:");
-    Serial.println(input);
+  //   Serial.println("Input:");
+  //   Serial.println(input);
 
-    SendMessage msg = handlejson(input);
-    if ( msg.msgType != FAILURE ){
-      payloadMsg payload;
-      payload.msg_id = msg.msgID;
-      strncpy(payload.data, msg.value, sizeof(payload.data));
-      if ( safeSend(msg.msgType, msg.recID, &payload, 10) ){
-        sendErr(msg,"Message Sent Sucessfully",0);
-      }
-      else{
-        sendErr(msg, "Message Failed to send",3);
-      }
-    }
-  }
-  while(network.available()){
+  //   SendMessage msg = handlejson(input);
+  //   if ( msg.msgType != FAILURE ){
+  //     payloadMsg payload;
+  //     payload.msg_id = msg.msgID;
+  //     strncpy(payload.data, msg.value, sizeof(payload.data));
+  //     if ( safeSend(msg.msgType, msg.recID, &payload, 10) ){
+  //       sendErr(msg,"Message Sent Sucessfully",0);
+  //     }
+  //     else{
+  //       sendErr(msg, "Message Failed to send",3);
+  //     }
+  //   }
+  // }
+  if(network.available()){
     RF24NetworkHeader header;
     payloadMsg payload;
     network.read(header,&payload, sizeof(payloadMsg));
-    switch (header.type){
-      case INIT:
-        //initData init;
-        //memcpy(&init,&payload.data,sizeof(payload.data));
-        Serial.println(header.from_node);
-        Serial.println("Got init type message");
-        printinit(&header);
-        break;
-      case TEMP_TYPE:
-        TempData temp;
-        memcpy(&temp,&payload.data,sizeof(payload.data));
-        printTemp(&temp,&payload,&header);
-        break;
-      case MOTOR_TYPE:
-        motorSettings_t settings;
-        memcpy(&settings,&payload.data,sizeof(payload.data));
-        String MotorState;
-        switch (settings.state) {
-          case FORWARD:
-            MotorState = "FORWARD";
-            break;
-          case REVERSE:
-            MotorState = "REVERSE";
-            break;
-          case LEFT:
-            MotorState = "LEFT";
-            break;
-          case RIGHT:
-            MotorState = "RIGHT";
-            break;
-          case STOP:
-            MotorState = "STOP";
-            break;
-          default:
-            SendMessage msg;
-            msg.msgID = payload.msg_id;
-            strncpy(msg.value,payload.data, sizeof(payload.data));
-            sendErr(msg,"Invalid Incoming Motor Type",5);
-            return;
-        }
-        printMotor(&settings, &payload, &header);
-        break;
-      case MOTOR_READY:
-        motorSettings_t setting;
-        memcpy(&setting,&payload.data,sizeof(payload.data));
-        printMotor(&setting, &payload, &header);
-        break;
-      default:
-        SendMessage msg;
-        msg.msgID = payload.msg_id;
-        strncpy(msg.value,payload.data, sizeof(payload.data));
-        sendErr(msg, "Invalid Incoming Message Type", 4);
-        return;
-    }
-
+    Serial.println(&payload.data);
+    // switch (header.type){
+    //   case INIT:
+    //     printinit(&header);
+    //     break;
+    //   case TEMP_TYPE:
+    //     TempData temp;
+    //     memcpy(&temp,&payload.data,sizeof(payload.data));
+    //     printTemp(&temp,&payload,&header);
+    //     break;
+    //   case MOTOR_TYPE:
+    //     motorSettings_t settings;
+    //     memcpy(&settings,&payload.data,sizeof(payload.data));
+    //     String MotorState;
+    //     switch (settings.state) {
+    //       case FORWARD:
+    //         MotorState = "FORWARD";
+    //         break;
+    //       case REVERSE:
+    //         MotorState = "REVERSE";
+    //         break;
+    //       case LEFT:
+    //         MotorState = "LEFT";
+    //         break;
+    //       case RIGHT:
+    //         MotorState = "RIGHT";
+    //         break;
+    //       case STOP:
+    //         MotorState = "STOP";
+    //         break;
+    //       default:
+    //         SendMessage msg;
+    //         msg.msgID = payload.msg_id;
+    //         strncpy(msg.value,payload.data, sizeof(payload.data));
+    //         sendErr(msg,"Invalid Incoming Motor Type",5);
+    //         return;
+    //     }
+    //     printMotor(&settings, &payload, &header);
+    //     break;
+    //   case MOTOR_READY:
+    //     motorSettings_t setting;
+    //     memcpy(&setting,&payload.data,sizeof(payload.data));
+    //     printMotor(&setting, &payload, &header);
+    //     break;
+    //   default:
+    //     SendMessage msg;
+    //     msg.msgID = payload.msg_id;
+    //     strncpy(msg.value,payload.data, sizeof(payload.data));
+    //     sendErr(msg, "Invalid Incoming Message Type", 4);
+    //     return;
+    // }
+    
   }
 }
 
@@ -175,6 +172,9 @@ SendMessage handlejson(String json){
     init.msgID = data["Initialize"];
     memcpy(&msg.value,&init,sizeof(msg.value));
   }
+  else if (msg.type == MOTOR_READY){
+    return msg;
+  }
   else{
     sendErr(msg,"Invalid Message type",1);
     msg.msgType = FAILURE;
@@ -188,7 +188,6 @@ void sendErr (SendMessage msg, String errM, int errType){
   err["MessageId"] = msg.msgID;
   err["RecipientId"] = msg.recID;
   err["MessageType"] = msg.msgType;
-  err.createNestedObject("Data");
   err["Data"]["ErrorMessage"] = errM;
   err["Data"]["ErrorType"] = errType;
   serializeJson(err, Serial);
@@ -213,7 +212,6 @@ void printMotor( motorSettings_t *motor, payloadMsg *payload, RF24NetworkHeader 
   Motorbody["MessageId"] = payload->msg_id;
   Motorbody["RecipientId"] = header->from_node;
   Motorbody["MessageType"] = header->type;
-  //Motorbody.createNestedObject("Data");
   Motorbody["Data"]["X"] = 0;
   Motorbody["Data"]["Y"] = 0;
   Motorbody["Data"]["Angle"] = motor->targetAngle;
