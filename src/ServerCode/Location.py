@@ -16,7 +16,7 @@ VISITED_STATUS_IN_PROGRESS 	= 2
 
 class Location:
 	def createRegions(self):
-		regions = np.full([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
+		regions = np.zeros([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
 
 		for i in range(0, regions.shape[0]):
 			for j in range(0, regions.shape[1]):
@@ -52,6 +52,9 @@ class Location:
 					return False
 
 		return True
+
+	def getInsect(self, insects, insectId):
+		return insects[0]
 
 	def exactLocation(self):
 		if not self.rawLocation: return (-1, -1)
