@@ -11,7 +11,7 @@ const char* ssid = "A3";
 const char* password = "12345678";
 char path [] = "/";
 char host [] = "192.168.43.91";
-int port = 8095;
+int port = 8074;
 bool connected = false;
 
 WebSocketClient webSocketClient;
@@ -64,8 +64,13 @@ void socketConnect (){
     }
 }
 
-void sendInit(){
-  if (!connected){
+void loop() {
+
+  
+  String data;
+
+  if (client.connected()) {
+    if (!connected){
         StaticJsonDocument<50> doc;
         doc["MessageType"] = "I";
         doc["MessageId"] = 0;
@@ -73,18 +78,11 @@ void sendInit(){
         String output;
         serializeJson(doc,output);
         webSocketClient.sendData(output);
+        Serial.print("Writing..");
+        Serial.println(output);
         connected = true;
     }
-}
 
-void loop() {
-
-  
-  String data;
-
-  if (client.connected()) {
-    sendInit();
-  
     
     webSocketClient.getData(data);
     if (data.length() > 0) {
@@ -97,10 +95,6 @@ void loop() {
     Serial.println("Client disconnected.");
     socketConnect();
   }
-  // motor.update();
-  // if (motor.ready) {
-
-  // }
 }
 
 void handleData (String data){
@@ -121,12 +115,9 @@ void handleData (String data){
       else if (state=="FORWARD" ){
           settings.state = FORWARD;
           settings.target = jsonBuffer["Data"]["Distance"].as<float>();
-     
       // motor.setMotor(settings);
           // while(!motor.ready) {motor.update()};
           calcXY(settings.target);
-
-
         }
 
       else if (state=="REVERSE"){
@@ -225,3 +216,7 @@ void writeToMaster(String msg){
     socketConnect();
   }
 }
+
+
+
+
