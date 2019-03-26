@@ -1,7 +1,8 @@
 import time
 import Parameters
-import Location
-import Insect
+
+from Insect import Insect
+from Location import Location
 
 import asyncio
 import websockets
@@ -11,7 +12,7 @@ measurements    = []                    # List of recieved measurement data
 recieved        = []                    # List of recieved messages
 insects         = []
 
-loc = Location.Location(measurements) # TODO
+loc_service = Location(measurements) # TODO
 
 print("Initialization complete")
 
@@ -29,18 +30,29 @@ async def run(websocket, path):
                 ins = Insect(recipientId)
                 insects.append(ins)
 
-                print('New insect added with ID:')
+                next = loc_service.nextState(ins)
+
+                await websocket.send(json.dumps({
+                    'MessageType': 'I',
+                    'RecipientId': recipientId,
+                    'Data': {}
+                }))
+
+                print('Insect added with ID: ')
                 print(recipientId)
 
             elif messageType == 'T':
                 # TODO - save measurement
                 pass
             
-            elif messageType == 'M':
+            elif messageType == 'R':
+                next = loc_service.nextState(loc_service.getInsect(insects, recipientId))
+
                 await websocket.send(json.dumps({
                     'MessageType': 'M',
-                    'Data': loc.getNextLocation(loc.getInsect(insects, recipientId))
-                })) 
+                    'RecipientId': recipientId,
+                    'Data': next
+                }))
 
         except Exception as e:
             print('Exception in run()')
