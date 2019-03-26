@@ -45,3 +45,9 @@ RES_TEMP            = "T"
 # Parameters - Insects #
 
 NUM_INSECTS         = 1
+
+# Parameters - WebSockets #
+
+# SOCKET_HOST = '172.17.100.149'
+SOCKET_HOST = '192.168.43.91'
+SOCKET_PORT = 8095
