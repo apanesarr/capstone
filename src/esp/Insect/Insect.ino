@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <math.h>
 #include "ArduinoJson.h"
 #include "CarMotorCtrl.h"
 
@@ -30,22 +31,25 @@ int init_wifi() {
 }
 void calcXY(float distance){
   if(0<=currentPos.Angle || currentPos.Angle < 45 || 135<= currentPos.Angle || currentPos.Angle < 180 || 180<= currentPos.Angle || currentPos.Angle < 225 || 315<= currentPos.Angle || currentPos.Angle <360){
-     currentPos.X += distance*cos(currentPos.Angle);
-     currentPos.Y += distance*sin(currentPos.Angle);
+     currentPos.X += distance*cos( currentPos.Angle*PI/180 );
+     currentPos.Y += distance*sin( currentPos.Angle*PI/180  );
      Serial.println(cos(currentPos.Angle));
      Serial.println(sin(currentPos.Angle));
          
   }
-  else if (45<= currentPos.Angle < 135 || 225<= currentPos.Angle < 315){
-    currentPos.Y += distance*cos(currentPos.Angle);
-     currentPos.X += distance*sin(currentPos.Angle);
+  else if (45<= currentPos.Angle || currentPos.Angle < 135 || 225<= currentPos.Angle || currentPos.Angle < 315){
+    currentPos.Y += distance*cos( currentPos.Angle *PI/180  );
+     currentPos.X += distance*sin( currentPos.Angle *PI/180  );
      Serial.println(cos(currentPos.Angle));
      Serial.println(sin(currentPos.Angle));
   }
 }
 
 void calcAngle(float angle){
-  if (currentPos.Angle - angle< 0 ){
+  if (currentPos.Angle == 0){
+    currentPos.Angle = angle;
+    }
+  else if (currentPos.Angle - angle < 0 ){
     currentPos.Angle = (currentPos.Angle - angle) + 360;
   }
   else if(currentPos.Angle - angle > 360){
@@ -77,7 +81,7 @@ void loop() {
 }
 
 void config_rest_server_routing() {
-    http_rest_server.on("/", HTTP_PUT, handleJSON);
+    http_rest_server.on("/", HTTP_POST, handleJSON);
     http_rest_server.on("/", HTTP_GET, handleJSON);
 }
 
@@ -100,8 +104,6 @@ void handleJSON(){
     String state = jsonBuffer["Data"]["State"].as<String>();
     Serial.println("Got here");
     Serial.println(state);
-//    Serial.println(state1=="FORWARD");
-//    Serial.println(strcmp(state,"FORWARD"));
     if(state=="STOP"){
       settings.state = STOP;
     }
