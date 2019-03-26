@@ -14,13 +14,24 @@ VISITED_STATUS_NEVER 		= 0
 VISITED_STATUS_DONE  		= 1
 VISITED_STATUS_IN_PROGRESS 	= 2
 
+NUM_REGIONS_X = Parameters.NUM_REGIONS_X
+NUM_REGIONS_Y = Parameters.NUM_REGIONS_Y
+
 class Location:
 	def createRegions(self):
-		regions = np.zeros([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
+		regions = []
 
-		for i in range(0, regions.shape[0]):
-			for j in range(0, regions.shape[1]):
-				region = {"visited": False }
+		for i in range(0, NUM_REGIONS_X):
+			x = []
+
+			for j in range(0, NUM_REGIONS_Y):
+				x.append(0)
+
+			regions.append(x)
+
+		for i in range(0, NUM_REGIONS_X):
+			for j in range(0, NUM_REGIONS_Y):
+				region = { "visited": False }
 
 				# Calculate center of region
 				x = (i + 0.5) * regionSizeX
@@ -66,7 +77,16 @@ class Location:
 		# TODO just testing
 		self.hasTarget = True
 
-		return { 'State': 'FORWARD', 'Distance': '20' }
+		dist = self.distance(currentLoc, nextLoc)
+		angl = self.angle(currentLoc, nextLoc)
+
+		if dist > 1:
+			return { 'State': 'FORWARD', 'Distance': dist }
+
+		elif angl > 0:
+			return { 'State': 'LEFT', 'Angle': angl }
+
+		return { 'State': 'RIGHT', 'Angle': angl }
 
 	def nextLocation(self, insect):
 		currentLoc = insect.currentLocation
