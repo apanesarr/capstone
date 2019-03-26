@@ -1,10 +1,8 @@
 #define MOTOR_TYPE 'M'
 #define MOTOR_READY 'R'
-// #define MOTOR_SET_STATE 'S'
 #define INIT 'I'
 #define TEMP_TYPE 'T'
 #define FAILURE 'F'
-#define GET_LOCATION 'G'
 
 struct payloadMsg {
     unsigned int msg_id;

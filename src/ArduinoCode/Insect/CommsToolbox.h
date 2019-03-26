@@ -1,28 +1,29 @@
-#define SET_GYRO_TYPE 'H'
 #define MOTOR_TYPE 'M'
-#define GET_GYRO_TYPE 'G'
-#define STOP_TYPE 'S'
+#define MOTOR_READY 'R'
 #define INIT 'I'
 #define TEMP_TYPE 'T'
-
+#define FAILURE 'F'
 
 struct payloadMsg {
-    unsigned msg_id;
+    unsigned int msg_id;
     char data [32];
 };
 
 
-struct MotorPayload {
-  unsigned int msg_id;
-  motorSettings_t setting;
+struct SendMessage{
+  unsigned int msgID;
+  unsigned int recID;
+  char msgType;
+  char value [32];
 };
 
 
-struct SensorPayload {
-  unsigned int msg_id;
-  float temp;
+struct TempData{
+	float Temp;
+	float Humidity;
 };
 
-struct InitPayload {
-  unsigned int msg_id;
+
+struct initData {
+	int msgID;
 };

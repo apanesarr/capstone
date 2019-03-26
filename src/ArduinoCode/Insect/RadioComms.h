@@ -5,12 +5,11 @@
 #include "RF24Network.h"
 #include "CarMotorCtrl.h"
 
-#define SET_GYRO_TYPE 'H'
 #define MOTOR_TYPE 'M'
-#define GET_GYRO_TYPE 'G'
-#define STOP_TYPE 'S'
+#define MOTOR_READY 'R'
 #define INIT 'I'
 #define TEMP_TYPE 'T'
+#define FAILURE 'F'
 
 struct payloadMsg {
     unsigned msg_id;

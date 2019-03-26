@@ -13,7 +13,7 @@ void setup() {
   Serial.begin(115200);
   
   radio1.begin();
-  network.begin(100,nodeID);
+  network.begin(90,nodeID);
 
   Serial.println("Starting Master");
   
@@ -46,7 +46,7 @@ void loop() {
     RF24NetworkHeader header;
     payloadMsg payload;
     network.read(header,&payload, sizeof(payloadMsg));
-    Serial.println(&payload.data);
+    Serial.println(header.type);
     // switch (header.type){
     //   case INIT:
     //     printinit(&header);
@@ -172,7 +172,7 @@ SendMessage handlejson(String json){
     init.msgID = data["Initialize"];
     memcpy(&msg.value,&init,sizeof(msg.value));
   }
-  else if (msg.type == MOTOR_READY){
+  else if (msg.msgType == MOTOR_READY){
     return msg;
   }
   else{
