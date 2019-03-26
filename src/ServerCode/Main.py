@@ -12,7 +12,7 @@ measurements    = []                    # List of recieved measurement data
 recieved        = []                    # List of recieved messages
 insects         = []
 
-loc_service = Location(measurements) # TODO
+loc_service = Location(measurements)
 
 print("Initialization complete")
 
@@ -42,44 +42,38 @@ async def run(websocket, path):
                 print(recipientId)
 
             elif messageType == 'T':
-                # TODO - save measurement
+
+                measurements.append({
+                    
+                }) 
                 pass
             
             elif messageType == 'R':
-                next = loc_service.nextState(loc_service.getInsect(insects, recipientId))
+                ins = loc_service.getInsect(insects, recipientId)
+
+                next = loc_service.nextState(ins)
+
+                ins.hasTarget = True
+                ins.currentLocation = target
+                ins.target = next
 
                 await websocket.send(json.dumps({
                     'MessageType': 'M',
                     'RecipientId': recipientId,
                     'Data': next
                 }))
+            
+            elif messageType == 'SIM':
+                await websocket.send(json.dumps({
+                    'MessageType': 'SIM',
+                    'Data': measurements
+                }))
 
         except Exception as e:
             print('Exception in run()')
             print(e)
 
-""" 
-    # Main loop
-    while (not location.surveyComplete()) and time.time() < Parameters.SURVEY_TIME:
-        handleComEvent(queue_reader)
-
-        # Set new targets for insects that aren't doing anything
-        for insect in insects:
-            if not insect.hasTarget:
-                queue_writer.put({
-                    "recipient"     : "COM",
-                    "command"       : "SetState",
-                    "state"         : location.nextState(insect)
-                })
-
-        # if the "q" key is pressed, stop the loop
-        if key == ord("q"):
-            break
-
-        time.sleep(0.2)
- """
-
-start = websockets.serve(run, Parameters.SOCKET_HOST, Parameters.SOCKET_PORT)
+start = websockets.serve(run, Parameters.SOCKET_HOST, Parameters.SOCKET_PORT, ping_timeout=999, close_timeout = 999)
 
 asyncio.get_event_loop().run_until_complete(start)
 asyncio.get_event_loop().run_forever()

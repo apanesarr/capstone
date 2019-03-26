@@ -86,7 +86,7 @@ class Location:
 		elif angl > 0:
 			return { 'State': 'LEFT', 'Angle': angl }
 
-		return { 'State': 'RIGHT', 'Angle': angl }
+		return { 'State': 'RIGHT', 'Angle': -angl }
 
 	def nextLocation(self, insect):
 		currentLoc = insect.currentLocation
