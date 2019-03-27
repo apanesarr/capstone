@@ -67,6 +67,8 @@ void processMsg (){
       Serial.println(settings.target);
       motor.setMotor(settings);
       calcXY(settings.target);
+      Serial.print("Motor Ready ------->>>>");
+      Serial.println(motor.ready);
     }
 
     else if (state=="REVERSE"){
@@ -74,6 +76,9 @@ void processMsg (){
       settings.target = comms.message["Data"]["Distance"].as<float>();
       motor.setMotor(settings);
       calcXY(settings.target);
+      Serial.print("Motor Ready ------->>>>");
+      Serial.println(motor.ready);
+
     }
 
     else if (state=="LEFT"){
@@ -85,6 +90,8 @@ void processMsg (){
       Serial.println(settings.target);
       motor.setMotor(settings);
       calcAngle(settings.target);
+      Serial.print("Motor Ready ------->>>>");
+      Serial.println(motor.ready);
     }
 
     else if (state=="RIGHT"){
@@ -94,7 +101,10 @@ void processMsg (){
       Serial.print(test);
       Serial.print("-------->>");
       Serial.println(settings.target);
+      motor.setMotor(settings);
       calcAngle(-1 * settings.target);
+      Serial.print("Motor Ready ------->>>>");
+      Serial.println(motor.ready);
     }
 
     else {
