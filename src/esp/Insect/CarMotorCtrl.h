@@ -71,12 +71,6 @@ struct pwrCtrl_t {
     int prevCntRS = 0;
 };
 
-struct pos {
-    float X;
-    float Y;
-    float Angle;
-};
-
 class MotorControl
 {
   public:

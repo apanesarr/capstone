@@ -1,5 +1,5 @@
 #include <ESP8266WiFi.h>
-#include <WebSocketClient.h>
+#include "WebSocketClient.h"
 #include <math.h>
 #include "ArduinoJson.h"
 #include "CarMotorCtrl.h"
@@ -52,36 +52,36 @@ void setup(){
 void socketConnect (){
   while (! client.connect(host, port)) {
       Serial.println("Not Connected");
-    } 
+    }
     webSocketClient.path = path;
     webSocketClient.host = host;
     while ( ! webSocketClient.handshake(client)) {
       Serial.println("HandShake Failed");
-    } 
-    
+    }
+
 //    else {
 //      Serial.println("Handshake failed.");
 ////      while(1) {
 ////        // Hang on failure
-////      }  
+////      }
 //    }
 }
 
 void loop() {
 
-  
+
   String data;
 
   if (client.connected()) {
-    
+
     webSocketClient.getData(data);
     if (data.length() > 0) {
       Serial.println(data);
       handleData(data);
     }
 
-    
-    } 
+
+    }
   else {
     Serial.println("Client disconnected.");
     while (!client.connected()){
@@ -104,19 +104,19 @@ void handleData (String data){
     connected = true;
     jsonBuffer["MessageType"] = "R";
     jsonBuffer["Data"]["X"] = currentPos.X;
-    jsonBuffer["Data"]["Y"] = currentPos.Y; 
+    jsonBuffer["Data"]["Y"] = currentPos.Y;
     jsonBuffer["Data"]["Angle"] = currentPos.Angle;
     String output;
     serializeJson(jsonBuffer, output);
     writeToMaster(output);
     Serial.println(output);
-    
+
   }
     else if (jsonBuffer["MessageType"] == "M"){
-      
+
       motorSettings_t settings;
       String state = jsonBuffer["Data"]["State"].as<String>();
-      
+
       if(state=="STOP"){
           settings.state = STOP;
       }
@@ -124,7 +124,7 @@ void handleData (String data){
       else if (state=="FORWARD" ){
           settings.state = FORWARD;
           settings.target = jsonBuffer["Data"]["Distance"].as<float>();
-     
+
       // motor.setMotor(settings);
           // while(!motor.ready) {motor.update()};
           calcXY(settings.target);
@@ -138,10 +138,10 @@ void handleData (String data){
       // motor.setMotor(settings);
           calcXY(settings.target);
       }
-      
+
       else if (state=="LEFT"){
           settings.state = LEFT;
-          settings.target = jsonBuffer["Data"]["Angle"].as<float>();    
+          settings.target = jsonBuffer["Data"]["Angle"].as<float>();
           calcAngle(settings.target);
       }
 
@@ -156,14 +156,14 @@ void handleData (String data){
       }
       jsonBuffer["MessageType"] = "R";
       jsonBuffer["Data"]["X"] = currentPos.X;
-      jsonBuffer["Data"]["Y"] = currentPos.Y; 
+      jsonBuffer["Data"]["Y"] = currentPos.Y;
       jsonBuffer["Data"]["Angle"] = currentPos.Angle;
       String output;
       serializeJson(jsonBuffer, output);
 //      writeToMaster(output);
       Serial.println(output);
   }
-  
+
   else if (jsonBuffer["MessageType"] == "R"){
       jsonBuffer["Data"]["X"] = currentPos.X;
       jsonBuffer["Data"]["Y"] = currentPos.Y;
@@ -180,7 +180,7 @@ void handleData (String data){
       serializeJson(jsonBuffer, output);
       writeToMaster(output);
   }
-  
+
   else {
     writeToMaster("Invaild Message");
   }
@@ -189,14 +189,18 @@ void handleData (String data){
 
 
 void calcXY(float distance){
-  if(0<=currentPos.Angle || currentPos.Angle < 45 || 135<= currentPos.Angle || currentPos.Angle < 180 || 180<= currentPos.Angle || currentPos.Angle < 225 || 315<= currentPos.Angle || currentPos.Angle <360){
+  if(0<=currentPos.Angle || currentPos.Angle < 45 || 135<= currentPos.Angle
+      || currentPos.Angle < 180 || 180<= currentPos.Angle
+      || currentPos.Angle < 225 || 315<= currentPos.Angle
+      || currentPos.Angle <360){
      currentPos.X += distance*cos( currentPos.Angle*PI/180 );
      currentPos.Y += distance*sin( currentPos.Angle*PI/180  );
      Serial.println(cos(currentPos.Angle));
      Serial.println(sin(currentPos.Angle));
-         
+
   }
-  else if (45<= currentPos.Angle || currentPos.Angle < 135 || 225<= currentPos.Angle || currentPos.Angle < 315){
+  else if (45<= currentPos.Angle || currentPos.Angle < 135
+      || 225<= currentPos.Angle || currentPos.Angle < 315){
     currentPos.Y += distance*cos( currentPos.Angle *PI/180  );
      currentPos.X += distance*sin( currentPos.Angle *PI/180  );
      Serial.println(cos(currentPos.Angle));
