@@ -1,8 +1,4 @@
-from collections import deque
-from threading import Thread
-
 import numpy as np
-import time
 import math
 
 import Parameters
@@ -23,6 +19,7 @@ class Location:
 	def createRegions(self):
 		regions = []
 
+		# Create empty matrix
 		for i in range(0, NUM_REGIONS_X):
 			x = []
 
@@ -33,7 +30,7 @@ class Location:
 
 		for i in range(0, NUM_REGIONS_X):
 			for j in range(0, NUM_REGIONS_Y):
-				region = { "visited": False }
+				region = { "visited": VISITED_STATUS_NEVER }
 
 				# Calculate center of region
 				x = (i + 0.5) * regionSizeX
@@ -68,7 +65,12 @@ class Location:
 		return True
 
 	def getInsect(self, insects, insectId):
-		return insects[0] # TODO this
+		for insect in insects:
+			if insect.insectId == insectId:
+				return insect
+
+		return None
+		print("Insect out of bounds")
 
 	def nextState(self, insect):
 		currentLoc	= insect.currentLocation
@@ -83,7 +85,7 @@ class Location:
 		self.hasTarget = True
 
 		dist = self.distance(currentLoc, nextLoc)
-		angl = self.angle(insect.angle, currentLoc, nextLoc) - insect.angle
+		angl = self.angle(insect.angle, currentLoc, nextLoc)
 
 		if angl > 10:
 			return { 'State': 'LEFT', 'Angle': angl }
@@ -91,7 +93,7 @@ class Location:
 		elif angl < -10:
 			return { 'State': 'RIGHT', 'Angle': -angl }
 
-		return { 'State': 'FORWARD', 'Distance': dist }
+		return { 'State': 'FORWARD', 'Distance': dist * 10 }
 
 	def nextLocation(self, insect):
 		currentLoc = insect.currentLocation
@@ -135,4 +137,12 @@ class Location:
 	def angle(self, angle, location_current, location_new):
 		delta = (location_new[0] - location_current[0], location_new[1] - location_current[1])
 
-		return angle - math.degrees(np.arctan2(delta[0], delta[1]))
+		x = math.degrees(np.arctan2(delta[0], delta[1])) - angle
+
+		if x > 350.0:
+			x = x - 360
+
+		if x < -350.0:
+			x = x + 360
+
+		return x
