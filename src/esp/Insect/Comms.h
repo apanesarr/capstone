@@ -6,7 +6,7 @@
 
 #define MAX_WIFI_INIT_RETRY 100
 #define WIFI_RETRY_DELAY 500
-
+#define REC_ID 0
 
 class Comms {
 	public:

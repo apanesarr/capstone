@@ -3,17 +3,23 @@
 #include "ArduinoJson.h"
 #include "CarMotorCtrl.h"
 #include "Comms.h"
+#include "DHTesp.h"
+
+#define DHTPIN 16
+#define DHTTYPE 11
 
 pos currentPos;
 MotorControl motor;
 motorSettings_t settings;
 Comms comms;
-
+DHTesp dht;
 
 void setup(){
   Serial.begin(115200);
+  dht.setup(DHTPIN, DHTesp::DHT11);
   comms.setup();
   motor.init();
+  
 }
 
 void loop() {
@@ -32,6 +38,7 @@ void loop() {
   }
 
   if(motor.ready){
+    
     // Serial.print("SEND ME MESSAGE PLZ");
     // Serial.println(comms.ready);
 
@@ -67,6 +74,8 @@ void processMsg (){
       Serial.println(settings.target);
       motor.setMotor(settings);
       calcXY(settings.target);
+      Serial.print("Motor Ready ------->>>>");
+      Serial.println(motor.ready);
     }
 
     else if (state=="REVERSE"){
@@ -74,6 +83,9 @@ void processMsg (){
       settings.target = comms.message["Data"]["Distance"].as<float>();
       motor.setMotor(settings);
       calcXY(settings.target);
+      Serial.print("Motor Ready ------->>>>");
+      Serial.println(motor.ready);
+
     }
 
     else if (state=="LEFT"){
@@ -84,7 +96,9 @@ void processMsg (){
       Serial.print("-------->>");
       Serial.println(settings.target);
       motor.setMotor(settings);
-      calcAngle(settings.target);
+      calcAngle(-1*settings.target);
+      Serial.print("Motor Ready ------->>>>");
+      Serial.println(motor.ready);
     }
 
     else if (state=="RIGHT"){
@@ -94,7 +108,10 @@ void processMsg (){
       Serial.print(test);
       Serial.print("-------->>");
       Serial.println(settings.target);
-      calcAngle(-1 * settings.target);
+      motor.setMotor(settings);
+      calcAngle( settings.target);
+      Serial.print("Motor Ready ------->>>>");
+      Serial.println(motor.ready);
     }
 
     else {
@@ -106,8 +123,11 @@ void processMsg (){
     sendReady();
   }
   else if (comms.message["MessageType"] == "T"){
-    comms.message["Data"]["Temperature"] = 10.0;
-    comms.message["Data"]["Humidity"] = 80.0;
+    comms.message["Data"]["Temperature"] = dht.getTemperature();
+    comms.message["Data"]["Humidity"] = dht.getHumidity();
+    comms.message["Data"]["X"] = currentPos.X;
+    comms.message["Data"]["Y"] = currentPos.Y;
+    comms.message["Data"]["Angle"] = currentPos.Angle;
     comms.transmit();
   }
   else {
@@ -118,7 +138,7 @@ void processMsg (){
 void sendReady(){
     Serial.println("Sending Ready!!!!!:))))");
     comms.messageReady["MessageType"] = "R";
-    comms.messageReady["RecipientId"] = 0;
+    comms.messageReady["RecipientId"] = REC_ID;
     comms.messageReady["Data"]["X"] =  currentPos.X;
     comms.messageReady["Data"]["Y"] = currentPos.Y;
     comms.messageReady["Data"]["Angle"] = currentPos.Angle;
@@ -146,7 +166,8 @@ void calcXY(float distance){
 }
 
 void calcAngle(float angle){
-  if (angle > 360) angle -= 360;
-  if (angle < 0)   angle += 360;
-  currentPos.Angle = angle;
+  // currentPos,Angle 
+  currentPos.Angle += angle;
+  currentPos.Angle = currentPos.Angle ;
+  // currentPos.Angle += angle;
 }
