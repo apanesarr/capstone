@@ -17,8 +17,6 @@ DHTesp dht;
 void setup(){
   Serial.begin(115200);
   dht.setup(DHTPIN, DHTesp::DHT11);
-  Serial.println(dht.getHumidity());
-  Serial.println(dht.getTemperature()); 
   comms.setup();
   motor.init();
   
@@ -98,7 +96,7 @@ void processMsg (){
       Serial.print("-------->>");
       Serial.println(settings.target);
       motor.setMotor(settings);
-      calcAngle(settings.target);
+      calcAngle(-1*settings.target);
       Serial.print("Motor Ready ------->>>>");
       Serial.println(motor.ready);
     }
@@ -111,7 +109,7 @@ void processMsg (){
       Serial.print("-------->>");
       Serial.println(settings.target);
       motor.setMotor(settings);
-      calcAngle(-1 * settings.target);
+      calcAngle( settings.target);
       Serial.print("Motor Ready ------->>>>");
       Serial.println(motor.ready);
     }
@@ -140,7 +138,7 @@ void processMsg (){
 void sendReady(){
     Serial.println("Sending Ready!!!!!:))))");
     comms.messageReady["MessageType"] = "R";
-    comms.messageReady["RecipientId"] = 0;
+    comms.messageReady["RecipientId"] = REC_ID;
     comms.messageReady["Data"]["X"] =  currentPos.X;
     comms.messageReady["Data"]["Y"] = currentPos.Y;
     comms.messageReady["Data"]["Angle"] = currentPos.Angle;
@@ -168,7 +166,8 @@ void calcXY(float distance){
 }
 
 void calcAngle(float angle){
-  if (angle > 360) angle -= 360;
-  if (angle < 0)   angle += 360;
-  currentPos.Angle = angle;
+  // currentPos,Angle 
+  currentPos.Angle += angle;
+  currentPos.Angle = currentPos.Angle ;
+  // currentPos.Angle += angle;
 }
