@@ -46,6 +46,7 @@ class Location:
 	def __init__(self, measurements):
 		self.regions 		= self.createRegions()
 		self.measurements	= measurements
+		self.hasTarget      = False
 
 	def regionComplete(self, region):
 		center = region["center"]
@@ -59,13 +60,13 @@ class Location:
 			for j in range(0, self.regions.shape[1]):
 				r = self.regions[i][j]
 
-				if not regionComplete(r):
+				if not self.regionComplete(r):
 					return False
 
 		return True
 
 	def getInsect(self, insects, insectId):
-		return insects[0]
+		return insects[0] # TODO this
 
 	def nextState(self, insect):
 		currentLoc	= insect.currentLocation
@@ -74,19 +75,18 @@ class Location:
 		if nextLoc == (-1, -1):
 			return { 'State': 'STOP' }
 
-		# TODO just testing
 		self.hasTarget = True
 
-		dist = self.distance(currentLoc, nextLoc)
-		angl = self.angle(currentLoc, nextLoc)
+		dist = self.distance(currentLoc, nextLoc) * 100
+		angl = self.angle(currentLoc, nextLoc) - insect.angle
 
-		if dist > 1:
-			return { 'State': 'FORWARD', 'Distance': dist }
-
-		elif angl > 0:
+		if angl > 5:
 			return { 'State': 'LEFT', 'Angle': angl }
 
-		return { 'State': 'RIGHT', 'Angle': -angl }
+		elif angl < -5:
+			return { 'State': 'RIGHT', 'Angle': -angl }
+
+		return { 'State': 'FORWARD', 'Distance': dist }
 
 	def nextLocation(self, insect):
 		currentLoc = insect.currentLocation
@@ -115,7 +115,7 @@ class Location:
 
 	# A measurement has been made so mark it as visited
 	def measurementMade(self, x, y):
-		(x, y) = roundToRegion(x, y)
+		(x, y) = self.roundToRegion(x, y)
 
 		self.regions[x][y]["visited"] = VISITED_STATUS_DONE
 

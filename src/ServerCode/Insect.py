@@ -11,3 +11,4 @@ class Insect:
         self.currentLocation = (0, 0)
         self.hasTarget       = False
         self.target          = (-1, -1)
+        self.angle           = 0
