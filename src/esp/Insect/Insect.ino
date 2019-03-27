@@ -3,7 +3,7 @@
 #include "ArduinoJson.h"
 #include "CarMotorCtrl.h"
 #include "Comms.h"
-// #include "DHT.h"
+#include "DHTesp.h"
 
 #define DHTPIN 16
 #define DHTTYPE 11
@@ -12,12 +12,16 @@ pos currentPos;
 MotorControl motor;
 motorSettings_t settings;
 Comms comms;
-// DHT dht(DHTPIN, DHTTYPE);
+DHTesp dht;
 
 void setup(){
   Serial.begin(115200);
+  dht.setup(DHTPIN, DHTesp::DHT11);
+  Serial.println(dht.getHumidity());
+  Serial.println(dht.getTemperature()); 
   comms.setup();
   motor.init();
+  
 }
 
 void loop() {
@@ -36,8 +40,7 @@ void loop() {
   }
 
   if(motor.ready){
-    // Serial.println(dht.readTemperature());
-    // Serial.println(dht.readHumidity());
+    
     // Serial.print("SEND ME MESSAGE PLZ");
     // Serial.println(comms.ready);
 
@@ -122,8 +125,8 @@ void processMsg (){
     sendReady();
   }
   else if (comms.message["MessageType"] == "T"){
-    comms.message["Data"]["Temperature"] = 10.1;
-    comms.message["Data"]["Humidity"] = 80.2;
+    comms.message["Data"]["Temperature"] = dht.getTemperature();
+    comms.message["Data"]["Humidity"] = dht.getHumidity();
     comms.message["Data"]["X"] = currentPos.X;
     comms.message["Data"]["Y"] = currentPos.Y;
     comms.message["Data"]["Angle"] = currentPos.Angle;
