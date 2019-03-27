@@ -1,166 +1,139 @@
-from collections import deque
-import threading
 import time
-import queue
-
-from imutils.video import VideoStream
-import numpy as np
-import cv2
-import imutils
-import argparse
-
-import Communication
 import Parameters
-import Location
 
-measurements = []
+import sys, os
 
-def handleComEvent(queue):
-    if queue.empty():
-        return
+from Insect import Insect
+from Location import Location
 
-    item = queue.get()
+import asyncio
+import websockets
+import json
 
-    if not (item["recipient"] == "MAIN"):
-        queue.put(item)
-        return
+measurements    = []                    # List of recieved measurement data
+recieved        = []                    # List of recieved messages
+insects         = []
 
-    elif (item["command"] == "RECORD_MEASUREMENT"):
-        measurement = item["measurement"]
+loc_service = Location(measurements)
 
-        measurements.append({
-            "location": rawLocation,
-            "measurement": measurement
-        })
+VERBOSE = True
 
-if __name__ == "__main__":
-    # Parse command line args
-    ap = argparse.ArgumentParser()
-    
-    ap.add_argument(
-        "-v", "--video",
-        help="path to the (optional) video file"
-    )
+print("Initialization complete")
 
-    ap.add_argument(
-        "-b", "--buffer",
-        type=int,
-        default=64,
-        help="max buffer size"
-    )
+print("Starting surveying")
 
-    args = vars(ap.parse_args())
+async def run(websocket, path):
+    async for message in websocket:
+        try:
+            if VERBOSE:
+                print("Recieved: %s" % message)
 
-    # If a video path was not supplied, grab the reference
-    # to the webcam
-    if not args.get("video", False):
-        vs = VideoStream(src=0).start()
+            message = json.loads(message)
 
-    # Otherwise, grab a reference to the video file
-    else:
-        vs = cv2.VideoCapture(args["video"])
+            messageType = message['MessageType']
+            recipientId = message['RecipientId']
 
-    # Set up Communication thread
-    queue_communication = queue.Queue()
-    event_communication = threading.Event()
-    event_communication.queue = queue_communication
+            if messageType == 'I':
+                ins = Insect(recipientId)
+                insects.append(ins)
 
-    communcation = Communication.Communication()
+                next = loc_service.nextState(ins)
 
-    thread_communication = threading.Thread(
-        name="communication",
-        target=communcation.runCommunication,
-        args=(event_communication,)
-    )
+                output = json.dumps({
+                    'MessageType': 'I',
+                    'RecipientId': recipientId,
+                    'Data': {}
+                })
 
-    thread_communication.start()
+                await websocket.send(output)
 
-    rawLocation = (-1, -1)
+                print('Insect added with ID: ')
+                print(recipientId)
 
-    # Let the webcam warm up
-    time.sleep(2.0)
+                if VERBOSE:
+                    print("Sent: %s" % output)
 
-    location = Location.Location()
+            elif messageType == 'T':
+                ins = loc_service.getInsect(insects, recipientId)
 
-    # Main loop
-    while True:
-        handleComEvent(queue_communication)
+                ins.currentLocation = (message['Data']['X'], message['Data']['Y'])
+                ins.angle = message['Data']['Angle']
 
-        frame = vs.read()
+                measurements.append({
+                    'Location': ins.currentLocation,
+                    'Temperature': message['Data']['Temperature'],
+                    'Humidity': message['Data']['Humidity']
+                })
 
-        if frame is None:
-            break
+                if VERBOSE:
+                    print('Measurement taken at: ')
+                    print(ins.currentLocation)
 
-        frame = imutils.resize(
-            frame,
-            width=Parameters.CAMERA_RES_W,
-            height=Parameters.CAMERA_RES_H
-        )
+                next = loc_service.nextState(ins)
+                targ = ins.target
 
-        blurred = cv2.GaussianBlur(frame, (11, 11), 0)
-        hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+                ins.hasTarget = True
 
-        # Apply color filtering
-        mask = cv2.inRange(hsv, Parameters.COLOR_LOWER, Parameters.COLOR_UPPER)
-        mask = cv2.erode(mask, None, iterations=2)
-        mask = cv2.dilate(mask, None, iterations=2)
+                output = json.dumps({
+                    'MessageType': 'M',
+                    'RecipientId': recipientId,
+                    'Data': next
+                })
 
-        cnts = cv2.findContours(
-            mask.copy(),
-            cv2.RETR_EXTERNAL,
-            cv2.CHAIN_APPROX_SIMPLE
-        )
+                await websocket.send(output)
 
-        cnts = imutils.grab_contours(cnts)
-        center = None
+                if VERBOSE:
+                    print("Sent: %s" % output)
+            
+            elif messageType == 'R':
+                ins = loc_service.getInsect(insects, recipientId)
 
-        if len(cnts) > 0:
-            c = max(cnts, key=cv2.contourArea)
+                ins.currentLocation = (message['Data']['X'], message['Data']['Y'])
+                ins.angle = message['Data']['Angle']
 
-            ((x, y), radius) = cv2.minEnclosingCircle(c)
+                if ins.arrived():
+                    output = json.dumps({
+                        'MessageType': 'T',
+                        'RecipientId': recipientId,
+                        'Data': {}
+                    })
 
-            M = cv2.moments(c)
+                    await websocket.send(output)
 
-            center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+                    if VERBOSE:
+                        print("Sent: ")
+                        print(output)
 
-            if radius > Parameters.MIN_RADIUS and radius < Parameters.MAX_RADIUS:
-                cv2.circle(
-                    frame,
-                    (int(x), int(y)),
-                    int(radius),
-                    (0, 255, 255),
-                    2
-                )
+                else:
+                    next = loc_service.nextState(ins)
+                    targ = ins.target
 
-                cv2.circle(
-                    frame,
-                    center,
-                    5,
-                    (0, 0, 255),
-                    -1
-                )
+                    ins.hasTarget = True
 
-                location.updateLocation(center)
+                    output = json.dumps({
+                        'MessageType': 'M',
+                        'RecipientId': recipientId,
+                        'Data': next
+                    })
 
-        if not location.hasTarget:
-            queue_communication.put({
-                "recipient": "COM",
-                "command": "SEND_NEW_LOCATION",
-                "location": location.nextLocation()
-            })
+                    await websocket.send(output)
 
-            location.hasTarget = False
+                    if VERBOSE:
+                        print("Sent: %s" % output)
+            
+            elif messageType == 'SIM':
+                await websocket.send(json.dumps({
+                    'MessageType': 'SIM',
+                    'Data': measurements
+                }))
 
-        # show the frame to our screen
-        cv2.imshow("Frame", frame)
-        key = cv2.waitKey(1) & 0xFF
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            print(e)
 
-        # if the "q" key is pressed, stop the loop
-        if key == ord("q"):
-            break
+start = websockets.serve(run, Parameters.SOCKET_HOST, Parameters.SOCKET_PORT, ping_interval=10, ping_timeout=1000)
 
-        time.sleep(0.1)
-
-    vs.stop()
-
-    cv2.destroyAllWindows()
+asyncio.get_event_loop().run_until_complete(start)
+asyncio.get_event_loop().run_forever()

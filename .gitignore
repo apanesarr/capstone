@@ -460,3 +460,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Latex
+*.fls
+*.aux
+*.synctex.gz
+*.lof
+*.fdb_latexmk
+*.toc
+*.out
