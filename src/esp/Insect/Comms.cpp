@@ -62,7 +62,7 @@ void Comms::setup(){
 	connectSocket();
 	StaticJsonDocument<96> doc;
 	doc["MessageType"] = "I";
-	doc["RecipientId"] = 0;
+	doc["RecipientId"] = REC_ID;
 	String output;
 	serializeJson(doc,output);
 	Serial.println(output);
