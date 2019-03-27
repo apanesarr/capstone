@@ -13,10 +13,13 @@ char path [] = "/";
 char host [] = "192.168.43.91";
 int port = 8095;
 bool connected = false;
+bool sent = true;
 
 WebSocketClient webSocketClient;
 WiFiClient client;
 pos currentPos;
+MotorControl motor;
+motorSettings_t settings;
 
 int init_wifi() {
     int retries = 0;
@@ -47,6 +50,7 @@ void setup(){
   String output;
   serializeJson(doc,output);
   writeToMaster(output);
+  motor.init();
 }
 
 void socketConnect (){
@@ -59,12 +63,6 @@ void socketConnect (){
       Serial.println("HandShake Failed");
     }
 
-//    else {
-//      Serial.println("Handshake failed.");
-////      while(1) {
-////        // Hang on failure
-////      }
-//    }
 }
 
 void loop() {
@@ -80,7 +78,6 @@ void loop() {
       handleData(data);
     }
 
-
     }
   else {
     Serial.println("Client disconnected.");
@@ -88,10 +85,20 @@ void loop() {
       socketConnect();
     }
   }
-  // motor.update();
-  // if (motor.ready) {
-
-  // }
+  motor.update();
+  if (motor.ready && !(sent)){
+  StaticJsonDocument<50> doc;
+   doc["MessageType"] = "R";
+   doc["MessageId"] = 0;
+   doc["RecipientId"] = 0;
+   doc["Data"]["X"] = currentPos.X;
+   doc["Data"]["Y"] = currentPos.Y;
+   doc["Data"]["Angle"] = currentPos.Angle;
+   String output;
+   serializeJson(doc,output);
+   writeToMaster(output);
+   sent = true;
+  }
 }
 
 void handleData (String data){
@@ -114,7 +121,6 @@ void handleData (String data){
   }
     else if (jsonBuffer["MessageType"] == "M"){
 
-      motorSettings_t settings;
       String state = jsonBuffer["Data"]["State"].as<String>();
 
       if(state=="STOP"){
@@ -124,13 +130,10 @@ void handleData (String data){
       else if (state=="FORWARD" ){
           settings.state = FORWARD;
           settings.target = jsonBuffer["Data"]["Distance"].as<float>();
-
-      // motor.setMotor(settings);
-          // while(!motor.ready) {motor.update()};
+          motor.setMotor(settings);
+          sent = false;
           calcXY(settings.target);
-
-
-        }
+      }
 
       else if (state=="REVERSE"){
         settings.state = REVERSE;
