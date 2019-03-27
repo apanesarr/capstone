@@ -4,16 +4,16 @@
 
 void IMU::init() {
 
-    Serial.begin(115200);
-    while(!Serial) {}
+    // Serial.begin(115200);
+    // while(!Serial) {}
 
     /* Start communication with IMU */
     status = sensor.begin();
     if (status < 0) {
-        Serial.println("IMU initialization unsuccessful");
-        Serial.println("Check IMU wiring or try cycling power");
-        Serial.print("Status: ");
-        Serial.println(status);
+        // Serial.println("IMU initialization unsuccessful");
+        // Serial.println("Check IMU wiring or try cycling power");
+        // Serial.print("Status: ");
+        // Serial.println(status);
         //while(1) {}
     }
     /* Setting the accelerometer full scale range to +/-8G */
@@ -47,9 +47,9 @@ void IMU::calibrateMag() {
      * Run the calibrate function from the library. According to the library,
      * "the sensor should be rotated in a figure 8 motion until complete."
      */
-    Serial.print("Calibrating...");
+    // Serial.print("Calibrating...");
     sensor.calibrateMag();
-    Serial.println("Done.");
+    // Serial.println("Done.");
 
     /* Bias */
     magCalParams.xBias = sensor.getMagBiasX_uT();
@@ -62,10 +62,10 @@ void IMU::calibrateMag() {
     magCalParams.zScaleFactor = sensor.getMagScaleFactorZ();
 
     /* Write to EEPROM */
-    Serial.print("Writing calibration data to EEPROM...");
+    // Serial.print("Writing calibration data to EEPROM...");
     EEPROM.put(MAG_CAL_DATA_EEPROM_ADDR, magCalParams);
-    Serial.println("Done.");
-    Serial.println("Calibration complete.");
+    // Serial.println("Done.");
+    // Serial.println("Calibration complete.");
 
     /* Indicate cal completed */
     digitalWrite(LED_BUILTIN, HIGH);

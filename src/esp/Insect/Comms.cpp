@@ -63,8 +63,6 @@ void Comms::setup(){
 	StaticJsonDocument<96> doc;
 	doc["MessageType"] = "I";
 	doc["RecipientId"] = 0;
-	// doc["Data"]["State"] = "FORWARD";
-	// doc["Data"]["Distance"] = "300";
 	String output;
 	serializeJson(doc,output);
 	Serial.println(output);
@@ -74,7 +72,7 @@ void Comms::setup(){
 
 int Comms::send(String data){
 	if(isConnected()){
-		Serial.println("sending....");
+		Serial.print("sending.......");
 		Serial.println(data);
 		SocketClient.sendData(data);
 		return 1;
@@ -90,7 +88,7 @@ int Comms::update (){
 	if (isConnected()){
 		SocketClient.getData(data);
 		if (data.length() > 0) {
-      		Serial.println("Recieved");
+      		Serial.print("Recieved........");
       		Serial.println(data);
       		return handleData(data);
     	}
@@ -108,6 +106,11 @@ void Comms::transmit(){
 	String output;
     serializeJson(message, output);
     send(output);
-    Serial.print("Output......");
-    Serial.println(output);
+}
+
+
+void Comms::transmitReady(){
+	String output;
+	serializeJson(messageReady, output);
+	send(output);
 }

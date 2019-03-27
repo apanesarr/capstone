@@ -22,26 +22,18 @@ void loop() {
   if (comms.update() && motor.ready){
     processMsg();
     Serial.println("NEW MESSAGE AND MOTOR READY");
-    Serial.print("Comms.....");
-    Serial.println(comms.ready);
-    Serial.print("motor.....");
-    Serial.println(motor.ready);
   } 
   motor.update();
   
   if (motor.ready &&  (comms.ready) ){
     Serial.println("MOTOR READY AND SEND READY");
-    Serial.print("Comms.....");
-    Serial.println(comms.ready);
-    Serial.print("motor.....");
-    Serial.println(motor.ready);
     sendReady();
     comms.ready = false;
   }
 
   if(motor.ready){
-    Serial.print("SEND ME MESSAGE PLZ");
-    Serial.println(comms.ready);
+    // Serial.print("SEND ME MESSAGE PLZ");
+    // Serial.println(comms.ready);
 
   }
   
@@ -57,18 +49,21 @@ void processMsg (){
     Serial.println("recived I");
   }
   else if (comms.message["MessageType"] == "M"){
+    Serial.print("Motor Ready ------->>>>");
+    Serial.println(motor.ready);
     String state = comms.message["Data"]["State"].as<String>();
     if(state=="STOP"){
       settings.state = STOP;
-      // motor.setMotor(settings);
+      motor.setMotor(settings);
     }
 
     else if (state=="FORWARD" ){
       settings.state = FORWARD;
       // Serial.println( comms.message["Data"]["Distance"] );
       String test = comms.message["Data"]["Distance"];
-      Serial.println(test);
       settings.target = comms.message["Data"]["Distance"].as<float>();
+      Serial.print(test);
+      Serial.print("-------->>");
       Serial.println(settings.target);
       motor.setMotor(settings);
       calcXY(settings.target);
@@ -83,15 +78,22 @@ void processMsg (){
 
     else if (state=="LEFT"){
       settings.state = LEFT;
+      String test = comms.message["Data"]["Angle"];
       settings.target = comms.message["Data"]["Angle"].as<float>();
-      // motor.setMotor(settings);
+      Serial.print(test);
+      Serial.print("-------->>");
+      Serial.println(settings.target);
+      motor.setMotor(settings);
       calcAngle(settings.target);
     }
 
     else if (state=="RIGHT"){
       settings.state = RIGHT;
       settings.target = comms.message["Data"]["Angle"].as<float>();
-      // motor.setMotor(settings);
+      String test = comms.message["Data"]["Angle"];
+      Serial.print(test);
+      Serial.print("-------->>");
+      Serial.println(settings.target);
       calcAngle(-1 * settings.target);
     }
 
@@ -114,11 +116,13 @@ void processMsg (){
 }
 
 void sendReady(){
-    comms.message["MessageType"] = "R";
-    comms.message["Data"]["X"] =  currentPos.X;
-    comms.message["Data"]["Y"] = currentPos.Y;
-    comms.message["Data"]["Angle"] = currentPos.Angle;
-    comms.transmit();
+    Serial.println("Sending Ready!!!!!:))))");
+    comms.messageReady["MessageType"] = "R";
+    comms.messageReady["RecipientId"] = 0;
+    comms.messageReady["Data"]["X"] =  currentPos.X;
+    comms.messageReady["Data"]["Y"] = currentPos.Y;
+    comms.messageReady["Data"]["Angle"] = currentPos.Angle;
+    comms.transmitReady();
 }
 
 void calcXY(float distance){

@@ -57,13 +57,13 @@ void MotorControl::setMotor(motorSettings_t newSettings)
       settings.target = newSettings.target;
       resetEncoders();
       forward();
-      ready = TRUE;
+      // ready = TRUE;
       break;
     case REVERSE:
       settings.target = newSettings.target;
       resetEncoders();
       reverse();
-      ready = TRUE;
+      // ready = TRUE;
       break;
     case LEFT:
       settings.target = imu.getYaw() - newSettings.target;

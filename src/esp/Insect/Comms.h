@@ -14,10 +14,12 @@ class Comms {
 		int update();
 		bool ready;
 		StaticJsonDocument<512> message;
+		StaticJsonDocument<512> messageReady;
 		int initWifi();
 		int handleData(String data);
 		int isConnected();
 		int send (String data);
 		void setup();
 		void transmit();
+		void transmitReady();
 };
