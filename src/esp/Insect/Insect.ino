@@ -22,6 +22,7 @@ int init_wifi() {
     int retries = 0;
     Serial.println("Connecting to WiFi AP..........");
     WiFi.mode(WIFI_STA);
+    Serial.print(WIFI_STA);
     WiFi.begin(ssid, password);
     while ((WiFi.status() != WL_CONNECTED) && (retries < MAX_WIFI_INIT_RETRY)) {
         retries++;
@@ -39,42 +40,31 @@ void setup(){
       Serial.println(WiFi.localIP());
   }
   socketConnect();
+  StaticJsonDocument<50> doc;
+  doc["MessageType"] = "I";
+  doc["MessageId"] = 0;
+  doc["RecipientId"] = 0;
+  String output;
+  serializeJson(doc,output);
+  writeToMaster(output);
 }
 
 void socketConnect (){
-  if (client.connect(host, port)) {
-      Serial.println("Connected");
+  while (! client.connect(host, port)) {
+      Serial.println("Not Connected");
     } 
-    else {
-      Serial.println("Connection failed.");
-      while(1) {
-          // Hang on failure
-      }
-    }
     webSocketClient.path = path;
     webSocketClient.host = host;
-    if (webSocketClient.handshake(client)) {
-      Serial.println("Handshake successful");
+    while ( ! webSocketClient.handshake(client)) {
+      Serial.println("HandShake Failed");
     } 
-    else {
-      Serial.println("Handshake failed.");
-      while(1) {
-        // Hang on failure
-      }  
-    }
-}
-
-void sendInit(){
-  if (!connected){
-        StaticJsonDocument<50> doc;
-        doc["MessageType"] = "I";
-        doc["MessageId"] = 0;
-        doc["RecipientId"] = 0;
-        String output;
-        serializeJson(doc,output);
-        webSocketClient.sendData(output);
-        connected = true;
-    }
+    
+//    else {
+//      Serial.println("Handshake failed.");
+////      while(1) {
+////        // Hang on failure
+////      }  
+//    }
 }
 
 void loop() {
@@ -83,11 +73,10 @@ void loop() {
   String data;
 
   if (client.connected()) {
-    sendInit();
-  
     
     webSocketClient.getData(data);
     if (data.length() > 0) {
+      Serial.println(data);
       handleData(data);
     }
 
@@ -95,7 +84,9 @@ void loop() {
     } 
   else {
     Serial.println("Client disconnected.");
-    socketConnect();
+    while (!client.connected()){
+      socketConnect();
+    }
   }
   // motor.update();
   // if (motor.ready) {
@@ -109,6 +100,18 @@ void handleData (String data){
   if (error) {
       return;
     }
+  if (jsonBuffer["MessageType"]=="I"){
+    connected = true;
+    jsonBuffer["MessageType"] = "R";
+    jsonBuffer["Data"]["X"] = currentPos.X;
+    jsonBuffer["Data"]["Y"] = currentPos.Y; 
+    jsonBuffer["Data"]["Angle"] = currentPos.Angle;
+    String output;
+    serializeJson(jsonBuffer, output);
+    writeToMaster(output);
+    Serial.println(output);
+    
+  }
     else if (jsonBuffer["MessageType"] == "M"){
       
       motorSettings_t settings;
@@ -139,25 +142,26 @@ void handleData (String data){
       else if (state=="LEFT"){
           settings.state = LEFT;
           settings.target = jsonBuffer["Data"]["Angle"].as<float>();    
-          calcAngle(-1*settings.target);
+          calcAngle(settings.target);
       }
 
       else if (state=="RIGHT"){
           settings.state = RIGHT;
           settings.target = jsonBuffer["Data"]["Angle"].as<float>();
-          calcAngle(settings.target);
+          calcAngle(-1 * settings.target);
       }
 
       else {
           return;
       }
-
+      jsonBuffer["MessageType"] = "R";
       jsonBuffer["Data"]["X"] = currentPos.X;
       jsonBuffer["Data"]["Y"] = currentPos.Y; 
       jsonBuffer["Data"]["Angle"] = currentPos.Angle;
       String output;
       serializeJson(jsonBuffer, output);
-      writeToMaster(output);
+//      writeToMaster(output);
+      Serial.println(output);
   }
   
   else if (jsonBuffer["MessageType"] == "R"){
@@ -201,20 +205,10 @@ void calcXY(float distance){
 }
 
 void calcAngle(float angle){
-  if (currentPos.Angle == 0){
-      currentPos.Angle = angle;
-    }
-    
-    else if (currentPos.Angle - angle < 0 ){
-      currentPos.Angle = (currentPos.Angle - angle) + 360;
-    }
-    
-    else if(currentPos.Angle - angle > 360){
-      currentPos.Angle = (currentPos.Angle - angle) - 360; 
-    }
-    else{
-      currentPos.Angle = (currentPos.Angle - angle);
-    }
+  if (angle > 360) angle -= 360;
+  if (angle < 0)   angle += 360;
+
+  currentPos.Angle = angle;
 }
 
 void writeToMaster(String msg){
