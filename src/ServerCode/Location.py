@@ -7,20 +7,31 @@ import math
 
 import Parameters
 
-regionSizeX = (Parameters.COVERAGE_AREA_X_MAX - Parameters.COVERAGE_AREA_X_MIN) / Parameters.NUM_REGIONS_X
-regionSizeY = (Parameters.COVERAGE_AREA_Y_MAX - Parameters.COVERAGE_AREA_Y_MIN) / Parameters.NUM_REGIONS_Y
+regionSizeX = Parameters.REGION_SIZE_X
+regionSizeY = Parameters.REGION_SIZE_Y
 
 VISITED_STATUS_NEVER 		= 0
 VISITED_STATUS_DONE  		= 1
 VISITED_STATUS_IN_PROGRESS 	= 2
 
+NUM_REGIONS_X = Parameters.NUM_REGIONS_X
+NUM_REGIONS_Y = Parameters.NUM_REGIONS_Y
+
 class Location:
 	def createRegions(self):
-		regions = np.full([Parameters.NUM_REGIONS_X, Parameters.NUM_REGIONS_Y], {})
+		regions = []
 
-		for i in range(0, regions.shape[0]):
-			for j in range(0, regions.shape[1]):
-				region = {"visited": False }
+		for i in range(0, NUM_REGIONS_X):
+			x = []
+
+			for j in range(0, NUM_REGIONS_Y):
+				x.append(0)
+
+			regions.append(x)
+
+		for i in range(0, NUM_REGIONS_X):
+			for j in range(0, NUM_REGIONS_Y):
+				region = { "visited": False }
 
 				# Calculate center of region
 				x = (i + 0.5) * regionSizeX
@@ -53,54 +64,57 @@ class Location:
 
 		return True
 
-	def exactLocation(self):
-		if not self.rawLocation: return (-1, -1)
-
-		x = (self.rawLocation[0] - Parameters.COVERAGE_AREA_X_MIN) / (Parameters.COVERAGE_AREA_X_MAX - Parameters.COVERAGE_AREA_X_MIN)
-		y = (self.rawLocation[1] - Parameters.COVERAGE_AREA_Y_MIN) / (Parameters.COVERAGE_AREA_Y_MAX - Parameters.COVERAGE_AREA_Y_MIN)
-
-		return (x, y)
+	def getInsect(self, insects, insectId):
+		return insects[0]
 
 	def nextState(self, insect):
-		currentLoc	= insect.currentLocation()
+		currentLoc	= insect.currentLocation
 		nextLoc		= self.nextLocation(insect)
 
 		if nextLoc == (-1, -1):
-			return { "State": "STOP" }
+			return { 'State': 'STOP' }
 
 		# TODO just testing
 		self.hasTarget = True
 
-		return { "State": "FORWARD", "Distance": "20" }
+		dist = self.distance(currentLoc, nextLoc)
+		angl = self.angle(currentLoc, nextLoc)
+
+		if dist > 1:
+			return { 'State': 'FORWARD', 'Distance': dist }
+
+		elif angl > 0:
+			return { 'State': 'LEFT', 'Angle': angl }
+
+		return { 'State': 'RIGHT', 'Angle': -angl }
 
 	def nextLocation(self, insect):
-		currentLoc = insect.currentLocation()
+		currentLoc = insect.currentLocation
 
 		# If we're out of bounds... screw it, it's game over for this insect
 		if (currentLoc == (-1, -1)):
 			return (-1, -1)
 
 		min = self.regions[0][0]
-		minD = 99999
+		minD = 9999999
 
 		for r in self.regions:
 			for j in r:
-				cent = j["center"]
+				cent = j['center']
 
-				if j["visited"] == VISITED_STATUS_NEVER and self.distance(cent, currentLoc) < minD:
+				if j['visited'] == VISITED_STATUS_NEVER and self.distance(cent, currentLoc) < minD:
 					min = j
 					minD = self.distance(cent, currentLoc)
 
-		min["visited"] = VISITED_STATUS_IN_PROGRESS
+		min['visited'] = VISITED_STATUS_IN_PROGRESS
 		
-		return min["center"]
+		return min['center']
 
 	def roundToRegion(self, x, y):
-		# TODO this function
-		pass
+		return (round(x), round(y))			
 
 	# A measurement has been made so mark it as visited
-	def measurementMade(self, x, y): # TODO this function
+	def measurementMade(self, x, y):
 		(x, y) = roundToRegion(x, y)
 
 		self.regions[x][y]["visited"] = VISITED_STATUS_DONE

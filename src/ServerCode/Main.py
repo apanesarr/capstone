@@ -1,103 +1,79 @@
-from collections import deque
-import threading
 import time
-import queue
-
 import Parameters
-import Location
 
-import Reader
-import Writer
+from Insect import Insect
+from Location import Location
 
-import Insect
+import asyncio
+import websockets
+import json
 
-class Main(threading.Thread):
-    def handleComEvent(self):
-        if self.queue.empty():
-            return
+measurements    = []                    # List of recieved measurement data
+recieved        = []                    # List of recieved messages
+insects         = []
 
-        item = queue.get()
+loc_service = Location(measurements)
 
-        # if it's not meant for us, put it back and return
-        if not (item["recipient"] == "MAIN"):
-            self.queue.put(item)
-            return
+print("Initialization complete")
 
-        if (item["command"] == "Arrived"):
-            insectId    = item["insectId"]
+print("Starting surveying")
 
-            getInsect(insects, insectId).hasTarget = False
+async def run(websocket, path):
+    async for message in websocket:
+        try:
+            message = json.loads(message)
 
-        elif (item["command"] == "RequestMeasurement"):
-            measurement = item["measurement"]
-            insectId    = item["insectId"]
-            insect      = getInsect(insects, insectId)
-            loc         = insect.exactloc()
+            messageType = message['MessageType']
+            recipientId = message['RecipientId']
 
-            measurements.append({
-                "insectId"      : insectId,
-                "location"      : loc,
-                "measurement"   : measurement
-            })
+            if messageType == 'I':
+                ins = Insect(recipientId)
+                insects.append(ins)
 
-            print("Measurement made:")
-            print("InsectId - %s - loc - (%s, %s) - Temperature - %s - Humidity - %s" \
-                % (insectId, loc["X"], loc["Y"], measurement["Temperature"], measurement["Humidity"]))
+                next = loc_service.nextState(ins)
 
-            insect.hasTarget = False
+                await websocket.send(json.dumps({
+                    'MessageType': 'I',
+                    'RecipientId': recipientId,
+                    'Data': {}
+                }))
 
-    def __init__(self):
-        # Set up Communication threads
-        self.queue_writer = queue.Queue()
-        self.event_writer = threading.Event()
-        self.event_writer.queue = self.queue_writer
+                print('Insect added with ID: ')
+                print(recipientId)
 
-        self.queue_reader = queue.Queue()
-        self.event_reader = threading.Event()
-        self.event_reader.queue = self.queue_reader 
+            elif messageType == 'T':
 
-        self.measurements    = [] # List of recieved measurement data
-        self.recieved        = [] # List of recieved messages
-        self.insects         = Insect.pairInsects() # List of insects
+                measurements.append({
+                    
+                }) 
+                pass
+            
+            elif messageType == 'R':
+                ins = loc_service.getInsect(insects, recipientId)
 
-        if len(self.insects) < 1:
-            print('No insects pairing. Exiting...')
-            exit()
+                next = loc_service.nextState(ins)
 
-        self.reader = Reader.Reader(Parameters.SERIAL_PORT_IN, Parameters.SERIAL_BODE, self.queue_reader, self.recieved)
-        self.writer = Writer.Writer(Parameters.SERIAL_PORT_OUT, Parameters.SERIAL_BODE, self.queue_writer, self.recieved)
+                ins.hasTarget = True
+                ins.currentLocation = target
+                ins.target = next
 
-        self.reader.start()
-        self.writer.start()
+                await websocket.send(json.dumps({
+                    'MessageType': 'M',
+                    'RecipientId': recipientId,
+                    'Data': next
+                }))
+            
+            elif messageType == 'SIM':
+                await websocket.send(json.dumps({
+                    'MessageType': 'SIM',
+                    'Data': measurements
+                }))
 
-        self.location = Location.Location(measurements) # TODO
+        except Exception as e:
+            print('Exception in run()')
+            print(e)
 
-        print("Initialization complete")
+start = websockets.serve(run, Parameters.SOCKET_HOST, Parameters.SOCKET_PORT, ping_timeout=999, close_timeout = 999)
 
-    def run(self):
-        endTime = time.time() + Parameters.SURVEY_TIME
-
-        print("Starting surveying")
-
-        # Main loop
-        while (not self.location.surveyComplete()) and time.time() < Parameters.SURVEY_TIME:
-            self.handleComEvent(queue_reader)
-
-            # Set new targets for insects that aren't doing anything
-            for insect in self.insects:
-                if not insect.hasTarget:
-                    self.queue_writer.put({
-                        "recipient"     : "COM",
-                        "command"       : "SetState",
-                        "state"         : self.location.nextState(insect)
-                    })
-
-            # if the "q" key is pressed, stop the loop
-            if key == ord("q"):
-                break
-
-            time.sleep(0.2)
-
-if __name__ == "__main__":
-    main = Main()
-    main.start()
+asyncio.get_event_loop().run_until_complete(start)
+asyncio.get_event_loop().run_forever()
