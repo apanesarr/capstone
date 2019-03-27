@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include <ESP8266WiFi.h>
 #include "CarMotorCtrl.h"
 
 static encoder_t encoder;
@@ -23,8 +23,12 @@ MotorControl::MotorControl()
 
 void MotorControl::init()
 {
+    analogWrite(LEFT_FWD_PIN, 0);
+    analogWrite(LEFT_BWD_PIN, 0);
+    analogWrite(RIGHT_FWD_PIN, 0);
+    analogWrite(RIGHT_BWD_PIN, 0);
     imu.init();
-    Serial.begin(115200);
+    // Serial.begin(115200);
     initEncoderPins();
     ready = TRUE;
 }
@@ -35,7 +39,7 @@ void MotorControl::initEncoderPins()
     pinMode(RS_ENC_A, INPUT);
     digitalWrite(RS_ENC_A, HIGH);
     attachInterrupt(digitalPinToInterrupt(RS_ENC_A), updateEncRS, CHANGE);
-    DEBUG_PRINT("ISR num:", digitalPinToInterrupt(RS_ENC_A));
+    // DEBUG_PRINT("ISR num:", digitalPinToInterrupt(RS_ENC_A));
 
     /* Left side encoder */
     pinMode(LS_ENC_A, INPUT);
@@ -115,23 +119,28 @@ int MotorControl::update()
 
 void MotorControl::updatePwrCtrl()
 {
-    int right = constrain(round((encoder.tickLS - encoder.tickRS) * GAIN), -MAX_OFFSET, MAX_OFFSET);
+    int tickLS = encoder.tickLS;
+    int tickRS = encoder.tickRS;
+    int rateLS = encoder.tickLS - pwrCtrl.prevCntLS;
+    int rateRS = encoder.tickRS - pwrCtrl.prevCntRS;
+    pwrCtrl.prevCntLS = tickLS;
+    pwrCtrl.prevCntRS = tickRS;
+
+    int right = constrain(
+                    round(
+                        (tickLS - tickRS) * P_GAIN
+                      + (rateLS - rateRS) * D_GAIN
+                    ),
+                    -MAX_OFFSET, MAX_OFFSET
+                );
     int left  = - right;
 
-    pwrCtrl.powerRS = MOTOR_PWR + right;
+    pwrCtrl.powerRS = round(RIGHT_OFFSET * MOTOR_PWR) + right;
     pwrCtrl.powerLS = MOTOR_PWR + left;
-    pwrCtrl.powerLS = constrain(pwrCtrl.powerLS, 0, 255);
-    pwrCtrl.powerRS = constrain(pwrCtrl.powerRS, 0, 255);
+    pwrCtrl.powerLS = constrain(pwrCtrl.powerLS, 0, 1023);
+    pwrCtrl.powerRS = constrain(pwrCtrl.powerRS, 0, 1023);
 
-    Serial.print("LS:\t");
-    Serial.print(encoder.tickLS);
-    Serial.print("\t");
-    Serial.println(pwrCtrl.powerLS);
-
-    Serial.print("RS:\t");
-    Serial.print(encoder.tickRS);
-    Serial.print("\t");
-    Serial.println(pwrCtrl.powerRS);
+    // GRAPH_PRINT(tickLS, tickRS, pwrCtrl.powerLS, pwrCtrl.powerRS);
 
     switch (settings.state) {
     case FORWARD:

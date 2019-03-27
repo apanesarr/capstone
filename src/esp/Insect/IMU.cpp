@@ -8,7 +8,7 @@ void IMU::init() {
     while(!Serial) {}
 
     /* Start communication with IMU */
-    status = sensor.begin();
+    status = sensor.begin(D2, D3);
     if (status < 0) {
         Serial.println("IMU initialization unsuccessful");
         Serial.println("Check IMU wiring or try cycling power");
@@ -85,7 +85,7 @@ int IMU::update()
 
 double IMU::getYaw()
 {
-    //Serial.println(yaw * 57.3);
+    Serial.println(yaw * 57.3);
     return yaw * 180 / M_PI;
 }
 
