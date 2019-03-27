@@ -54,20 +54,25 @@ async def run(websocket, path):
                     print("Sent: %s" % output)
 
             elif messageType == 'T':
-                measurements.append({
-                })
-            
-            elif messageType == 'R':
                 ins = loc_service.getInsect(insects, recipientId)
 
-                ins.currentLocation = (message['Data']['Y'], message['Data']['Y'])
+                ins.currentLocation = (message['Data']['X'], message['Data']['Y'])
                 ins.angle = message['Data']['Angle']
 
+                measurements.append({
+                    'Location': ins.currentLocation,
+                    'Temperature': message['Data']['Temperature'],
+                    'Humidity': message['Data']['Humidity']
+                })
+
+                if VERBOSE:
+                    print('Measurement taken at: ')
+                    print(ins.currentLocation)
+
                 next = loc_service.nextState(ins)
+                targ = ins.target
 
                 ins.hasTarget = True
-                ins.currentLocation = ins.target
-                ins.target = next
 
                 output = json.dumps({
                     'MessageType': 'M',
@@ -79,6 +84,42 @@ async def run(websocket, path):
 
                 if VERBOSE:
                     print("Sent: %s" % output)
+            
+            elif messageType == 'R':
+                ins = loc_service.getInsect(insects, recipientId)
+
+                ins.currentLocation = (message['Data']['X'], message['Data']['Y'])
+                ins.angle = message['Data']['Angle']
+
+                if ins.arrived():
+                    output = json.dumps({
+                        'MessageType': 'T',
+                        'RecipientId': recipientId,
+                        'Data': {}
+                    })
+
+                    await websocket.send(output)
+
+                    if VERBOSE:
+                        print("Sent: ")
+                        print(output)
+
+                else:
+                    next = loc_service.nextState(ins)
+                    targ = ins.target
+
+                    ins.hasTarget = True
+
+                    output = json.dumps({
+                        'MessageType': 'M',
+                        'RecipientId': recipientId,
+                        'Data': next
+                    })
+
+                    await websocket.send(output)
+
+                    if VERBOSE:
+                        print("Sent: %s" % output)
             
             elif messageType == 'SIM':
                 await websocket.send(json.dumps({

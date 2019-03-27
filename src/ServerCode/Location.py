@@ -17,6 +17,8 @@ VISITED_STATUS_IN_PROGRESS 	= 2
 NUM_REGIONS_X = Parameters.NUM_REGIONS_X
 NUM_REGIONS_Y = Parameters.NUM_REGIONS_Y
 
+VERBOSE = True
+
 class Location:
 	def createRegions(self):
 		regions = []
@@ -35,7 +37,7 @@ class Location:
 
 				# Calculate center of region
 				x = (i + 0.5) * regionSizeX
-				y = (i + 0.5) * regionSizeY
+				y = (j + 0.5) * regionSizeY
 
 				region["center"] = (x, y)
 
@@ -72,18 +74,21 @@ class Location:
 		currentLoc	= insect.currentLocation
 		nextLoc		= self.nextLocation(insect)
 
+		if VERBOSE:
+			print('Moving to location: %s - %s' % (nextLoc[0], nextLoc[1]))
+
 		if nextLoc == (-1, -1):
 			return { 'State': 'STOP' }
 
 		self.hasTarget = True
 
-		dist = self.distance(currentLoc, nextLoc) * 100
-		angl = self.angle(currentLoc, nextLoc) - insect.angle
+		dist = self.distance(currentLoc, nextLoc)
+		angl = self.angle(insect.angle, currentLoc, nextLoc) - insect.angle
 
-		if angl > 5:
+		if angl > 10:
 			return { 'State': 'LEFT', 'Angle': angl }
 
-		elif angl < -5:
+		elif angl < -10:
 			return { 'State': 'RIGHT', 'Angle': -angl }
 
 		return { 'State': 'FORWARD', 'Distance': dist }
@@ -107,6 +112,8 @@ class Location:
 					minD = self.distance(cent, currentLoc)
 
 		min['visited'] = VISITED_STATUS_IN_PROGRESS
+
+		insect.target = min['center']
 		
 		return min['center']
 
@@ -125,7 +132,7 @@ class Location:
 
 		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
-	def angle(self, location_current, location_new):
+	def angle(self, angle, location_current, location_new):
 		delta = (location_new[0] - location_current[0], location_new[1] - location_current[1])
 
-		return math.degrees(np.arctan2(delta[0], delta[1]))
+		return angle - math.degrees(np.arctan2(delta[0], delta[1]))
