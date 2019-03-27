@@ -28,7 +28,7 @@ void MotorControl::init()
     analogWrite(RIGHT_FWD_PIN, 0);
     analogWrite(RIGHT_BWD_PIN, 0);
     imu.init();
-    Serial.begin(115200);
+    // Serial.begin(115200);
     initEncoderPins();
     ready = TRUE;
 }
@@ -39,7 +39,7 @@ void MotorControl::initEncoderPins()
     pinMode(RS_ENC_A, INPUT);
     digitalWrite(RS_ENC_A, HIGH);
     attachInterrupt(digitalPinToInterrupt(RS_ENC_A), updateEncRS, CHANGE);
-    DEBUG_PRINT("ISR num:", digitalPinToInterrupt(RS_ENC_A));
+    // DEBUG_PRINT("ISR num:", digitalPinToInterrupt(RS_ENC_A));
 
     /* Left side encoder */
     pinMode(LS_ENC_A, INPUT);
@@ -140,7 +140,7 @@ void MotorControl::updatePwrCtrl()
     pwrCtrl.powerLS = constrain(pwrCtrl.powerLS, 0, 1023);
     pwrCtrl.powerRS = constrain(pwrCtrl.powerRS, 0, 1023);
 
-    GRAPH_PRINT(tickLS, tickRS, pwrCtrl.powerLS, pwrCtrl.powerRS);
+    // GRAPH_PRINT(tickLS, tickRS, pwrCtrl.powerLS, pwrCtrl.powerRS);
 
     switch (settings.state) {
     case FORWARD:

@@ -5,7 +5,7 @@
 #include <ESP8266WiFi.h>
 #include "IMU.h"
 
-#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #define DEBUG_PRINT(label, var) Serial.print(label); \
@@ -85,6 +85,12 @@ struct pwrCtrl_t {
     int powerRS = MOTOR_PWR;
     int prevCntLS = 0;
     int prevCntRS = 0;
+};
+
+struct pos {
+  float X;
+  float Y;
+  float Angle;
 };
 
 class MotorControl
