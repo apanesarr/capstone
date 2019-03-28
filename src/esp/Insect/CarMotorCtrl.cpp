@@ -57,21 +57,22 @@ void MotorControl::setMotor(motorSettings_t newSettings)
       settings.target = newSettings.target;
       resetEncoders();
       forward();
-      // ready = TRUE;
       break;
     case REVERSE:
       settings.target = newSettings.target;
       resetEncoders();
       reverse();
-      // ready = TRUE;
       break;
-    case LEFT:
-      settings.target = imu.getYaw() - newSettings.target;
-      left();
-      break;
-    case RIGHT:
-      settings.target = imu.getYaw() + newSettings.target;
-      right();
+    case ROTATE:
+      settings.target = newSettings.target;
+      if ((settings.target - imu.getYaw()) > 0) {
+          settings.state = LEFT;
+          left();
+      }
+      else {
+          settings.state = RIGHT;
+          right();
+      }
       break;
     case STOP:
       stop();
@@ -101,16 +102,18 @@ int MotorControl::update()
       break;
 
     case LEFT:
-      if (imu.getYaw() <= settings.target) {
+      if (imu.getYaw() == settings.target) {
         stop();
         ready = TRUE;
+        yaw = imu.getYaw();
       }
       break;
 
     case RIGHT:
-      if (imu.getYaw() >= settings.target) {
+      if (imu.getYaw() == settings.target) {
         stop();
         ready = TRUE;
+        yaw = imu.getYaw();
       }
       break;
   }
