@@ -70,6 +70,7 @@ class Location:
 				return insect
 
 		return None
+
 		print("Insect out of bounds")
 
 	def nextState(self, insect):
@@ -87,13 +88,26 @@ class Location:
 		dist = self.distance(currentLoc, nextLoc)
 		angl = self.angle(insect.angle, currentLoc, nextLoc)
 
-		if angl > 10:
-			return { 'State': 'LEFT', 'Angle': angl }
+		(x, y) = (dist * math.sin(math.radians(angl)), dist * math.cos(math.radians(angl)))
 
-		elif angl < -10:
-			return { 'State': 'RIGHT', 'Angle': -angl }
+		if abs(x) > 10:
+			new_angl = - insect.angle
 
-		return { 'State': 'FORWARD', 'Distance': dist * 10 }
+			if abs(new_angl) > 10:
+				return { 'State': 'ROTATE', 'Angle': 0 }
+
+			if x > 0:
+				return { 'State': 'FORWARD', 'Distance': abs(x) }
+			else:
+				return { 'State': 'REVERSE', 'Distance': abs(x) }
+
+		if abs(insect.angle - 90) > 10:
+			return { 'State': 'ROTATE', 'Angle': 90 }
+
+		if y > 0:
+			return { 'State': 'FORWARD', 'Distance': abs(y) }
+		else:
+			return { 'State': 'REVERSE', 'Distance': abs(y) }
 
 	def nextLocation(self, insect):
 		currentLoc = insect.currentLocation
@@ -129,8 +143,8 @@ class Location:
 		self.regions[x][y]["visited"] = VISITED_STATUS_DONE
 
 	def distance(self, p1, p2):
-		deltaX = abs(p1[0] - p2[1])
-		deltaY = abs(p2[0] - p2[1])
+		deltaX = abs(p1[0] - p2[0])
+		deltaY = abs(p1[1] - p2[1])
 
 		return math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
@@ -138,11 +152,5 @@ class Location:
 		delta = (location_new[0] - location_current[0], location_new[1] - location_current[1])
 
 		x = math.degrees(np.arctan2(delta[0], delta[1])) - angle
-
-		if x > 350.0:
-			x = x - 360
-
-		if x < -350.0:
-			x = x + 360
 
 		return x

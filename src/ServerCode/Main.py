@@ -10,6 +10,8 @@ import asyncio
 import websockets
 import json
 
+import random
+
 measurements    = []                    # List of recieved measurement data
 recieved        = []                    # List of recieved messages
 insects         = []
@@ -21,6 +23,9 @@ VERBOSE = True
 print("Initialization complete")
 
 print("Starting surveying")
+
+def randomize(value):
+    return value + random.randint(-Parameters.RANDOM_RANGE, Parameters.RANDOM_RANGE)
 
 async def run(websocket, path):
     async for message in websocket:
@@ -61,8 +66,8 @@ async def run(websocket, path):
 
                 measurements.append({
                     'Location': ins.currentLocation,
-                    'Temperature': message['Data']['Temperature'],
-                    'Humidity': message['Data']['Humidity']
+                    'Temperature': randomize(message['Data']['Temperature']),
+                    'Humidity': randomize(message['Data']['Humidity'])
                 })
 
                 if VERBOSE:
