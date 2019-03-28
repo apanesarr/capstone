@@ -13,7 +13,17 @@ VISITED_STATUS_IN_PROGRESS 	= 2
 NUM_REGIONS_X = Parameters.NUM_REGIONS_X
 NUM_REGIONS_Y = Parameters.NUM_REGIONS_Y
 
-VERBOSE = True
+VERBOSE = False
+
+moves = [
+	{'State': 'FORWARD', 'Distance': 400},
+	{'State': 'FORWARD', 'Distance': 400},
+	{'State': 'FORWARD', 'Distance': 400},
+	{'State': 'ROTATE', 'Angle': 90},
+	{'State': 'FORWARD', 'Distance': 400},
+	{'State': 'ROTATE', 'Angle': 180},
+	{'State': 'FORWARD', 'Distance': 400},
+]
 
 class Location:
 	def createRegions(self):
@@ -46,6 +56,7 @@ class Location:
 		self.regions 		= self.createRegions()
 		self.measurements	= measurements
 		self.hasTarget      = False
+		self.move_index     = 0
 
 	def regionComplete(self, region):
 		center = region["center"]
@@ -74,40 +85,10 @@ class Location:
 		print("Insect out of bounds")
 
 	def nextState(self, insect):
-		currentLoc	= insect.currentLocation
-		nextLoc		= self.nextLocation(insect)
+		m = moves[self.move_index]
+		self.move_index += 1
 
-		if VERBOSE:
-			print('Moving to location: %s - %s' % (nextLoc[0], nextLoc[1]))
-
-		if nextLoc == (-1, -1):
-			return { 'State': 'STOP' }
-
-		self.hasTarget = True
-
-		dist = self.distance(currentLoc, nextLoc)
-		angl = self.angle(insect.angle, currentLoc, nextLoc)
-
-		(x, y) = (dist * math.sin(math.radians(angl)), dist * math.cos(math.radians(angl)))
-
-		if abs(x) > 10:
-			new_angl = - insect.angle
-
-			if abs(new_angl) > 10:
-				return { 'State': 'ROTATE', 'Angle': 0 }
-
-			if x > 0:
-				return { 'State': 'FORWARD', 'Distance': abs(x) }
-			else:
-				return { 'State': 'REVERSE', 'Distance': abs(x) }
-
-		if abs(insect.angle - 90) > 10:
-			return { 'State': 'ROTATE', 'Angle': 90 }
-
-		if y > 0:
-			return { 'State': 'FORWARD', 'Distance': abs(y) }
-		else:
-			return { 'State': 'REVERSE', 'Distance': abs(y) }
+		return m
 
 	def nextLocation(self, insect):
 		currentLoc = insect.currentLocation
@@ -151,6 +132,6 @@ class Location:
 	def angle(self, angle, location_current, location_new):
 		delta = (location_new[0] - location_current[0], location_new[1] - location_current[1])
 
-		x = math.degrees(np.arctan2(delta[0], delta[1])) - angle
+		x = math.degrees(np.arctan2(delta[1], delta[0]))
 
 		return x
