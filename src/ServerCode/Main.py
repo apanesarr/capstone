@@ -18,7 +18,7 @@ insects         = []
 
 loc_service = Location(measurements)
 
-VERBOSE = True
+VERBOSE = False
 
 print("Initialization complete")
 
@@ -26,6 +26,19 @@ print("Starting surveying")
 
 def randomize(value):
     return value + random.randint(-Parameters.RANDOM_RANGE, Parameters.RANDOM_RANGE)
+
+# def saveMeasurements():
+#    fo = open("foo.txt", "rw+")#
+#
+#    for m in measurements:
+#        x = m['Location'][0]
+#        y = m['Location'][1]
+#        t = m['Temperature']
+#        h = m['Humidity']#
+#
+#        fo.write('%s,%s,%s,%s' % (x, y, t, h))
+#
+#    fo.close()
 
 async def run(websocket, path):
     async for message in websocket:
@@ -70,6 +83,8 @@ async def run(websocket, path):
                     'Humidity': randomize(message['Data']['Humidity'])
                 })
 
+                # saveMeasurements()
+
                 if VERBOSE:
                     print('Measurement taken at: ')
                     print(ins.currentLocation)
@@ -77,7 +92,6 @@ async def run(websocket, path):
                 next = loc_service.nextState(ins)
                 targ = ins.target
 
-                ins.hasTarget = True
 
                 output = json.dumps({
                     'MessageType': 'M',
@@ -112,8 +126,6 @@ async def run(websocket, path):
                 else:
                     next = loc_service.nextState(ins)
                     targ = ins.target
-
-                    ins.hasTarget = True
 
                     output = json.dumps({
                         'MessageType': 'M',
