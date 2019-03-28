@@ -77,7 +77,7 @@ void processMsg (){
       settings.state = REVERSE;
       settings.target = comms.message["Data"]["Distance"].as<float>();
       motor.setMotor(settings);
-      calcXY(settings.target);
+      calcXY((-1) * settings.target);
       Serial.print("Motor Ready ------->>>>");
       Serial.println(motor.ready);
 
