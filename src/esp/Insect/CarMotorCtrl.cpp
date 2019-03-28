@@ -51,7 +51,7 @@ void MotorControl::setMotor(motorSettings_t newSettings)
 {
   settings.state = newSettings.state;
   ready = FALSE;
-
+  int current;
   switch (settings.state) {
     case FORWARD:
       settings.target = newSettings.target;
@@ -65,13 +65,12 @@ void MotorControl::setMotor(motorSettings_t newSettings)
       break;
     case ROTATE:
       settings.target = newSettings.target;
-      if ((settings.target - imu.getYaw()) > 0) {
-          settings.state = LEFT;
-          left();
+      current = imu.getYaw();
+      if ((((( (int) settings.target - current) + 360) % 360) - 180) > 0 ) {
+          right();
       }
       else {
-          settings.state = RIGHT;
-          right();
+          left();
       }
       break;
     case STOP:
@@ -101,15 +100,7 @@ int MotorControl::update()
       ready = TRUE;
       break;
 
-    case LEFT:
-      if (imu.getYaw() == settings.target) {
-        stop();
-        ready = TRUE;
-        yaw = imu.getYaw();
-      }
-      break;
-
-    case RIGHT:
+    case ROTATE:
       if (imu.getYaw() == settings.target) {
         stop();
         ready = TRUE;

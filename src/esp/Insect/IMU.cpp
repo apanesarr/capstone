@@ -77,7 +77,7 @@ int IMU::update()
         return -1;
     }
     dt = millis() - dt;
-    float gyroZ = sensor.getGyroZ_rads();
+    float gyroZ = -sensor.getGyroZ_rads();
     yaw += gyroZ * dt / 1000;
     dt = millis();
     return 1;
@@ -86,7 +86,7 @@ int IMU::update()
 int IMU::getYaw()
 {
     int angle = (int) (round(yaw * 180 / M_PI) + 360) % 360;
-    //Serial.println(angle);
+    Serial.println(angle);
     return angle;
 }
 
