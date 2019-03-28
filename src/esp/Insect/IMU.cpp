@@ -83,9 +83,10 @@ int IMU::update()
     return 1;
 }
 
-double IMU::getYaw()
+int IMU::getYaw()
 {
-    Serial.println(yaw * 57.3);
-    return yaw * 180 / M_PI;
+    int angle = (int) (round(yaw * 180 / M_PI) + 360) % 360;
+    //Serial.println(angle);
+    return angle;
 }
 
