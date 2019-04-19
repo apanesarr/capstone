@@ -53,11 +53,42 @@ class Location:
 
 		print("Insect out of bounds")
 
-	def nextState(self, insect):
-		m = moves[self.move_index]
-		self.move_index += 1
 
-		return m
+	def nextState(self, insect):
+		currentLoc	= insect.currentLocation
+		nextLoc		= self.nextLocation(insect)
+
+		if VERBOSE:
+			print('Moving to location: %s - %s' % (nextLoc[0], nextLoc[1]))
+
+		if nextLoc == (-1, -1):
+			return { 'State': 'STOP' }
+
+		self.hasTarget = True
+
+		dist = self.distance(currentLoc, nextLoc)
+		angl = self.angle(insect.angle, currentLoc, nextLoc)
+
+		(x, y) = (dist * math.sin(math.radians(angl)), dist * math.cos(math.radians(angl)))
+
+		if abs(x) > 10:
+			new_angl = - insect.angle
+
+			if abs(new_angl) > 10:
+				return { 'State': 'ROTATE', 'Angle': 0 }
+
+			if x > 0:
+				return { 'State': 'FORWARD', 'Distance': abs(x) }
+			else:
+				return { 'State': 'REVERSE', 'Distance': abs(x) }
+
+		if abs(insect.angle - 90) > 10:
+			return { 'State': 'ROTATE', 'Angle': 90 }
+
+		if y > 0:
+			return { 'State': 'FORWARD', 'Distance': abs(y) }
+		else:
+			return { 'State': 'REVERSE', 'Distance': abs(y) }
 
 	def nextLocation(self, insect):
 		currentLoc = insect.currentLocation

@@ -9,11 +9,11 @@ COLOR_UPPER = (64, 255, 255)
 
 # Parameters - Geometry #
 
-NUM_REGIONS_X = 10
-NUM_REGIONS_Y = 10
+NUM_REGIONS_X = 5
+NUM_REGIONS_Y = 5
 
-REGION_SIZE_X = 10
-REGION_SIZE_Y = 10
+REGION_SIZE_X = 30
+REGION_SIZE_Y = 30
 
 # Parameters - Serial I/O #
 
