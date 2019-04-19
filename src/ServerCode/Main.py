@@ -67,7 +67,11 @@ async def run(websocket, path):
                     'Humidity': randomize(message['Data']['Humidity'])
                 })
 
-                loc_service.measurementMade(message['Data']['X'], message['Data']['Y'])
+                data = message['Data']
+                X    = data['X']
+                Y    = data['Y']
+
+                loc_service.measurementMade(X, Y)
 
                 if VERBOSE:
                     print('Measurement taken at: ')

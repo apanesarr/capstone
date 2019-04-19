@@ -93,7 +93,7 @@ class Location:
 		i = math.floor(i)
 		j = math.floor(j)
 
-		return ((i + 0.5) * Parameters.REGION_SIZE_X), ((j + 0.5) * Parameters.REGION_SIZE_Y)
+		return (i, j)
 
 	# A measurement has been made so mark it as visited
 	def measurementMade(self, x, y):

@@ -43,7 +43,7 @@ NUM_INSECTS         = 1
 
 # Parameters - WebSockets #
 
-SOCKET_HOST = '192.168.43.91'
+SOCKET_HOST = '172.20.10.9'
 SOCKET_PORT = 8095
 
 RANDOM_RANGE = 5
