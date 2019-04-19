@@ -27,19 +27,6 @@ print("Starting surveying")
 def randomize(value):
     return value + random.randint(-Parameters.RANDOM_RANGE, Parameters.RANDOM_RANGE)
 
-# def saveMeasurements():
-#    fo = open("foo.txt", "rw+")#
-#
-#    for m in measurements:
-#        x = m['Location'][0]
-#        y = m['Location'][1]
-#        t = m['Temperature']
-#        h = m['Humidity']#
-#
-#        fo.write('%s,%s,%s,%s' % (x, y, t, h))
-#
-#    fo.close()
-
 async def run(websocket, path):
     async for message in websocket:
         try:
@@ -83,7 +70,7 @@ async def run(websocket, path):
                     'Humidity': randomize(message['Data']['Humidity'])
                 })
 
-                # saveMeasurements()
+                loc_service.measurementMade(message['Data']['X'], message['Data']['Y'])
 
                 if VERBOSE:
                     print('Measurement taken at: ')
@@ -91,7 +78,6 @@ async def run(websocket, path):
 
                 next = loc_service.nextState(ins)
                 targ = ins.target
-
 
                 output = json.dumps({
                     'MessageType': 'M',

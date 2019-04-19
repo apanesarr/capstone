@@ -3,74 +3,41 @@ import math
 
 import Parameters
 
-regionSizeX = Parameters.REGION_SIZE_X
-regionSizeY = Parameters.REGION_SIZE_Y
-
 VISITED_STATUS_NEVER 		= 0
 VISITED_STATUS_DONE  		= 1
 VISITED_STATUS_IN_PROGRESS 	= 2
 
-NUM_REGIONS_X = Parameters.NUM_REGIONS_X
-NUM_REGIONS_Y = Parameters.NUM_REGIONS_Y
-
 VERBOSE = False
-
-moves = [
-	{'State': 'FORWARD', 'Distance': 400},
-	{'State': 'FORWARD', 'Distance': 400},
-	{'State': 'FORWARD', 'Distance': 400},
-	{'State': 'ROTATE', 'Angle': 90},
-	{'State': 'FORWARD', 'Distance': 400},
-	{'State': 'ROTATE', 'Angle': 180},
-	{'State': 'FORWARD', 'Distance': 400},
-]
 
 class Location:
 	def createRegions(self):
 		regions = []
 
-		# Create empty matrix
-		for i in range(0, NUM_REGIONS_X):
-			x = []
+		for i in range(0, Parameters.NUM_REGIONS_X):
+			regions.append([])
 
-			for j in range(0, NUM_REGIONS_Y):
-				x.append(0)
-
-			regions.append(x)
-
-		for i in range(0, NUM_REGIONS_X):
-			for j in range(0, NUM_REGIONS_Y):
-				region = { "visited": VISITED_STATUS_NEVER }
-
+			for j in range(0, Parameters.NUM_REGIONS_Y):
 				# Calculate center of region
-				x = (i + 0.5) * regionSizeX
-				y = (j + 0.5) * regionSizeY
+				x = (i + 0.5) * Parameters.REGION_SIZE_X
+				y = (j + 0.5) * Parameters.REGION_SIZE_Y
 
-				region["center"] = (x, y)
+				region = {
+					"visited": VISITED_STATUS_NEVER,
+					"center" : (x, y)
+				}
 
-				regions[i][j] = region
-
+				regions[i].append(region)
+		
 		return regions
 
 	def __init__(self, measurements):
-		self.regions 		= self.createRegions()
 		self.measurements	= measurements
-		self.hasTarget      = False
-		self.move_index     = 0
-
-	def regionComplete(self, region):
-		center = region["center"]
-
-		filtered = [item for item in self.measurements if lambda x : center == round(x["location"])]
-
-		return len(filtered) > 0
+		self.regions 		= self.createRegions()
 
 	def surveyComplete(self):
-		for i in range(0, self.regions.shape[0]):
-			for j in range(0, self.regions.shape[1]):
-				r = self.regions[i][j]
-
-				if not self.regionComplete(r):
+		for r in self.regions:
+			for s in r:
+				if not s["visited"] == VISITED_STATUS_DONE
 					return False
 
 		return True
@@ -115,11 +82,20 @@ class Location:
 		return min['center']
 
 	def roundToRegion(self, x, y):
-		return (round(x), round(y))			
+		if (x < 0) or (y < 0):
+			return (-1, -1)
+
+		i = (x / Parameters.REGION_SIZE_X)
+		j = (y / Parameters.REGION_SIZE_Y)
+
+		i = math.floor(i)
+		j = math.floor(j)
+
+		return ((i + 0.5) * Parameters.REGION_SIZE_X), ((j + 0.5) * Parameters.REGION_SIZE_Y)
 
 	# A measurement has been made so mark it as visited
 	def measurementMade(self, x, y):
-		(x, y) = self.roundToRegion(x, y)
+		x, y = self.roundToRegion(x, y)
 
 		self.regions[x][y]["visited"] = VISITED_STATUS_DONE
 
