@@ -6,6 +6,7 @@ import Parameters
 VISITED_STATUS_NEVER 		= 0
 VISITED_STATUS_DONE  		= 1
 VISITED_STATUS_IN_PROGRESS 	= 2
+VISITED_STATUS_DEAD         = 3
 
 VERBOSE = False
 
@@ -39,9 +40,10 @@ class Location:
 			for s in r:
 				if not (s["visited"] == VISITED_STATUS_DONE):
 					return False
-		
+
 		return True
 
+	# TODO - move this somewhere else
 	def getInsect(self, insects, insectId):
 		for insect in insects:
 			if insect.insectId == insectId:

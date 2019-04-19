@@ -2,8 +2,6 @@ import time
 import queue
 import threading
 
-import Reader
-import Writer
 import Parameters
 class Insect:
     def __init__(self, insectId):
@@ -12,6 +10,7 @@ class Insect:
         self.hasTarget       = False
         self.target          = (-1, -1)
         self.angle           = 0
+        self.lastUpdateTime  = time.time() # To kill dead targets
 
     def arrived(self):
         x1 = self.currentLocation[0]

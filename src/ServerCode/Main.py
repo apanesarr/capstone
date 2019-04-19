@@ -18,7 +18,7 @@ insects         = []
 
 loc_service = Location(measurements)
 
-VERBOSE = False
+VERBOSE = True
 
 print("Initialization complete")
 
@@ -39,10 +39,7 @@ async def run(websocket, path):
             recipientId = message['RecipientId']
 
             if messageType == 'I':
-                ins = Insect(recipientId)
-                insects.append(ins)
-
-                next = loc_service.nextState(ins)
+                insects.append(Insect(recipientId))
 
                 output = json.dumps({
                     'MessageType': 'I',
@@ -77,7 +74,6 @@ async def run(websocket, path):
                     print(ins.currentLocation)
 
                 next = loc_service.nextState(ins)
-                targ = ins.target
 
                 output = json.dumps({
                     'MessageType': 'M',
@@ -111,7 +107,6 @@ async def run(websocket, path):
 
                 else:
                     next = loc_service.nextState(ins)
-                    targ = ins.target
 
                     output = json.dumps({
                         'MessageType': 'M',
@@ -125,6 +120,8 @@ async def run(websocket, path):
                         print("Sent: %s" % output)
             
             elif messageType == 'SIM':
+                print("Recieveing SIM message")
+
                 await websocket.send(json.dumps({
                     'MessageType': 'SIM',
                     'Data': measurements
