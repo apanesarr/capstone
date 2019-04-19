@@ -37,9 +37,9 @@ class Location:
 	def surveyComplete(self):
 		for r in self.regions:
 			for s in r:
-				if not s["visited"] == VISITED_STATUS_DONE
+				if not (s["visited"] == VISITED_STATUS_DONE):
 					return False
-
+		
 		return True
 
 	def getInsect(self, insects, insectId):

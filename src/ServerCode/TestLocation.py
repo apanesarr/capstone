@@ -15,7 +15,12 @@ def test_round_to_region_three():
 
 	assert(loc.roundToRegion(-1.0, -50) == (-1.0, -1.0))
 
-def test_round_to_region_three():
+def test_round_to_region_four():
 	loc = Location([])
 
-	assert(loc.roundToRegion(80.0, 26.8) == (85.0, 25.0))
+	assert(loc.roundToRegion(81.0, 26.8) == (85.0, 25.0))
+
+def test_round_to_region_five():
+	loc = Location([])
+
+	assert(loc.roundToRegion(79.9, 24.8) == (75.0, 25.0))
