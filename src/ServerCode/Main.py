@@ -18,7 +18,7 @@ insects         = []
 
 loc_service = Location(measurements)
 
-VERBOSE = True
+VERBOSE = False
 
 print("Initialization complete")
 
@@ -67,6 +67,9 @@ async def run(websocket, path):
                     'Humidity': randomize(message['Data']['Humidity'])
                 })
 
+                print("Measurements:")
+                print(measurements)
+
                 data = message['Data']
                 X    = data['X']
                 Y    = data['Y']
@@ -97,6 +100,8 @@ async def run(websocket, path):
                 ins.angle = message['Data']['Angle']
 
                 if ins.arrived():
+                    ins.hasTarget = False
+
                     output = json.dumps({
                         'MessageType': 'T',
                         'RecipientId': recipientId,

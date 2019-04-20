@@ -28,7 +28,9 @@ class Location:
 				}
 
 				regions[i].append(region)
-		
+
+		regions[0][0]["visited"] = VISITED_STATUS_IN_PROGRESS
+
 		return regions
 
 	def __init__(self, measurements):
@@ -56,7 +58,11 @@ class Location:
 
 	def nextState(self, insect):
 		currentLoc	= insect.currentLocation
-		nextLoc		= self.nextLocation(insect)
+
+		if insect.hasTarget:
+			nextLoc = insect.target
+		else:
+			nextLoc		= self.nextLocation(insect)
 
 		if VERBOSE:
 			print('Moving to location: %s - %s' % (nextLoc[0], nextLoc[1]))
@@ -64,12 +70,13 @@ class Location:
 		if nextLoc == (-1, -1):
 			return { 'State': 'STOP' }
 
-		self.hasTarget = True
+		insect.hasTarget = True
+		insect.target    = nextLoc
 
 		dist = self.distance(currentLoc, nextLoc)
 		angl = self.angle(insect.angle, currentLoc, nextLoc)
 
-		(x, y) = (dist * math.sin(math.radians(angl)), dist * math.cos(math.radians(angl)))
+		(x, y) = (dist * math.cos(math.radians(angl)), dist * math.sin(math.radians(angl)))
 
 		if abs(x) > 10:
 			new_angl = - insect.angle
@@ -114,23 +121,21 @@ class Location:
 		
 		return min['center']
 
-	def roundToRegion(self, x, y):
-		if (x < 0) or (y < 0):
-			return (-1, -1)
+	def getRegionAt(self, x, y):
+		for i in self.regions:
+			for j in i:
+				center = j["center"]
 
-		i = (x / Parameters.REGION_SIZE_X)
-		j = (y / Parameters.REGION_SIZE_Y)
+				if (abs(x - center[0]) <= (Parameters.REGION_SIZE_X / 2)) and (abs(y - center[1]) <= (Parameters.REGION_SIZE_Y / 2)):
+					return j
 
-		i = math.floor(i)
-		j = math.floor(j)
-
-		return (i, j)
+		return None
 
 	# A measurement has been made so mark it as visited
 	def measurementMade(self, x, y):
-		x, y = self.roundToRegion(x, y)
+		region = self.getRegionAt(x, y)
 
-		self.regions[x][y]["visited"] = VISITED_STATUS_DONE
+		region["visited"] = VISITED_STATUS_DONE
 
 	def distance(self, p1, p2):
 		deltaX = abs(p1[0] - p2[0])
