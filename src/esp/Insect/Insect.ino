@@ -48,11 +48,6 @@ void loop() {
 
 void processMsg (){
   if (comms.message["MessageType"]=="I"){
-    // comms.message["MessageType"] = "R";
-    // comms.message["Data"]["X"] = currentPos.X;
-    // comms.message["Data"]["Y"] = currentPos.Y;
-    // comms.message["Data"]["Angle"] = currentPos.Angle;
-    // comms.transmit();
     Serial.println("recived I");
   }
   else if (comms.message["MessageType"] == "M"){
@@ -82,34 +77,20 @@ void processMsg (){
       settings.state = REVERSE;
       settings.target = comms.message["Data"]["Distance"].as<float>();
       motor.setMotor(settings);
-      calcXY(settings.target);
+      calcXY((-1) * settings.target);
       Serial.print("Motor Ready ------->>>>");
       Serial.println(motor.ready);
 
     }
 
-    else if (state=="LEFT"){
-      settings.state = LEFT;
+    else if (state=="ROTATE"){
+      settings.state = ROTATE;
       String test = comms.message["Data"]["Angle"];
       settings.target = comms.message["Data"]["Angle"].as<float>();
       Serial.print(test);
       Serial.print("-------->>");
       Serial.println(settings.target);
       motor.setMotor(settings);
-      calcAngle(-1*settings.target);
-      Serial.print("Motor Ready ------->>>>");
-      Serial.println(motor.ready);
-    }
-
-    else if (state=="RIGHT"){
-      settings.state = RIGHT;
-      settings.target = comms.message["Data"]["Angle"].as<float>();
-      String test = comms.message["Data"]["Angle"];
-      Serial.print(test);
-      Serial.print("-------->>");
-      Serial.println(settings.target);
-      motor.setMotor(settings);
-      calcAngle( settings.target);
       Serial.print("Motor Ready ------->>>>");
       Serial.println(motor.ready);
     }
@@ -127,7 +108,7 @@ void processMsg (){
     comms.message["Data"]["Humidity"] = dht.getHumidity();
     comms.message["Data"]["X"] = currentPos.X;
     comms.message["Data"]["Y"] = currentPos.Y;
-    comms.message["Data"]["Angle"] = currentPos.Angle;
+    comms.message["Data"]["Angle"] = motor.yaw;
     comms.transmit();
   }
   else {
@@ -141,33 +122,26 @@ void sendReady(){
     comms.messageReady["RecipientId"] = REC_ID;
     comms.messageReady["Data"]["X"] =  currentPos.X;
     comms.messageReady["Data"]["Y"] = currentPos.Y;
-    comms.messageReady["Data"]["Angle"] = currentPos.Angle;
+    comms.messageReady["Data"]["Angle"] = motor.yaw;
     comms.transmitReady();
 }
 
 void calcXY(float distance){
-  if(0<=currentPos.Angle || currentPos.Angle < 45 || 135<= currentPos.Angle
-      || currentPos.Angle < 180 || 180<= currentPos.Angle
-      || currentPos.Angle < 225 || 315<= currentPos.Angle
-      || currentPos.Angle <360){
-     currentPos.X += distance*cos( currentPos.Angle*PI/180 );
-     currentPos.Y += distance*sin( currentPos.Angle*PI/180  );
-     // Serial.println(cos(currentPos.Angle));
-     // Serial.println(sin(currentPos.Angle));
+  if(0<=motor.yaw || motor.yaw < 45 || 135<= motor.yaw
+      || motor.yaw < 180 || 180<= motor.yaw
+      || motor.yaw < 225 || 315<= motor.yaw
+      || motor.yaw <360){
+     currentPos.X += distance*cos( motor.yaw*PI/180 );
+     currentPos.Y += distance*sin( motor.yaw*PI/180  );
+     // Serial.println(cos(motor.yaw));
+     // Serial.println(sin(motor.yaw));
 
   }
-  else if (45<= currentPos.Angle || currentPos.Angle < 135
-      || 225<= currentPos.Angle || currentPos.Angle < 315){
-    currentPos.Y += distance*cos( currentPos.Angle *PI/180  );
-     currentPos.X += distance*sin( currentPos.Angle *PI/180  );
-     // Serial.println(cos(currentPos.Angle));
-     // Serial.println(sin(currentPos.Angle));
+  else if (45<= motor.yaw || motor.yaw < 135
+      || 225<= motor.yaw || motor.yaw < 315){
+    currentPos.Y += distance*cos( motor.yaw *PI/180  );
+     currentPos.X += distance*sin( motor.yaw *PI/180  );
+     // Serial.println(cos(motor.yaw));
+     // Serial.println(sin(motor.yaw));
   }
-}
-
-void calcAngle(float angle){
-  // currentPos,Angle 
-  currentPos.Angle += angle;
-  currentPos.Angle = currentPos.Angle ;
-  // currentPos.Angle += angle;
 }

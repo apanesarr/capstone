@@ -62,6 +62,7 @@
 enum motorState_e {
   FORWARD,
   REVERSE,
+  ROTATE,
   LEFT,
   RIGHT,
   STOP
@@ -98,6 +99,7 @@ class MotorControl
   public:
     MotorControl();
     void setMotor(motorSettings_t newSettings);
+    int yaw;
     int update();
     void init();
     bool ready;

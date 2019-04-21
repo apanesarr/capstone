@@ -20,7 +20,7 @@ class IMU {
         IMU() : sensor(Wire, I2C_ADDR_IMU) {};
         void init();
         int update();
-        double getYaw();
+        int getYaw();
         void calibrateMag();
     private:
         MPU9250 sensor;

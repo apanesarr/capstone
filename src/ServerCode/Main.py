@@ -10,17 +10,22 @@ import asyncio
 import websockets
 import json
 
+import random
+
 measurements    = []                    # List of recieved measurement data
 recieved        = []                    # List of recieved messages
 insects         = []
 
 loc_service = Location(measurements)
 
-VERBOSE = True
+VERBOSE = False
 
 print("Initialization complete")
 
 print("Starting surveying")
+
+def randomize(value):
+    return value + random.randint(-Parameters.RANDOM_RANGE, Parameters.RANDOM_RANGE)
 
 async def run(websocket, path):
     async for message in websocket:
@@ -34,10 +39,7 @@ async def run(websocket, path):
             recipientId = message['RecipientId']
 
             if messageType == 'I':
-                ins = Insect(recipientId)
-                insects.append(ins)
-
-                next = loc_service.nextState(ins)
+                insects.append(Insect(recipientId))
 
                 output = json.dumps({
                     'MessageType': 'I',
@@ -61,18 +63,24 @@ async def run(websocket, path):
 
                 measurements.append({
                     'Location': ins.currentLocation,
-                    'Temperature': message['Data']['Temperature'],
-                    'Humidity': message['Data']['Humidity']
+                    'Temperature': randomize(message['Data']['Temperature']),
+                    'Humidity': randomize(message['Data']['Humidity'])
                 })
+
+                print("Measurements:")
+                print(measurements)
+
+                data = message['Data']
+                X    = data['X']
+                Y    = data['Y']
+
+                loc_service.measurementMade(X, Y)
 
                 if VERBOSE:
                     print('Measurement taken at: ')
                     print(ins.currentLocation)
 
                 next = loc_service.nextState(ins)
-                targ = ins.target
-
-                ins.hasTarget = True
 
                 output = json.dumps({
                     'MessageType': 'M',
@@ -92,6 +100,8 @@ async def run(websocket, path):
                 ins.angle = message['Data']['Angle']
 
                 if ins.arrived():
+                    ins.hasTarget = False
+
                     output = json.dumps({
                         'MessageType': 'T',
                         'RecipientId': recipientId,
@@ -106,9 +116,6 @@ async def run(websocket, path):
 
                 else:
                     next = loc_service.nextState(ins)
-                    targ = ins.target
-
-                    ins.hasTarget = True
 
                     output = json.dumps({
                         'MessageType': 'M',
@@ -122,6 +129,8 @@ async def run(websocket, path):
                         print("Sent: %s" % output)
             
             elif messageType == 'SIM':
+                print("Recieveing SIM message")
+
                 await websocket.send(json.dumps({
                     'MessageType': 'SIM',
                     'Data': measurements
