@@ -7,8 +7,6 @@ Created on Tue Mar 26 11:56:00 2019
 import seaborn as sns
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 import csv
 
 #fig = plt.figure()
