@@ -6,11 +6,7 @@
 #define MAX_WIFI_INIT_RETRY 100
 #define WIFI_RETRY_DELAY 500
 
-#ifdef GORDO_1
-#define REC_ID 0
-#else
 #define REC_ID 1
-#endif
 
 class Comms {
 	public:
