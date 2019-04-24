@@ -3,10 +3,11 @@ import queue
 import threading
 
 import Parameters
+
 class Insect:
     def __init__(self, insectId):
         self.insectId        = insectId
-        self.currentLocation = (0, 0)
+        self.currentLocation = Parameters.INSECT_START_LOCS[insectId]
         self.hasTarget       = False
         self.target          = (-1, -1)
         self.angle           = 0

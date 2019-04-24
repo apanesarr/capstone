@@ -41,6 +41,8 @@ RES_TEMP            = "T"
 
 NUM_INSECTS         = 1
 
+INSECT_START_LOCS   = [(0, 0), (0, 1)]
+
 # Parameters - WebSockets #
 
 SOCKET_HOST = '192.168.2.17'

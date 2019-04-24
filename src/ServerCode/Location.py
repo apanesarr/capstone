@@ -29,7 +29,9 @@ class Location:
 
 				regions[i].append(region)
 
+        # TODO - make this better
 		regions[0][0]["visited"] = VISITED_STATUS_IN_PROGRESS
+        regions[0][1]["visited"] = VISITED_STATUS_IN_PROGRESS
 
 		return regions
 
@@ -118,7 +120,7 @@ class Location:
 		min['visited'] = VISITED_STATUS_IN_PROGRESS
 
 		insect.target = min['center']
-		
+
 		return min['center']
 
 	def getRegionAt(self, x, y):
