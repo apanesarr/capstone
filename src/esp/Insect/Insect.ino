@@ -1,12 +1,17 @@
+#define GORDO_2
+
 #include <ESP8266WiFi.h>
+#include "Comms.h"
 #include <math.h>
 #include "ArduinoJson.h"
 #include "CarMotorCtrl.h"
-#include "Comms.h"
+
 #include "DHTesp.h"
 
 #define DHTPIN 16
 #define DHTTYPE 11
+
+#define ROOM_HUMIDITY 45
 
 pos currentPos;
 MotorControl motor;
@@ -104,8 +109,16 @@ void processMsg (){
     sendReady();
   }
   else if (comms.message["MessageType"] == "T"){
+
+#ifdef GORDO_1
+#error
     comms.message["Data"]["Temperature"] = dht.getTemperature();
     comms.message["Data"]["Humidity"] = dht.getHumidity();
+#else
+    comms.message["Data"]["Temperature"] = motor.imu.getTemp();
+    comms.message["Data"]["Humidity"] = ROOM_HUMIDITY;
+#endif
+
     comms.message["Data"]["X"] = currentPos.X;
     comms.message["Data"]["Y"] = currentPos.Y;
     comms.message["Data"]["Angle"] = motor.yaw;

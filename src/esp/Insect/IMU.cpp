@@ -37,6 +37,10 @@ void IMU::init() {
     yaw = 0;
 }
 
+float IMU::getTemp() {
+    return sensor.getTemperature_C();
+};
+
 void IMU::calibrateMag() {
 
     /* Ensure indicator LED is off */

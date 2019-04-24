@@ -99,12 +99,12 @@ class MotorControl
   public:
     MotorControl();
     void setMotor(motorSettings_t newSettings);
+    IMU imu;
     int yaw;
     int update();
     void init();
     bool ready;
   private:
-    IMU imu;
     motorSettings_t settings;
     pwrCtrl_t pwrCtrl;
     void forward();
