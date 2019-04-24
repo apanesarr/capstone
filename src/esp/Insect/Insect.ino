@@ -1,10 +1,9 @@
-#define GORDO_2
-
 #include <ESP8266WiFi.h>
 #include "Comms.h"
 #include <math.h>
 #include "ArduinoJson.h"
 #include "CarMotorCtrl.h"
+#include "parameters.h"
 
 #include "DHTesp.h"
 
@@ -111,7 +110,6 @@ void processMsg (){
   else if (comms.message["MessageType"] == "T"){
 
 #ifdef GORDO_1
-#error
     comms.message["Data"]["Temperature"] = dht.getTemperature();
     comms.message["Data"]["Humidity"] = dht.getHumidity();
 #else

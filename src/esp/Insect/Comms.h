@@ -2,11 +2,10 @@
 #include <math.h>
 #include "WebSocketClient.h"
 #include "ArduinoJson.h"
+#include "parameters.h"
 
 #define MAX_WIFI_INIT_RETRY 100
 #define WIFI_RETRY_DELAY 500
-
-#define REC_ID 1
 
 class Comms {
 	public:
