@@ -4,6 +4,7 @@
 #include "MotorPatterns.h"
 #include <ESP8266WiFi.h>
 #include "IMU.h"
+#include "parameters.h"
 
 // #define DEBUG
 
@@ -43,18 +44,7 @@
 #define LS_ENC_A 13
 //#define LS_ENC_B 4
 
-/* Rover wheel radius in mm */
-#define RADIUS_SCALE_FACTOR 1.15
-#define WHEEL_RADIUS 31 * RADIUS_SCALE_FACTOR
-#define TICKS_PER_REV 166.5
-
 #define MOTOR_PWR 593
-#define RIGHT_OFFSET 0.89
-/* Rate in ms for compensating between motors */
-#define UPDATE_RATE 50
-#define P_GAIN 7
-#define D_GAIN 3
-#define MAX_OFFSET 39
 
 #define TRUE 1
 #define FALSE 0
@@ -99,12 +89,12 @@ class MotorControl
   public:
     MotorControl();
     void setMotor(motorSettings_t newSettings);
+    IMU imu;
     int yaw;
     int update();
     void init();
     bool ready;
   private:
-    IMU imu;
     motorSettings_t settings;
     pwrCtrl_t pwrCtrl;
     void forward();

@@ -19,6 +19,7 @@ class IMU {
     public:
         IMU() : sensor(Wire, I2C_ADDR_IMU) {};
         void init();
+        float getTemp();
         int update();
         int getYaw();
         void calibrateMag();
