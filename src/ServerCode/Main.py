@@ -18,7 +18,9 @@ insects         = []
 
 loc_service = Location(measurements)
 
-VERBOSE = False
+fakeMeasurements = [{'Location': (0, 0), 'Temperature': 22, 'Humidity': 45}, {'Location': (0, 0), 'Temperature': 22, 'Humidity': 45}, {'Location': (0, 0), 'Temperature': 22, 'Humidity': 45}]
+
+VERBOSE = True
 
 print("Initialization complete")
 
@@ -133,7 +135,7 @@ async def run(websocket, path):
 
                 await websocket.send(json.dumps({
                     'MessageType': 'SIM',
-                    'Data': measurements
+                    'Data': measurements # fakeMeasurements
                 }))
 
         except Exception as e:

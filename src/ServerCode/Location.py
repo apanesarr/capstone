@@ -31,7 +31,7 @@ class Location:
 
         # TODO - make this better
 		regions[0][0]["visited"] = VISITED_STATUS_IN_PROGRESS
-        regions[0][1]["visited"] = VISITED_STATUS_IN_PROGRESS
+		regions[0][1]["visited"] = VISITED_STATUS_IN_PROGRESS
 
 		return regions
 
@@ -106,6 +106,7 @@ class Location:
 		if (currentLoc == (-1, -1)):
 			return (-1, -1)
 
+		# TODO - Get default location for the insect
 		min = self.regions[0][0]
 		minD = 9999999
 
