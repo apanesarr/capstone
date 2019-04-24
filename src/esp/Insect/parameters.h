@@ -1,7 +1,7 @@
 #ifndef parameters_h
 #define parameters_h
 
-#define GORDO_1
+#define GORDO_2
 
 /**
  *  GORDO 1 SETTINGS
@@ -15,7 +15,7 @@
 #define TICKS_PER_REV 166.5
 
 /* Power offset for right motor */
-#define RIGHT_OFFSET 0.89
+#define RIGHT_OFFSET 1
 
 /* Rate in ms for compensating between motors */
 #define UPDATE_RATE 50
@@ -35,7 +35,7 @@
 #define TICKS_PER_REV 166.5
 
 /* Power offset for right motor */
-#define RIGHT_OFFSET 0.89
+#define RIGHT_OFFSET 0.86
 
 /* Rate in ms for compensating between motors */
 #define UPDATE_RATE 50
