@@ -107,7 +107,7 @@ class Location:
 			return (-1, -1)
 
 		# TODO - Get default location for the insect
-		min = self.regions[0][0]
+		min = insect.defaultLocation 
 		minD = 9999999
 
 		for r in self.regions:
