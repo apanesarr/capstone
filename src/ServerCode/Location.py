@@ -104,7 +104,7 @@ class Location:
 		if (currentLoc == (-1, -1)):
 			return (-1, -1)
 
-		min  = self.getRegionAt(insect.defaultLocation)
+		min  = self.getRegionAt(insect.defaultLocation[0], insect.defaultLocation[1])
 		minD = 9999999
 
 		for r in self.regions:
