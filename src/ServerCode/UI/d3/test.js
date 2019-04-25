@@ -1,16 +1,38 @@
-var exampleSocket = new WebSocket("wss://echo.websocket.org" );
-
+var exampleSocket = new WebSocket("ws://169.254.93.115:8095" );
+console.log("Setup")
 exampleSocket.onopen = function (event){
     setInterval(function(){ 
-        exampleSocket.send("Hello")
+        exampleSocket.send(JSON.stringify({
+            "MessageType": "SIM",
+            "RecipientId": "-1",
+            "Data": ""}))
     }, 500);
 }
 
 exampleSocket.onmessage = function (event) {
-    console.log(event.data);
-    // update data
+    // console.log(event.data);
 
+    let x = JSON.parse(event.data)["Data"]
+
+    console.log(x)
+    // update data
+    data = []
+    x.forEach(function (elem){
+        data.push({
+            x : elem.Location[0],
+            y : elem.Location[1],
+            value : elem.Temperature,
+            hum : elem.Humidity
+        })
+    })
+
+    console.log(data)
     // rerender graph
+
+    d3.select("svg").remove();
+    draw()
+    // svg.transition()
+    // .duration(500)
 
     
   }
@@ -30,8 +52,7 @@ var svg = d3.select('#temp')
 
 data = []
 
-
-
+function draw (){
 var myGroups = d3.map(data, function(d){return d.x;}).keys()
 var myVars = d3.map(data, function(d){return d.y;}).keys()
 
@@ -130,3 +151,6 @@ svg.append("text")
         .style("fill", "grey")
         .style("max-width", 400)
         .text("A short description of the take-away message of this chart.");
+
+}
+
