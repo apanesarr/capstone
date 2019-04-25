@@ -8,8 +8,6 @@ VISITED_STATUS_DONE          = 1
 VISITED_STATUS_IN_PROGRESS     = 2
 VISITED_STATUS_DEAD         = 3
 
-VERBOSE = False
-
 class Location:
     def createRegions(self):
         regions = []
@@ -66,8 +64,8 @@ class Location:
         else:
             nextLoc        = self.nextLocation(insect)
 
-        if VERBOSE:
-            print('Moving to location: %s - %s' % (nextLoc[0], nextLoc[1]))
+		if Parameters.VERBOSE:
+			print('Moving to location: %s - %s' % (nextLoc[0], nextLoc[1]))
 
         if nextLoc == (-1, -1):
             return { 'State': 'STOP' }
@@ -106,8 +104,9 @@ class Location:
         if (currentLoc == (-1, -1)):
             return (-1, -1)
 
-        min = self.regions[0][0]
-        minD = 9999999
+		min  = self.getRegionAt(insect.defaultLocation)
+		minD = 9999999
+
 
         for r in self.regions:
             for j in r:
