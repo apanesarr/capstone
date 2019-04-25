@@ -469,3 +469,5 @@ dmypy.json
 *.fdb_latexmk
 *.toc
 *.out
+
+Notes\.md

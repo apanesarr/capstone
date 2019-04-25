@@ -104,8 +104,7 @@ class Location:
 		if (currentLoc == (-1, -1)):
 			return (-1, -1)
 
-		# TODO - Get default location for the insect
-		min = insect.defaultLocation 
+		min  = self.getRegionAt(insect.defaultLocation)
 		minD = 9999999
 
 		for r in self.regions:

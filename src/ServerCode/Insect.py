@@ -7,8 +7,8 @@ import Parameters
 class Insect:
     def __init__(self, insectId):
         self.insectId        = insectId
-        self.currentLocation = Parameters.INSECT_START_LOCS[insectId]
-        self.defaultLocation = self.currentLocation
+        self.defaultLocation = Parameters.INSECT_START_LOCS[insectId]
+        self.currentLocation = self.defaultLocation
         self.hasTarget       = False
         self.target          = (-1, -1)
         self.angle           = 0
