@@ -62,10 +62,9 @@ class Location:
         if insect.hasTarget:
             nextLoc = insect.target
         else:
-            nextLoc        = self.nextLocation(insect)
-
-		if Parameters.VERBOSE:
-			print('Moving to location: %s - %s' % (nextLoc[0], nextLoc[1]))
+            nextLoc = self.nextLocation(insect)
+        if Parameters.VERBOSE:
+            print('Moving to location: %s - %s' % (nextLoc[0], nextLoc[1]))
 
         if nextLoc == (-1, -1):
             return { 'State': 'STOP' }
@@ -103,9 +102,8 @@ class Location:
         # If we're out of bounds... screw it, it's game over for this insect
         if (currentLoc == (-1, -1)):
             return (-1, -1)
-
-		min  = self.getRegionAt(insect.defaultLocation[0], insect.defaultLocation[1])
-		minD = 9999999
+        min  = self.getRegionAt(insect.defaultLocation[0], insect.defaultLocation[1])
+        minD = 9999999
 
 
         for r in self.regions:
