@@ -1,4 +1,4 @@
-var exampleSocket = new WebSocket("ws://169.254.93.115:8095" );
+var exampleSocket = new WebSocket("ws://169.254.28.56:8095" );
 console.log("Setup")
 exampleSocket.onopen = function (event){
     setInterval(function(){ 
