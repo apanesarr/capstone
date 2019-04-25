@@ -8,8 +8,6 @@ VISITED_STATUS_DONE  		= 1
 VISITED_STATUS_IN_PROGRESS 	= 2
 VISITED_STATUS_DEAD         = 3
 
-VERBOSE = False
-
 class Location:
 	def createRegions(self):
 		regions = []
@@ -29,7 +27,7 @@ class Location:
 
 				regions[i].append(region)
 
-        # TODO - make this better
+    # TODO - make this better
 		regions[0][0]["visited"] = VISITED_STATUS_IN_PROGRESS
 		regions[0][1]["visited"] = VISITED_STATUS_IN_PROGRESS
 
@@ -66,7 +64,7 @@ class Location:
 		else:
 			nextLoc		= self.nextLocation(insect)
 
-		if VERBOSE:
+		if Parameters.VERBOSE:
 			print('Moving to location: %s - %s' % (nextLoc[0], nextLoc[1]))
 
 		if nextLoc == (-1, -1):

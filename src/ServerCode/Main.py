@@ -20,8 +20,6 @@ loc_service = Location(measurements)
 
 fakeMeasurements = [{'Location': (0, 0), 'Temperature': 22, 'Humidity': 45}, {'Location': (0, 0), 'Temperature': 22, 'Humidity': 45}, {'Location': (0, 0), 'Temperature': 22, 'Humidity': 45}]
 
-VERBOSE = True
-
 print("Initialization complete")
 
 print("Starting surveying")
@@ -32,7 +30,7 @@ def randomize(value):
 async def run(websocket, path):
     async for message in websocket:
         try:
-            if VERBOSE:
+            if Parameters.VERBOSE:
                 print("Recieved: %s" % message)
 
             message = json.loads(message)
@@ -54,7 +52,7 @@ async def run(websocket, path):
                 print('Insect added with ID: ')
                 print(recipientId)
 
-                if VERBOSE:
+                if Parameters.VERBOSE:
                     print("Sent: %s" % output)
 
             elif messageType == 'T':
@@ -78,7 +76,7 @@ async def run(websocket, path):
 
                 loc_service.measurementMade(X, Y)
 
-                if VERBOSE:
+                if Parameters.VERBOSE:
                     print('Measurement taken at: ')
                     print(ins.currentLocation)
 
@@ -92,7 +90,7 @@ async def run(websocket, path):
 
                 await websocket.send(output)
 
-                if VERBOSE:
+                if Parameters.VERBOSE:
                     print("Sent: %s" % output)
             
             elif messageType == 'R':
@@ -112,7 +110,7 @@ async def run(websocket, path):
 
                     await websocket.send(output)
 
-                    if VERBOSE:
+                    if Parameters.VERBOSE:
                         print("Sent: ")
                         print(output)
 
@@ -127,7 +125,7 @@ async def run(websocket, path):
 
                     await websocket.send(output)
 
-                    if VERBOSE:
+                    if Parameters.VERBOSE:
                         print("Sent: %s" % output)
             
             elif messageType == 'SIM':
