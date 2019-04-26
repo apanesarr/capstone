@@ -13,14 +13,32 @@ exampleSocket.onopen = function (event) {
 exampleSocket.onmessage = function (event) {
     let x = JSON.parse(event.data)["Data"]
     console.log(x)
+    let y = data.filter(function(elem){
+        return elem.value
+    })
+
     data.forEach(function (elem) {
         x.forEach(function (nex) {
-            if ( Math.floor(nex.Location[0] / 400) == elem.x && Math.floor(nex.Location[1] / 600)  == elem.y) {
+            if ( Math.floor(nex.Location[0] / 400) == elem.x && Math.floor(nex.Location[1] / 400)  == elem.y) {
+                if (nex.Location[0]  == 600 && nex.Location[1] == 600){
+                    data[1].value = 23
+                }
                 elem.value = nex.Temperature
             }
+            
         })
     })
-    
+    // console.log(y)
+    // if (y[0].x == 0 && y[0].y == 1 && y.length == 1){
+    //     if (y[0].value == 0){
+    //         data[1] = {
+    //             x : 0,
+    //             y : 1,
+    //             value : 23
+    //         }
+    //     }
+    // }
+
     d3.select("svg").remove();
     draw();
 }
