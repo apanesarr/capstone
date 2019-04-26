@@ -24,7 +24,7 @@ package "Client" {
 [Insect Communication Interface] --> [Insect Motor Control]
 [Insect Communication Interface] --> [Insect Tracking/Positioning]
 
-[Server Communication Interface] --> R.F.
-R.F. --> [Insect Communication Interface]
+[Server Communication Interface] --> Wifi
+Wifi --> [Insect Communication Interface]
 
 @enduml
