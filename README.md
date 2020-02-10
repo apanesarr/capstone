@@ -12,6 +12,8 @@ Nishanth Balamohan
 
 ##### Demo: https://www.youtube.com/watch?v=XuM2vm01Y_w
 
+[![Demo capstone](https://img.youtube.com/vi/XuM2vm01Y_w/2.jpg)](https://www.youtube.com/watch?v=XuM2vm01Y_w)
+
 ## Installation
 
 ### 1. Server Code
